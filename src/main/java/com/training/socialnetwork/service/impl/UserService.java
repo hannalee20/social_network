@@ -14,11 +14,20 @@ public class UserService implements IUserService {
 	private UserRepository userRepository;
 	
 	@Override
-	public UserEntity createAccount(UserEntity userEntity) {
+	public UserEntity createUser(UserEntity userEntity) {
 		if(userRepository.findByUsername(userEntity.getUsername()) != null){
 			return null;
 		}
 		return userRepository.save(userEntity);
+	}
+
+	@Override
+	public boolean loginUser(String username, String password) {
+		UserEntity userEntity = userRepository.getUserLogin(username, password);
+		if(userEntity != null) {
+			return true;
+		}
+		return false;
 	}
 
 }
