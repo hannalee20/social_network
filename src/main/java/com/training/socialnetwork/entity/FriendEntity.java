@@ -20,12 +20,12 @@ public class FriendEntity {
 	private int friendId;
 	
 	@ManyToOne
-	@JoinColumn(name = "accountId")
-	private AccountEntity accountEntity1;
+	@JoinColumn(name = "userId1")
+	private UserEntity userEntity1;
 	
 	@ManyToOne
-	@JoinColumn(name = "accountId")
-	private AccountEntity accountEntity2;
+	@JoinColumn(name = "userId2")
+	private UserEntity userEntity2;
 	
 	@Column
 	private int status;
@@ -43,21 +43,21 @@ public class FriendEntity {
 	public void setFriendId(int friendId) {
 		this.friendId = friendId;
 	}
-
-	public AccountEntity getAccountEntity1() {
-		return accountEntity1;
+	
+	public UserEntity getUserEntity1() {
+		return userEntity1;
 	}
 
-	public void setAccountEntity1(AccountEntity accountEntity1) {
-		this.accountEntity1 = accountEntity1;
+	public void setUserEntity1(UserEntity userEntity1) {
+		this.userEntity1 = userEntity1;
 	}
 
-	public AccountEntity getAccountEntity2() {
-		return accountEntity2;
+	public UserEntity getUserEntity2() {
+		return userEntity2;
 	}
 
-	public void setAccountEntity2(AccountEntity accountEntity2) {
-		this.accountEntity2 = accountEntity2;
+	public void setUserEntity2(UserEntity userEntity2) {
+		this.userEntity2 = userEntity2;
 	}
 
 	public int getStatus() {

@@ -20,8 +20,8 @@ public class CommentEntity {
 	private int commentId;
 	
 	@ManyToOne
-	@JoinColumn(name = "accountId")
-	private AccountEntity accountEntity;
+	@JoinColumn(name = "userId")
+	private UserEntity userEntity;
 	
 	@ManyToOne
 	@JoinColumn(name = "postId")
@@ -47,12 +47,12 @@ public class CommentEntity {
 		this.commentId = commentId;
 	}
 
-	public AccountEntity getAccountEntity() {
-		return accountEntity;
+	public UserEntity getUserEntity() {
+		return userEntity;
 	}
 
-	public void setAccountEntity(AccountEntity accountEntity) {
-		this.accountEntity = accountEntity;
+	public void setUserEntity(UserEntity userEntity) {
+		this.userEntity = userEntity;
 	}
 
 	public PostEntity getPostEntity() {

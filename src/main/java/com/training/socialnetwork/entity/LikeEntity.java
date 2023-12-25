@@ -24,8 +24,8 @@ public class LikeEntity {
 	private PostEntity postEntity;
 	
 	@ManyToOne 
-	@JoinColumn(name = "accountId")
-	private AccountEntity accountEntity;
+	@JoinColumn(name = "userId")
+	private UserEntity userEntity;
 	
 	@Column
 	private Date createDate;
@@ -52,12 +52,12 @@ public class LikeEntity {
 		this.postEntity = postEntity;
 	}
 
-	public AccountEntity getAccountEntity() {
-		return accountEntity;
+	public UserEntity getUserEntity() {
+		return userEntity;
 	}
 
-	public void setAccountEntity(AccountEntity accountEntity) {
-		this.accountEntity = accountEntity;
+	public void setUserEntity(UserEntity userEntity) {
+		this.userEntity = userEntity;
 	}
 
 	public Date getCreateDate() {

@@ -20,8 +20,8 @@ public class PostEntity {
 	private int postId;
 	
 	@ManyToOne
-	@JoinColumn(name = "accountId")
-	private AccountEntity accountEntity;
+	@JoinColumn(name = "userId")
+	private UserEntity userEntity;
 	
 	@Column
 	private String text;
@@ -43,12 +43,12 @@ public class PostEntity {
 		this.postId = postId;
 	}
 
-	public AccountEntity getAccountEntity() {
-		return accountEntity;
+	public UserEntity getUserEntity() {
+		return userEntity;
 	}
 
-	public void setAccountEntity(AccountEntity accountEntity) {
-		this.accountEntity = accountEntity;
+	public void setUserEntity(UserEntity userEntity) {
+		this.userEntity = userEntity;
 	}
 
 	public String getText() {

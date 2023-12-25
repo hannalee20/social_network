@@ -23,6 +23,10 @@ public class PhotoEntity {
 	@JoinColumn(name = "postId")
 	private PostEntity postEntity;
 	
+	@ManyToOne
+	@JoinColumn(name = "userId")
+	private UserEntity userEntity;
+	
 	@Column
 	private String name;
 	
@@ -52,6 +56,14 @@ public class PhotoEntity {
 
 	public void setPostEntity(PostEntity postEntity) {
 		this.postEntity = postEntity;
+	}
+
+	public UserEntity getUserEntity() {
+		return userEntity;
+	}
+
+	public void setUserEntity(UserEntity userEntity) {
+		this.userEntity = userEntity;
 	}
 
 	public String getName() {

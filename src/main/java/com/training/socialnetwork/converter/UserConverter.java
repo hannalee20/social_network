@@ -2,14 +2,14 @@ package com.training.socialnetwork.converter;
 
 import org.springframework.stereotype.Component;
 
-import com.training.socialnetwork.dto.AccountDTO;
+import com.training.socialnetwork.dto.UserDTO;
 import com.training.socialnetwork.entity.AccountEntity;
 
 @Component
-public class AccountConverter {
+public class UserConverter {
 
-	public AccountDTO toDto(AccountEntity accountEntity) {
-		AccountDTO result = new AccountDTO();
+	public UserDTO toDto(AccountEntity accountEntity) {
+		UserDTO result = new UserDTO();
 		result.setAccountId(accountEntity.getAccountId());
 		result.setUsername(accountEntity.getUsername());
 		result.setPassword(accountEntity.getPassword());
