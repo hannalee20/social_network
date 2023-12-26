@@ -1,6 +1,9 @@
 package com.training.socialnetwork.service.impl;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.training.socialnetwork.entity.UserEntity;
@@ -18,6 +21,9 @@ public class UserService implements IUserService {
 		if(userRepository.findByUsername(userEntity.getUsername()) != null){
 			return null;
 		}
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(16);
+		String encryptPassword = encoder.encode(userEntity.getPassword());
+		userEntity.setPassword(encryptPassword);
 		return userRepository.save(userEntity);
 	}
 
@@ -28,6 +34,18 @@ public class UserService implements IUserService {
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public void updateInfo(UserEntity userEntity) {
+		userRepository.save(userEntity);
+	}
+
+	@Override
+	public UserEntity getInfo(int userId) {
+		Optional<UserEntity> optional = userRepository.findById(userId);
+		UserEntity userEntity = optional.get();
+		return userEntity;
 	}
 
 }
