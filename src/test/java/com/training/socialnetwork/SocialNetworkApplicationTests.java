@@ -1,4 +1,4 @@
-package com.socialnetwork;
+package com.training.socialnetwork;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

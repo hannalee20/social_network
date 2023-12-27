@@ -29,8 +29,10 @@ public class UserService implements IUserService {
 
 	@Override
 	public boolean loginUser(String username, String password) {
-		UserEntity userEntity = userRepository.getUserLogin(username, password);
-		if(userEntity != null) {
+		UserEntity userEntity = userRepository.findByUsername(username);
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(16);
+		String encryptPassword = encoder.encode(userEntity.getPassword());
+		if(userEntity != null && userEntity.getPassword().equals(encryptPassword)) {
 			return true;
 		}
 		return false;
