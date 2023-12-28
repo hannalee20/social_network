@@ -7,7 +7,7 @@ public interface IUserService {
 	
 	boolean loginUser(String username, String password);
 	
-	void updateInfo(UserEntity userEntity);
+	boolean updateInfo(UserEntity userEntity);
 	
 	public UserEntity getInfo(int userId);
 }

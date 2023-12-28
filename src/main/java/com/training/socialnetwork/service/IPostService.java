@@ -13,5 +13,7 @@ public interface IPostService {
 	public PostEntity getPost(int postId);
 	
 	public void updatePost(PostEntity postEntity, int postId);
+	
+	public void deletePost(int postId);
 
 }

@@ -40,4 +40,9 @@ public class PostService implements IPostService{
 		postRepository.save(postEntity);
 	}
 
+	@Override
+	public void deletePost(int postId) {
+		postRepository.deleteById(postId);
+	}
+
 }

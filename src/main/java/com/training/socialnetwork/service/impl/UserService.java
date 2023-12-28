@@ -16,31 +16,35 @@ public class UserService implements IUserService {
 	@Autowired
 	private UserRepository userRepository;
 	
+	@Autowired
+	private BCryptPasswordEncoder bCryptPasswordEncoder;
+	
 	@Override
 	public UserEntity createUser(UserEntity userEntity) {
 		if(userRepository.findByUsername(userEntity.getUsername()) != null){
 			return null;
 		}
-		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(16);
-		String encryptPassword = encoder.encode(userEntity.getPassword());
-		userEntity.setPassword(encryptPassword);
+		userEntity.setPassword(bCryptPasswordEncoder.encode(userEntity.getPassword()));
+		userEntity.setRole(1);
 		return userRepository.save(userEntity);
 	}
 
 	@Override
 	public boolean loginUser(String username, String password) {
 		UserEntity userEntity = userRepository.findByUsername(username);
-		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(16);
-		String encryptPassword = encoder.encode(userEntity.getPassword());
-		if(userEntity != null && userEntity.getPassword().equals(encryptPassword)) {
+		if(userEntity != null && userEntity.getPassword().equals(bCryptPasswordEncoder.encode(userEntity.getPassword()))) {
 			return true;
 		}
 		return false;
 	}
 
 	@Override
-	public void updateInfo(UserEntity userEntity) {
-		userRepository.save(userEntity);
+	public boolean updateInfo(UserEntity userEntity) {
+		if(userRepository.findById(userEntity.getUserId()) != null) {
+			userRepository.save(userEntity);
+			return true;
+		}
+		return false;
 	}
 
 	@Override
