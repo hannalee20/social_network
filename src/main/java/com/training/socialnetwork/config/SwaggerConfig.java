@@ -13,21 +13,14 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 public class SwaggerConfig {
 
-@Bean
-public Docket booksApi() {
-    return new Docket(DocumentationType.SWAGGER_2)
-            .apiInfo(apiInfo())
-            .select()
-            .apis(RequestHandlerSelectors.any())
-            .paths(PathSelectors.regex("/.*"))
-            .build();
-}
+	@Bean
+	public Docket booksApi() {
+		return new Docket(DocumentationType.SWAGGER_2).apiInfo(apiInfo()).select().apis(RequestHandlerSelectors.any())
+				.paths(PathSelectors.regex("/.*")).build();
+	}
 
-private ApiInfo apiInfo() {
-    return new ApiInfoBuilder()
-            .title("blah")
-            .description("blah.")
-            .termsOfServiceUrl("http://www.blah.com.au")
-            .build();
-}
+	private ApiInfo apiInfo() {
+		return new ApiInfoBuilder().title("blah").description("blah.").termsOfServiceUrl("http://www.blah.com.au")
+				.build();
+	}
 }
