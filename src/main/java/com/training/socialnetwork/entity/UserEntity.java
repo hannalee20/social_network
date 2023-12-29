@@ -1,12 +1,14 @@
 package com.training.socialnetwork.entity;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -51,6 +53,9 @@ public class UserEntity {
 	private String about;
 	
 	@Column
+	private String avatarUrl;
+	
+	@Column
 	private int role;
 	
 	@Column 
@@ -58,6 +63,21 @@ public class UserEntity {
 	
 	@Column
 	private Date updateDate;
+	
+	@OneToMany(mappedBy = "userId1")
+	private List<FriendEntity> userId1;
+	
+	@OneToMany(mappedBy = "userId2")
+	private List<FriendEntity> userId2;
+	
+	@OneToMany(mappedBy = "userId")
+	private List<PostEntity> postList;
+	
+	@OneToMany(mappedBy = "userId")
+	private List<LikeEntity> likeList;
+	
+	@OneToMany(mappedBy = "userId")
+	private List<CommentEntity> commentList;
 
 	public int getUserId() {
 		return userId;
@@ -155,6 +175,14 @@ public class UserEntity {
 		this.about = about;
 	}
 
+	public String getAvatarUrl() {
+		return avatarUrl;
+	}
+
+	public void setAvatarUrl(String avatarUrl) {
+		this.avatarUrl = avatarUrl;
+	}
+
 	public int getRole() {
 		return role;
 	}
@@ -177,6 +205,46 @@ public class UserEntity {
 
 	public void setUpdateDate(Date updateDate) {
 		this.updateDate = updateDate;
+	}
+
+	public List<FriendEntity> getUserId1() {
+		return userId1;
+	}
+
+	public void setUserId1(List<FriendEntity> userId1) {
+		this.userId1 = userId1;
+	}
+
+	public List<FriendEntity> getUserId2() {
+		return userId2;
+	}
+
+	public void setUserId2(List<FriendEntity> userId2) {
+		this.userId2 = userId2;
+	}
+
+	public List<PostEntity> getPostList() {
+		return postList;
+	}
+
+	public void setPostList(List<PostEntity> postList) {
+		this.postList = postList;
+	}
+
+	public List<LikeEntity> getLikeList() {
+		return likeList;
+	}
+
+	public void setLikeList(List<LikeEntity> likeList) {
+		this.likeList = likeList;
+	}
+
+	public List<CommentEntity> getCommentList() {
+		return commentList;
+	}
+
+	public void setCommentList(List<CommentEntity> commentList) {
+		this.commentList = commentList;
 	}
 	
 }
