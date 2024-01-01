@@ -11,25 +11,21 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-
 @Entity
-@Table(name = "comment")
-public class CommentEntity {
+@Table(name = "likes")
+public class Like {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int commentId;
-	
-	@ManyToOne
-	@JoinColumn(name = "userId")
-	private UserEntity userEntity;
+	private int likeId;
 	
 	@ManyToOne
 	@JoinColumn(name = "postId")
-	private PostEntity postEntity;
+	private Post post;
 	
-	@Column
-	private String content;
+	@ManyToOne 
+	@JoinColumn(name = "userId")
+	private User user;
 	
 	@Column
 	private Date createDate;
@@ -40,36 +36,28 @@ public class CommentEntity {
 	@Column
 	private int deleteFlg;
 
-	public int getCommentId() {
-		return commentId;
+	public int getLikeId() {
+		return likeId;
 	}
 
-	public void setCommentId(int commentId) {
-		this.commentId = commentId;
+	public void setLikeId(int likeId) {
+		this.likeId = likeId;
 	}
 
-	public UserEntity getUserEntity() {
-		return userEntity;
+	public Post getPost() {
+		return post;
 	}
 
-	public void setUserEntity(UserEntity userEntity) {
-		this.userEntity = userEntity;
+	public void setPost(Post post) {
+		this.post = post;
 	}
 
-	public PostEntity getPostEntity() {
-		return postEntity;
+	public User getUser() {
+		return user;
 	}
 
-	public void setPostEntity(PostEntity postEntity) {
-		this.postEntity = postEntity;
-	}
-
-	public String getContent() {
-		return content;
-	}
-
-	public void setContent(String content) {
-		this.content = content;
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 	public Date getCreateDate() {

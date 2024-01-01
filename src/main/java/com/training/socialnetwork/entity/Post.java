@@ -1,6 +1,7 @@
 package com.training.socialnetwork.entity;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,22 +10,26 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "post")
-public class PostEntity {
+public class Post {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int postId;
 	
-	@ManyToOne
+	@ManyToOne(targetEntity = User.class)
 	@JoinColumn(name = "userId")
-	private UserEntity userEntity;
+	private User user;
 	
 	@Column
-	private String text;
+	private String content;
+	
+	@Column
+	private String photoUrl;
 	
 	@Column
 	private Date createDate;
@@ -34,6 +39,12 @@ public class PostEntity {
 	
 	@Column
 	private int deleteFlg;
+	
+	@OneToMany(targetEntity = Like.class, mappedBy = "post")
+	private List<Like> likeList;
+	
+	@OneToMany(targetEntity = Comment.class, mappedBy = "post")
+	private List<Comment> commentList;
 
 	public int getPostId() {
 		return postId;
@@ -43,20 +54,28 @@ public class PostEntity {
 		this.postId = postId;
 	}
 
-	public UserEntity getUserEntity() {
-		return userEntity;
+	public User getUser() {
+		return user;
 	}
 
-	public void setUserEntity(UserEntity userEntity) {
-		this.userEntity = userEntity;
+	public void setUser(User user) {
+		this.user = user;
 	}
 
-	public String getText() {
-		return text;
+	public String getContent() {
+		return content;
 	}
 
-	public void setText(String text) {
-		this.text = text;
+	public void setContent(String content) {
+		this.content = content;
+	}
+
+	public String getPhotoUrl() {
+		return photoUrl;
+	}
+
+	public void setPhotoUrl(String photoUrl) {
+		this.photoUrl = photoUrl;
 	}
 
 	public Date getCreateDate() {
@@ -81,6 +100,22 @@ public class PostEntity {
 
 	public void setDeleteFlg(int deleteFlg) {
 		this.deleteFlg = deleteFlg;
+	}
+
+	public List<Like> getLikeList() {
+		return likeList;
+	}
+
+	public void setLikeList(List<Like> likeList) {
+		this.likeList = likeList;
+	}
+
+	public List<Comment> getCommentList() {
+		return commentList;
+	}
+
+	public void setCommentList(List<Comment> commentList) {
+		this.commentList = commentList;
 	}
 	
 }

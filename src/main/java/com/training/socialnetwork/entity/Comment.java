@@ -11,21 +11,28 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+
 @Entity
-@Table(name = "likes")
-public class LikeEntity {
+@Table(name = "comment")
+public class Comment {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int likeId;
+	private int commentId;
 	
-	@ManyToOne
+	@ManyToOne(targetEntity = Post.class)
 	@JoinColumn(name = "postId")
-	private PostEntity postEntity;
+	private Post post;
 	
 	@ManyToOne 
 	@JoinColumn(name = "userId")
-	private UserEntity userEntity;
+	private User user;
+	
+	@Column
+	private String content;
+	
+	@Column
+	private String photoUrl;
 	
 	@Column
 	private Date createDate;
@@ -36,28 +43,44 @@ public class LikeEntity {
 	@Column
 	private int deleteFlg;
 
-	public int getLikeId() {
-		return likeId;
+	public int getCommentId() {
+		return commentId;
 	}
 
-	public void setLikeId(int likeId) {
-		this.likeId = likeId;
+	public void setCommentId(int commentId) {
+		this.commentId = commentId;
 	}
 
-	public PostEntity getPostEntity() {
-		return postEntity;
+	public User getUser() {
+		return user;
 	}
 
-	public void setPostEntity(PostEntity postEntity) {
-		this.postEntity = postEntity;
+	public void setUser(User user) {
+		this.user = user;
 	}
 
-	public UserEntity getUserEntity() {
-		return userEntity;
+	public Post getPost() {
+		return post;
 	}
 
-	public void setUserEntity(UserEntity userEntity) {
-		this.userEntity = userEntity;
+	public void setPost(Post post) {
+		this.post = post;
+	}
+
+	public String getContent() {
+		return content;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
+	}
+
+	public String getPhotoUrl() {
+		return photoUrl;
+	}
+
+	public void setPhotoUrl(String photoUrl) {
+		this.photoUrl = photoUrl;
 	}
 
 	public Date getCreateDate() {

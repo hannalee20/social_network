@@ -1,12 +1,14 @@
 package com.training.socialnetwork.service.impl;
 
+import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.training.socialnetwork.entity.UserEntity;
+import com.training.socialnetwork.entity.User;
 import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.IUserService;
 
@@ -20,38 +22,44 @@ public class UserService implements IUserService {
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 	
 	@Override
-	public UserEntity createUser(UserEntity userEntity) {
-		if(userRepository.findByUsername(userEntity.getUsername()) != null){
+	public User createUser(User user) {
+		if(userRepository.findByUsername(user.getUsername()) != null){
 			return null;
 		}
-		userEntity.setPassword(bCryptPasswordEncoder.encode(userEntity.getPassword()));
-		userEntity.setRole(1);
-		return userRepository.save(userEntity);
+		user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+		user.setRole(1);
+		user.setCreateDate(new Date());
+		user.setUpdateDate(new Date());
+		return userRepository.save(user);
 	}
 
 	@Override
 	public boolean loginUser(String username, String password) {
-		UserEntity userEntity = userRepository.findByUsername(username);
-		if(userEntity != null && userEntity.getPassword().equals(bCryptPasswordEncoder.encode(userEntity.getPassword()))) {
+		User user = userRepository.findByUsername(username);
+		if(user != null && user.getPassword().equals(bCryptPasswordEncoder.encode(user.getPassword()))) {
 			return true;
 		}
 		return false;
 	}
 
 	@Override
-	public boolean updateInfo(UserEntity userEntity) {
-		if(userRepository.findById(userEntity.getUserId()) != null) {
-			userRepository.save(userEntity);
+	public boolean updateInfo(User user) {
+		if(userRepository.findById(user.getUserId()) != null) {
+			userRepository.save(user);
 			return true;
 		}
 		return false;
 	}
 
 	@Override
-	public UserEntity getInfo(int userId) {
-		Optional<UserEntity> optional = userRepository.findById(userId);
-		UserEntity userEntity = optional.get();
-		return userEntity;
+	public User getInfo(int userId) {
+		Optional<User> optional = userRepository.findById(userId);
+		User user = optional.get();
+		return user;
 	}
 
+	@Override
+	public List<User> searchUser(int userId, String keyword) {
+		return userRepository.findAllUserLike(userId, keyword);
+	}
 }

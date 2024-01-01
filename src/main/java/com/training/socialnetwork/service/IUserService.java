@@ -1,13 +1,18 @@
 package com.training.socialnetwork.service;
 
-import com.training.socialnetwork.entity.UserEntity;
+import java.util.List;
+
+import com.training.socialnetwork.entity.User;
 
 public interface IUserService {
-	UserEntity createUser(UserEntity userEntity);
+	
+	User createUser(User user);
 	
 	boolean loginUser(String username, String password);
 	
-	boolean updateInfo(UserEntity userEntity);
+	boolean updateInfo(User user);
 	
-	public UserEntity getInfo(int userId);
+	User getInfo(int userId);
+	
+	List<User> searchUser(int userId, String keyword);
 }

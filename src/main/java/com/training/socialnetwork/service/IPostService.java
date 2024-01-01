@@ -2,18 +2,18 @@ package com.training.socialnetwork.service;
 
 import java.util.List;
 
-import com.training.socialnetwork.entity.PostEntity;
+import com.training.socialnetwork.entity.Post;
 
 public interface IPostService {
 	
-	public void createPost(PostEntity postEntity);
+	void createPost(Post post);
 	
-	public List<PostEntity> getListPost();
+	List<Post> getAllPosts(int userId);
 	
-	public PostEntity getPost(int postId);
+	Post getPost(int postId);
 	
-	public void updatePost(PostEntity postEntity, int postId);
+	boolean updatePost(Post post, int userId);
 	
-	public void deletePost(int postId);
+	boolean deletePost(int postId, int userId);
 
 }

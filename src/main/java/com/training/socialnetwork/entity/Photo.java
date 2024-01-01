@@ -13,7 +13,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "photo")
-public class PhotoEntity {
+public class Photo {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,11 +21,11 @@ public class PhotoEntity {
 	
 	@ManyToOne
 	@JoinColumn(name = "postId")
-	private PostEntity postEntity;
+	private Post post;
 	
 	@ManyToOne
 	@JoinColumn(name = "userId")
-	private UserEntity userEntity;
+	private User user;
 	
 	@Column
 	private String name;
@@ -50,20 +50,20 @@ public class PhotoEntity {
 		this.photoId = photoId;
 	}
 
-	public PostEntity getPostEntity() {
-		return postEntity;
+	public Post getPost() {
+		return post;
 	}
 
-	public void setPostEntity(PostEntity postEntity) {
-		this.postEntity = postEntity;
+	public void setPost(Post post) {
+		this.post = post;
 	}
 
-	public UserEntity getUserEntity() {
-		return userEntity;
+	public User getUser() {
+		return user;
 	}
 
-	public void setUserEntity(UserEntity userEntity) {
-		this.userEntity = userEntity;
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 	public String getName() {

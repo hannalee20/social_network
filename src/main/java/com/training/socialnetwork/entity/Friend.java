@@ -13,7 +13,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "friend")
-public class FriendEntity {
+public class Friend {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,11 +21,11 @@ public class FriendEntity {
 	
 	@ManyToOne
 	@JoinColumn(name = "userId1")
-	private UserEntity userEntity1;
+	private User user1;
 	
 	@ManyToOne
 	@JoinColumn(name = "userId2")
-	private UserEntity userEntity2;
+	private User user2;
 	
 	@Column
 	private int status;
@@ -44,20 +44,20 @@ public class FriendEntity {
 		this.friendId = friendId;
 	}
 	
-	public UserEntity getUserEntity1() {
-		return userEntity1;
+	public User getUser1() {
+		return user1;
 	}
 
-	public void setUserEntity1(UserEntity userEntity1) {
-		this.userEntity1 = userEntity1;
+	public void setUser1(User user1) {
+		this.user1 = user1;
 	}
 
-	public UserEntity getUserEntity2() {
-		return userEntity2;
+	public User getUser2() {
+		return user2;
 	}
 
-	public void setUserEntity2(UserEntity userEntity2) {
-		this.userEntity2 = userEntity2;
+	public void setUser2(User user2) {
+		this.user2 = user2;
 	}
 
 	public int getStatus() {

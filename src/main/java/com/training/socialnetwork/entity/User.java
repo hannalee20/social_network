@@ -13,7 +13,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "user")
-public class UserEntity {
+public class User {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -64,20 +64,20 @@ public class UserEntity {
 	@Column
 	private Date updateDate;
 	
-	@OneToMany(mappedBy = "userId1")
-	private List<FriendEntity> userId1;
+	@OneToMany(mappedBy = "user1")
+	private List<Friend> userId1;
 	
-	@OneToMany(mappedBy = "userId2")
-	private List<FriendEntity> userId2;
+	@OneToMany(mappedBy = "user2")
+	private List<Friend> userId2;
 	
-	@OneToMany(mappedBy = "userId")
-	private List<PostEntity> postList;
+	@OneToMany(mappedBy = "user")
+	private List<Post> postList;
 	
-	@OneToMany(mappedBy = "userId")
-	private List<LikeEntity> likeList;
+	@OneToMany(mappedBy = "user")
+	private List<Like> likeList;
 	
-	@OneToMany(mappedBy = "userId")
-	private List<CommentEntity> commentList;
+	@OneToMany(mappedBy = "user")
+	private List<Comment> commentList;
 
 	public int getUserId() {
 		return userId;
@@ -207,43 +207,43 @@ public class UserEntity {
 		this.updateDate = updateDate;
 	}
 
-	public List<FriendEntity> getUserId1() {
+	public List<Friend> getUserId1() {
 		return userId1;
 	}
 
-	public void setUserId1(List<FriendEntity> userId1) {
+	public void setUserId1(List<Friend> userId1) {
 		this.userId1 = userId1;
 	}
 
-	public List<FriendEntity> getUserId2() {
+	public List<Friend> getUserId2() {
 		return userId2;
 	}
 
-	public void setUserId2(List<FriendEntity> userId2) {
+	public void setUserId2(List<Friend> userId2) {
 		this.userId2 = userId2;
 	}
 
-	public List<PostEntity> getPostList() {
+	public List<Post> getPostList() {
 		return postList;
 	}
 
-	public void setPostList(List<PostEntity> postList) {
+	public void setPostList(List<Post> postList) {
 		this.postList = postList;
 	}
 
-	public List<LikeEntity> getLikeList() {
+	public List<Like> getLikeList() {
 		return likeList;
 	}
 
-	public void setLikeList(List<LikeEntity> likeList) {
+	public void setLikeList(List<Like> likeList) {
 		this.likeList = likeList;
 	}
 
-	public List<CommentEntity> getCommentList() {
+	public List<Comment> getCommentList() {
 		return commentList;
 	}
 
-	public void setCommentList(List<CommentEntity> commentList) {
+	public void setCommentList(List<Comment> commentList) {
 		this.commentList = commentList;
 	}
 	
