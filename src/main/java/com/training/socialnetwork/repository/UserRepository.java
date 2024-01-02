@@ -18,6 +18,6 @@ public interface UserRepository extends JpaRepository<User, Integer>{
 				"select u from User as u " + 
 				"where u.userId <> :userId " + 
 				"and (lower(u.username) like concat('%', :keyword, '%') " + 
-				"or lower(u.realName) like concat('%', :keyWord, '%')) ")
-	List<User> findAllUserLike(@Param(value = "userId") int userId, @Param(value = "keyWord") String keyword);
+				"or lower(u.realName) like concat('%', :keyword, '%')) ")
+	List<User> findAllUserLike(@Param(value = "userId") int userId, @Param(value = "keyword") String keyword);
 }

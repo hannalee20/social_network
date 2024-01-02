@@ -43,12 +43,20 @@ public class UserService implements IUserService {
 	}
 
 	@Override
-	public boolean updateInfo(User user) {
-		if(userRepository.findById(user.getUserId()) != null) {
-			userRepository.save(user);
-			return true;
+	public boolean updateInfo(User user, int userId) {
+		User userToUpdate = userRepository.findById(user.getUserId()).orElse(null);
+		User loggedInUser = userRepository.findById(userId).orElse(null);
+		
+		if(userToUpdate == null || loggedInUser == null || userToUpdate.getUserId() != loggedInUser.getUserId()) {
+			return false;
 		}
-		return false;
+		
+		user.setUsername(userToUpdate.getUsername());
+		user.setPassword(userToUpdate.getPassword());
+		user.setEmail(userToUpdate.getEmail());
+		user.setRole(userToUpdate.getRole());
+		
+		return userRepository.save(user) != null;
 	}
 
 	@Override

@@ -10,7 +10,7 @@ public interface IUserService {
 	
 	boolean loginUser(String username, String password);
 	
-	boolean updateInfo(User user);
+	boolean updateInfo(User user, int userId);
 	
 	User getInfo(int userId);
 	
