@@ -22,13 +22,13 @@ public class PostService implements IPostService{
 	private UserRepository userRepository;
 	
 	@Override
-	public void createPost(Post post) {
-		postRepository.save(post);
+	public boolean createPost(Post post) {
+		return postRepository.save(post) != null;
 	}
 
 	@Override
 	public List<Post> getAllPosts(int userId) {
-		List<Post> postList = postRepository.findAllByUserUserIdOrderByUpdateDateDesc(userId);
+		List<Post> postList = postRepository.findAllByUserIdOrderByUpdateDateDesc(userId);
 		postList.stream().peek(post ->{
 			List<Comment> commentList = post.getCommentList()
 					.stream()

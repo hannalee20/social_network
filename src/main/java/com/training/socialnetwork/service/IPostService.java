@@ -6,7 +6,7 @@ import com.training.socialnetwork.entity.Post;
 
 public interface IPostService {
 	
-	void createPost(Post post);
+	boolean createPost(Post post);
 	
 	List<Post> getAllPosts(int userId);
 	
