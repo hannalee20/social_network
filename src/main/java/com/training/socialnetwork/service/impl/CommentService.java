@@ -22,15 +22,15 @@ public class CommentService implements ICommentService{
 	private PostRepository postRepository;
 
 	@Override
-	public boolean createComment(Comment comment) {
+	public Comment createComment(Comment comment) {
 		Post post = postRepository.findById(comment.getPost().getPostId()).orElse(null);
 		User user = userRepository.findById(comment.getUser().getUserId()).orElse(null);
 		
 		if (post == null || user == null) {
-			return false;
+			return null;
 		}
 		
-		return commentRepository.save(comment) != null;
+		return commentRepository.save(comment);
 	}
 
 	@Override

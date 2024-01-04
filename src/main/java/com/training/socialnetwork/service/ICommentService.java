@@ -4,7 +4,7 @@ import com.training.socialnetwork.entity.Comment;
 
 public interface ICommentService {
 	
-	boolean createComment(Comment comment);
+	Comment createComment(Comment comment);
 	
 	boolean updateComment(Comment comment, int userId);
 

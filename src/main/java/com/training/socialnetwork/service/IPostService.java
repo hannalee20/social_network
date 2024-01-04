@@ -12,7 +12,7 @@ public interface IPostService {
 	
 	Post getPost(int postId);
 	
-	boolean updatePost(Post post, int userId);
+	Post updatePost(Post post, int userId);
 	
 	boolean deletePost(int postId, int userId);
 

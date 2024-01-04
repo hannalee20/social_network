@@ -65,7 +65,7 @@ public class UserController {
 		}
 	}
 	
-	@GetMapping(value = "/detaul/{userId}")
+	@GetMapping(value = "/detail/{userId}")
 	public ResponseEntity<Object> getUserInfo(@PathVariable(value = "userId") int userId) throws Exception {
 		User user = userService.getInfo(userId);
 		

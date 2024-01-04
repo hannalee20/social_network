@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.training.socialnetwork.entity.Comment;
 import com.training.socialnetwork.entity.Post;
@@ -13,6 +14,7 @@ import com.training.socialnetwork.repository.PostRepository;
 import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.IPostService;
 
+@Service
 public class PostService implements IPostService{
 
 	@Autowired
@@ -28,7 +30,7 @@ public class PostService implements IPostService{
 
 	@Override
 	public List<Post> getAllPosts(int userId) {
-		List<Post> postList = postRepository.findAllByUserIdOrderByUpdateDateDesc(userId);
+		List<Post> postList = postRepository.findAllByUserUserIdOrderByUpdateDateDesc(userId);
 		postList.stream().peek(post ->{
 			List<Comment> commentList = post.getCommentList()
 					.stream()
@@ -53,13 +55,13 @@ public class PostService implements IPostService{
 	}
 
 	@Override
-	public boolean updatePost(Post post, int userId) {
+	public Post updatePost(Post post, int userId) {
 		User user = userRepository.findById(post.getUser().getUserId()).orElse(null);
 		if(user.getUserId() != userId) {
-			return false;
+			return null;
 		}
 
-		return postRepository.save(post) != null;
+		return postRepository.save(post);
 	}
 
 	@Override
