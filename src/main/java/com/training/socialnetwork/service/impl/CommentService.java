@@ -1,6 +1,7 @@
 package com.training.socialnetwork.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.training.socialnetwork.entity.Comment;
 import com.training.socialnetwork.entity.Post;
@@ -10,6 +11,7 @@ import com.training.socialnetwork.repository.PostRepository;
 import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.ICommentService;
 
+@Service
 public class CommentService implements ICommentService{
 	
 	@Autowired

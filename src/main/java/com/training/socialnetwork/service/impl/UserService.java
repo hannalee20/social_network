@@ -4,13 +4,17 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.training.socialnetwork.dto.response.user.UserRegistedDto;
+import com.training.socialnetwork.dto.response.user.UserUpdatedDto;
 import com.training.socialnetwork.entity.User;
 import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.IUserService;
+import com.training.socialnetwork.util.contanst.Constant;
 
 @Service
 public class UserService implements IUserService {
@@ -19,27 +23,38 @@ public class UserService implements IUserService {
 	private UserRepository userRepository;
 	
 	@Autowired
+	private ModelMapper modelMapper;
+	
+	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 	
 	@Override
-	public User createUser(User user) {
+	public UserRegistedDto createUser(User user) throws Exception {
 		if(userRepository.findByUsername(user.getUsername()) != null){
-			return null;
+			throw new Exception(Constant.SERVER_ERROR);
 		}
 		user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-		user.setRole(1);
+		user.setRole(Constant.ROLE_USER);
 		user.setCreateDate(new Date());
 		user.setUpdateDate(new Date());
-		return userRepository.save(user);
+		
+		User userRegisted = userRepository.save(user);
+		
+		if (userRegisted != null) {
+			return modelMapper.map(userRegisted, UserRegistedDto.class);
+		}
+		
+		throw new Exception(Constant.SERVER_ERROR);
 	}
 
 	@Override
-	public boolean loginUser(String username, String password) {
+	public UserUpdatedDto loginUser(String username, String password) throws Exception {
 		User user = userRepository.findByUsername(username);
 		if(user != null && user.getPassword().equals(bCryptPasswordEncoder.encode(user.getPassword()))) {
-			return true;
+			return modelMapper.map(user, UserUpdatedDto.class);
 		}
-		return false;
+		
+		throw new Exception(Constant.SERVER_ERROR);
 	}
 
 	@Override

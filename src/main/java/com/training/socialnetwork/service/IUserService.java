@@ -2,13 +2,15 @@ package com.training.socialnetwork.service;
 
 import java.util.List;
 
+import com.training.socialnetwork.dto.response.user.UserRegistedDto;
+import com.training.socialnetwork.dto.response.user.UserUpdatedDto;
 import com.training.socialnetwork.entity.User;
 
 public interface IUserService {
 	
-	User createUser(User user);
+	UserRegistedDto createUser(User user) throws Exception ;
 	
-	boolean loginUser(String username, String password);
+	UserUpdatedDto loginUser(String username, String password) throws Exception;
 	
 	boolean updateInfo(User user, int userId);
 	

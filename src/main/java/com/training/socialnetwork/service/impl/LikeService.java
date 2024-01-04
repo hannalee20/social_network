@@ -1,6 +1,7 @@
 package com.training.socialnetwork.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.training.socialnetwork.entity.Like;
 import com.training.socialnetwork.entity.Post;
@@ -10,6 +11,7 @@ import com.training.socialnetwork.repository.PostRepository;
 import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.ILikeService;
 
+@Service
 public class LikeService implements ILikeService{
 
 	@Autowired

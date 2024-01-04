@@ -3,6 +3,7 @@ package com.training.socialnetwork.service.impl;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.training.socialnetwork.entity.Friend;
 import com.training.socialnetwork.entity.User;
@@ -10,6 +11,7 @@ import com.training.socialnetwork.repository.FriendRepository;
 import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.IFriendService;
 
+@Service
 public class FriendService implements IFriendService{
 	
 	@Autowired
