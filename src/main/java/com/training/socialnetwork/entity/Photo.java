@@ -18,27 +18,27 @@ public class Photo {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int photoId;
-	
+
 	@ManyToOne
 	@JoinColumn(name = "postId")
 	private Post post;
-	
+
 	@ManyToOne
 	@JoinColumn(name = "userId")
 	private User user;
-	
+
 	@Column
 	private String name;
-	
+
 	@Column
 	private int type;
-	
+
 	@Column
 	private Date createDate;
 
 	@Column
 	private Date updateDate;
-	
+
 	@Column
 	private int deleteFlg;
 
@@ -105,5 +105,5 @@ public class Photo {
 	public void setDeleteFlg(int deleteFlg) {
 		this.deleteFlg = deleteFlg;
 	}
-	
+
 }

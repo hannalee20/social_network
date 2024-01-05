@@ -2,19 +2,22 @@ package com.training.socialnetwork.service.impl;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.training.socialnetwork.dto.request.user.UserRegisterDto;
+import com.training.socialnetwork.dto.request.user.UserUpdateDto;
+import com.training.socialnetwork.dto.response.user.UserDetailDto;
+import com.training.socialnetwork.dto.response.user.UserLoggedInDto;
 import com.training.socialnetwork.dto.response.user.UserRegistedDto;
 import com.training.socialnetwork.dto.response.user.UserUpdatedDto;
 import com.training.socialnetwork.entity.User;
 import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.IUserService;
-import com.training.socialnetwork.util.contanst.Constant;
+import com.training.socialnetwork.util.constant.Constant;
 
 @Service
 public class UserService implements IUserService {
@@ -29,11 +32,14 @@ public class UserService implements IUserService {
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 	
 	@Override
-	public UserRegistedDto createUser(User user) throws Exception {
-		if(userRepository.findByUsername(user.getUsername()) != null){
+	public UserRegistedDto createUser(UserRegisterDto userRegisterDto) throws Exception {
+		if(userRepository.findByUsername(userRegisterDto.getUsername()) != null){
 			throw new Exception(Constant.SERVER_ERROR);
 		}
-		user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+		User user = new User();
+		user.setUsername(userRegisterDto.getUsername());
+		user.setPassword(bCryptPasswordEncoder.encode(userRegisterDto.getPassword()));
+		user.setEmail(userRegisterDto.getEmail());
 		user.setRole(Constant.ROLE_USER);
 		user.setCreateDate(new Date());
 		user.setUpdateDate(new Date());
@@ -48,37 +54,48 @@ public class UserService implements IUserService {
 	}
 
 	@Override
-	public UserUpdatedDto loginUser(String username, String password) throws Exception {
+	public UserLoggedInDto loginUser(String username, String password) throws Exception {
 		User user = userRepository.findByUsername(username);
 		if(user != null && user.getPassword().equals(bCryptPasswordEncoder.encode(user.getPassword()))) {
-			return modelMapper.map(user, UserUpdatedDto.class);
+			return modelMapper.map(user, UserLoggedInDto.class);
 		}
 		
 		throw new Exception(Constant.SERVER_ERROR);
 	}
 
 	@Override
-	public boolean updateInfo(User user, int userId) {
-		User userToUpdate = userRepository.findById(user.getUserId()).orElse(null);
+	public UserUpdatedDto updateInfo(UserUpdateDto userUpdateDto, int userId) throws Exception {
+		User userToUpdate = userRepository.findById(userUpdateDto.getUserId()).orElse(null);
 		User loggedInUser = userRepository.findById(userId).orElse(null);
 		
 		if(userToUpdate == null || loggedInUser == null || userToUpdate.getUserId() != loggedInUser.getUserId()) {
-			return false;
+			throw new Exception(Constant.SERVER_ERROR);
 		}
 		
+		User user = modelMapper.map(userUpdateDto, User.class);
+			
 		user.setUsername(userToUpdate.getUsername());
 		user.setPassword(userToUpdate.getPassword());
-		user.setEmail(userToUpdate.getEmail());
 		user.setRole(userToUpdate.getRole());
 		
-		return userRepository.save(user) != null;
+		User userUpdated = userRepository.save(user);
+		
+		if (userUpdated != null) {
+			return modelMapper.map(userUpdated, UserUpdatedDto.class);
+		}
+		
+		throw new Exception(Constant.SERVER_ERROR);
 	}
 
 	@Override
-	public User getInfo(int userId) {
-		Optional<User> optional = userRepository.findById(userId);
-		User user = optional.get();
-		return user;
+	public UserDetailDto getInfo(int userId) throws Exception {
+		User user = userRepository.findById(userId).orElse(null);
+		
+		if(user == null) {
+			throw new Exception(Constant.SERVER_ERROR);
+		}
+		
+		return modelMapper.map(user, UserDetailDto.class);
 	}
 
 	@Override

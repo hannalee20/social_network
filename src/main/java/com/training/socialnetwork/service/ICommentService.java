@@ -1,12 +1,14 @@
 package com.training.socialnetwork.service;
 
-import com.training.socialnetwork.entity.Comment;
+import com.training.socialnetwork.dto.request.comment.CommentCreateDto;
+import com.training.socialnetwork.dto.request.comment.CommentUpdateDto;
+import com.training.socialnetwork.dto.response.comment.CommentCreatedDto;
 
 public interface ICommentService {
 	
-	Comment createComment(Comment comment);
+	CommentCreatedDto createComment(CommentCreateDto comment) throws Exception;
 	
-	boolean updateComment(Comment comment, int userId);
+	CommentCreatedDto updateComment(CommentUpdateDto comment, int userId) throws Exception;
 
-	boolean deleteComment(int commentId, int userId);
+	boolean deleteComment(int commentId, int userId) throws Exception;
 }

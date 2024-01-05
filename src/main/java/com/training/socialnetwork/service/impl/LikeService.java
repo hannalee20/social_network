@@ -10,6 +10,7 @@ import com.training.socialnetwork.repository.LikeRepository;
 import com.training.socialnetwork.repository.PostRepository;
 import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.ILikeService;
+import com.training.socialnetwork.util.constant.Constant;
 
 @Service
 public class LikeService implements ILikeService{
@@ -24,12 +25,12 @@ public class LikeService implements ILikeService{
 	private UserRepository userRepository;
 	
 	@Override
-	public boolean updatePostLike(int postId, int userId) {
+	public boolean updatePostLike(int postId, int userId) throws Exception {
 		Post post = postRepository.findById(postId).orElse(null);
 		User user = userRepository.findById(userId).orElse(null);
 		
 		if(post == null || user == null) {
-			return false;
+			throw new Exception(Constant.SERVER_ERROR);
 		}
 		
 		Like likeEntity = likeRepository.findByPostAndUser(post, user);
@@ -38,9 +39,9 @@ public class LikeService implements ILikeService{
 			likeEntity = new Like();
 			likeEntity.setPost(post);
 			likeEntity.setUser(user);
-			likeEntity.setDeleteFlg(0);
+			likeEntity.setDeleteFlg(Constant.UNDELETED_FLG);
 		} else {
-			likeEntity.setDeleteFlg(1);
+			likeEntity.setDeleteFlg(Constant.DELETED_FlG);
 		}
 		
 		return likeRepository.save(likeEntity) != null;

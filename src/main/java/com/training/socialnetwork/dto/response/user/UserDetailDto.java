@@ -1,18 +1,11 @@
-package com.training.socialnetwork.dto.request.user;
+package com.training.socialnetwork.dto.response.user;
 
-import java.io.Serializable;
 import java.util.Date;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-
-import com.training.socialnetwork.util.constant.Constant;
-
-public class UserUpdateDto implements Serializable {
-
-	private static final long serialVersionUID = 1L;
+public class UserDetailDto {
 
 	private int userId;
+	private String username;
 	private String realName;
 	private Date birthDate;
 	private int gender;
@@ -24,7 +17,6 @@ public class UserUpdateDto implements Serializable {
 	private String about;
 	private String avatarUrl;
 
-	@NotNull(message = Constant.INVALID_ID)
 	public int getUserId() {
 		return userId;
 	}
@@ -33,7 +25,14 @@ public class UserUpdateDto implements Serializable {
 		this.userId = userId;
 	}
 
-	@Pattern(regexp = "^[A-Z]([a-zA-Z]+)?$", message = Constant.INVALID_REAL_NAME)
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
 	public String getRealName() {
 		return realName;
 	}
@@ -65,8 +64,7 @@ public class UserUpdateDto implements Serializable {
 	public void setAddress(String address) {
 		this.address = address;
 	}
-	
-	@Pattern(regexp = "^[A-Za-z0-9+_.-]+@(.+)$", message = Constant.INVALID_EMAIL)
+
 	public String getEmail() {
 		return email;
 	}
@@ -113,10 +111,6 @@ public class UserUpdateDto implements Serializable {
 
 	public void setAvatarUrl(String avatarUrl) {
 		this.avatarUrl = avatarUrl;
-	}
-
-	public static long getSerialversionuid() {
-		return serialVersionUID;
 	}
 
 }

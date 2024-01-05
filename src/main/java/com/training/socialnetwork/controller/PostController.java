@@ -15,9 +15,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.training.socialnetwork.entity.Post;
+import com.training.socialnetwork.dto.request.post.PostCreateDto;
+import com.training.socialnetwork.dto.request.post.PostUpdateDto;
+import com.training.socialnetwork.dto.response.post.PostCreatedDto;
+import com.training.socialnetwork.dto.response.post.PostDetailDto;
+import com.training.socialnetwork.dto.response.post.PostListDto;
+import com.training.socialnetwork.dto.response.post.PostUpdatedDto;
 import com.training.socialnetwork.service.IPostService;
+import com.training.socialnetwork.util.constant.Constant;
 
 @RestController
 @RequestMapping(value = "/post")
@@ -25,41 +30,45 @@ public class PostController {
 
 	@Autowired
 	private IPostService postService;
-	
-	@Autowired
-	private ObjectMapper objectMapper;
-	
+
 	@PostMapping(value = "/create")
-	public ResponseEntity<Object> createPost(@RequestBody Post post) throws Exception {
-		boolean result = postService.createPost(post);
-		
-		if(result) {
-			return new ResponseEntity<Object>("success", HttpStatus.OK);
-		}
-		
-		throw new Exception("server error");
+	public ResponseEntity<Object> createPost(@RequestBody PostCreateDto post) throws Exception {
+		PostCreatedDto result = postService.createPost(post);
+
+		return new ResponseEntity<Object>(result, HttpStatus.OK);
 	}
-	
+
 	@GetMapping(value = "/all/{userId}")
-	public List<Post> getPostList(@PathVariable(value = "userId") int userId) {
+	public List<PostListDto> getPostList(@PathVariable(value = "userId") int userId) {
 		return postService.getAllPosts(userId);
-		
+
 	}
-	
-	@PutMapping(value = "/update")
-	public ResponseEntity<Object> updatePost(@RequestBody Post post, @RequestParam(value = "userId") int userId) {
-		return new ResponseEntity<Object>(postService.updatePost(post, userId), HttpStatus.OK);
-		
+
+	@GetMapping(value = "/detail/{postId}")
+	public ResponseEntity<Object> getPostDetail(@PathVariable(value = "postId") int postId) throws Exception {
+		PostDetailDto result = postService.getPost(postId);
+
+		return new ResponseEntity<Object>(result, HttpStatus.OK);
 	}
-	
-	@DeleteMapping(value = "/delete")
-	
-	public ResponseEntity<Object> deletePost(@RequestParam(value = "postId") int postId, @RequestParam(value = "userId") int userId) throws Exception {
+
+	@PutMapping(value = "/update/{postId}")
+	public ResponseEntity<Object> updatePost(@RequestBody PostUpdateDto post,
+			@PathVariable(value = "postId") int postId, @RequestParam(value = "userId") int userId) throws Exception {
+		PostUpdatedDto result = postService.updatePost(post, postId, userId);
+
+		return new ResponseEntity<Object>(result, HttpStatus.OK);
+
+	}
+
+	@DeleteMapping(value = "/delete/{postId}")
+	public ResponseEntity<Object> deletePost(@RequestParam(value = "postId") int postId,
+			@RequestParam(value = "userId") int userId) throws Exception {
 		boolean result = postService.deletePost(postId, userId);
-		if(result) {
-			return new ResponseEntity<Object>("success", HttpStatus.OK);
+		if (result) {
+			return new ResponseEntity<Object>(Constant.DELETED_SUCCESSFULLY, HttpStatus.OK);
 		}
-		throw new Exception("server error");
+
+		throw new Exception(Constant.SERVER_ERROR);
 	}
-	
+
 }

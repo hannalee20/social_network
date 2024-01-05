@@ -5,7 +5,7 @@ import java.io.Serializable;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
-import com.training.socialnetwork.util.contanst.Constant;
+import com.training.socialnetwork.util.constant.Constant;
 
 public class UserRegisterDto implements Serializable {
 	private static final long serialVersionUID = 1L;
