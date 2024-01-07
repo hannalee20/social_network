@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.training.socialnetwork.dto.request.comment.CommentCreateDto;
 import com.training.socialnetwork.dto.request.comment.CommentUpdateDto;
 import com.training.socialnetwork.dto.response.comment.CommentCreatedDto;
+import com.training.socialnetwork.dto.response.comment.CommentDetailDto;
 import com.training.socialnetwork.service.ICommentService;
 import com.training.socialnetwork.util.constant.Constant;
 
@@ -51,5 +53,12 @@ public class CommentController {
 		}
 		
 		throw new Exception(Constant.SERVER_ERROR);
+	}
+	
+	@GetMapping(value = "/detail/{commentId}")
+	public ResponseEntity<Object> getCommentDetail(@PathVariable(value = "commentId") int commentId) throws Exception {
+		CommentDetailDto result = commentService.getCommentDetail(commentId);
+		
+		return new ResponseEntity<Object>(result, HttpStatus.OK);
 	}
 }

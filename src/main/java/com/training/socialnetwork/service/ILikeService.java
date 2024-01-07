@@ -2,5 +2,7 @@ package com.training.socialnetwork.service;
 
 public interface ILikeService {
 
-	boolean updatePostLike(int postId, int userId) throws Exception;
+	boolean addLikePost(int postId, int userId) throws Exception;
+	
+	boolean unlikePost(int postId, int userId) throws Exception;
 }

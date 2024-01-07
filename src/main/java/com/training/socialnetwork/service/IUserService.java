@@ -7,8 +7,9 @@ import com.training.socialnetwork.dto.request.user.UserUpdateDto;
 import com.training.socialnetwork.dto.response.user.UserDetailDto;
 import com.training.socialnetwork.dto.response.user.UserLoggedInDto;
 import com.training.socialnetwork.dto.response.user.UserRegistedDto;
+import com.training.socialnetwork.dto.response.user.UserReportDto;
+import com.training.socialnetwork.dto.response.user.UserSearchDto;
 import com.training.socialnetwork.dto.response.user.UserUpdatedDto;
-import com.training.socialnetwork.entity.User;
 
 public interface IUserService {
 	
@@ -20,5 +21,7 @@ public interface IUserService {
 	
 	UserDetailDto getInfo(int userId) throws Exception;
 	
-	List<User> searchUser(int userId, String keyword);
+	List<UserSearchDto> searchUser(int userId, String keyword);
+	
+	UserReportDto getReportUser(int userId);
 }

@@ -61,12 +61,12 @@ public class PostService implements IPostService {
 
 	@Override
 	public List<PostListDto> getAllPosts(int userId) {
-		List<Post> postList = postRepository.findAllByUserUserIdOrderByUpdateDateDesc(userId);
+		List<Post> postList = postRepository.findAllByUserId(userId);
 
 		return postList.stream().map(post -> {
 			PostListDto postListDto = modelMapper.map(post, PostListDto.class);
-			postListDto.setLikeTotal(post.getLikeList().size());
-			postListDto.setCommentTotal(post.getCommentList().size());
+			postListDto.setLikeCount(post.getLikeList().size());
+			postListDto.setCommentCount(post.getCommentList().size());
 			return postListDto;
 		}).collect(Collectors.toList());
 	}
@@ -89,7 +89,7 @@ public class PostService implements IPostService {
 			return 0;
 		}).collect(Collectors.toList());
 
-		postDetailDto.setLikeTotal(post.getLikeList().size());
+		postDetailDto.setLikeCount(post.getLikeList().size());
 		postDetailDto.setCommentList(commentList);
 
 		return postDetailDto;

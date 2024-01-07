@@ -10,8 +10,8 @@ public class PostListDto {
 	private String content;
 	private String photoUrl;
 	private Date createDate;
-	private int likeTotal;
-	private int commentTotal;
+	private int likeCount;
+	private int commentCount;
 
 	public int getPostId() {
 		return postId;
@@ -61,20 +61,20 @@ public class PostListDto {
 		this.createDate = createDate;
 	}
 
-	public int getLikeTotal() {
-		return likeTotal;
+	public int getLikeCount() {
+		return likeCount;
 	}
 
-	public void setLikeTotal(int likeTotal) {
-		this.likeTotal = likeTotal;
+	public void setLikeCount(int likeCount) {
+		this.likeCount = likeCount;
 	}
 
-	public int getCommentTotal() {
-		return commentTotal;
+	public int getCommentCount() {
+		return commentCount;
 	}
 
-	public void setCommentTotal(int commentTotal) {
-		this.commentTotal = commentTotal;
+	public void setCommentCount(int commentCount) {
+		this.commentCount = commentCount;
 	}
 
 }

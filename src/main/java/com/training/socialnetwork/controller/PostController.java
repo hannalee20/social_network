@@ -35,7 +35,7 @@ public class PostController {
 	public ResponseEntity<Object> createPost(@RequestBody PostCreateDto post) throws Exception {
 		PostCreatedDto result = postService.createPost(post);
 
-		return new ResponseEntity<Object>(result, HttpStatus.OK);
+		return new ResponseEntity<Object>(result, HttpStatus.CREATED);
 	}
 
 	@GetMapping(value = "/all/{userId}")

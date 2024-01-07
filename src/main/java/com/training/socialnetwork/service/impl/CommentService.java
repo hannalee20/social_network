@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.training.socialnetwork.dto.request.comment.CommentCreateDto;
 import com.training.socialnetwork.dto.request.comment.CommentUpdateDto;
 import com.training.socialnetwork.dto.response.comment.CommentCreatedDto;
+import com.training.socialnetwork.dto.response.comment.CommentDetailDto;
 import com.training.socialnetwork.entity.Comment;
 import com.training.socialnetwork.entity.Post;
 import com.training.socialnetwork.entity.User;
@@ -87,6 +88,17 @@ public class CommentService implements ICommentService{
 		comment.setDeleteFlg(Constant.DELETED_FlG);
 		
 		return commentRepository.save(comment) != null;
+	}
+
+	@Override
+	public CommentDetailDto getCommentDetail(int commentId) throws Exception {
+		Comment comment = commentRepository.findById(commentId).orElse(null);
+		
+		if(comment == null) {
+			throw new Exception(Constant.SERVER_ERROR);
+		}
+		
+		return modelMapper.map(comment, CommentDetailDto.class);
 	}
 
 }

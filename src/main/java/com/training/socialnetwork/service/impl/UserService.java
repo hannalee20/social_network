@@ -1,7 +1,12 @@
 package com.training.socialnetwork.service.impl;
 
+import java.time.LocalDate;
+import java.time.temporal.TemporalField;
+import java.time.temporal.WeekFields;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +18,12 @@ import com.training.socialnetwork.dto.request.user.UserUpdateDto;
 import com.training.socialnetwork.dto.response.user.UserDetailDto;
 import com.training.socialnetwork.dto.response.user.UserLoggedInDto;
 import com.training.socialnetwork.dto.response.user.UserRegistedDto;
+import com.training.socialnetwork.dto.response.user.UserReportDto;
+import com.training.socialnetwork.dto.response.user.UserSearchDto;
 import com.training.socialnetwork.dto.response.user.UserUpdatedDto;
+import com.training.socialnetwork.entity.Friend;
 import com.training.socialnetwork.entity.User;
+import com.training.socialnetwork.repository.FriendRepository;
 import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.IUserService;
 import com.training.socialnetwork.util.constant.Constant;
@@ -24,6 +33,9 @@ public class UserService implements IUserService {
 	
 	@Autowired
 	private UserRepository userRepository;
+	
+	@Autowired
+	private FriendRepository friendRepository;
 	
 	@Autowired
 	private ModelMapper modelMapper;
@@ -99,7 +111,41 @@ public class UserService implements IUserService {
 	}
 
 	@Override
-	public List<User> searchUser(int userId, String keyword) {
-		return userRepository.findAllUserLike(userId, keyword);
+	public List<UserSearchDto> searchUser(int userId, String keyword) {
+		List<User> userList = userRepository.findAllUserByKeyword(userId, keyword);
+		
+		List<Friend> friendList = friendRepository.findAllByUserId(userId);
+		
+		List<UserSearchDto> userSearchList = userList.stream().map(user -> modelMapper.map(user, UserSearchDto.class)).collect(Collectors.toList());
+		
+		for (UserSearchDto user : userSearchList) {
+			user.setFriendStatus(Constant.NOT_FRIEND);
+			for (Friend friend : friendList) {
+				if(friend.getUser1().getUserId() == user.getUserId() || friend.getUser2().getUserId() == user.getUserId()) {
+					user.setFriendStatus(friend.getStatus());
+					break;
+				}
+			}
+		}
+		
+		return userSearchList;
+	}
+
+	@Override
+	public UserReportDto getReportUser(int userId) {
+		LocalDate date = LocalDate.now();
+		TemporalField fieldISO = WeekFields.of(Locale.FRANCE).dayOfWeek();
+		LocalDate dateStart = date.with(fieldISO, 1);
+		LocalDate dateEnd = date.with(fieldISO, 7);
+		
+		User user = userRepository.getReport(userId, dateStart, dateEnd);
+		
+		UserReportDto userReportDto = new UserReportDto();
+		userReportDto.setPostCount(user.getPostList().size());
+		userReportDto.setCommentCount(user.getCommentList().size());
+		userReportDto.setFriendCount(user.getUserId1().size() + user.getUserId2().size());
+		userReportDto.setLikeCount(user.getLikeList().size());
+		
+		return userReportDto;
 	}
 }

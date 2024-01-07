@@ -13,40 +13,47 @@ import com.training.socialnetwork.service.ILikeService;
 import com.training.socialnetwork.util.constant.Constant;
 
 @Service
-public class LikeService implements ILikeService{
+public class LikeService implements ILikeService {
 
 	@Autowired
 	private LikeRepository likeRepository;
-	
+
 	@Autowired
 	private PostRepository postRepository;
-	
+
 	@Autowired
 	private UserRepository userRepository;
-	
+
 	@Override
-	public boolean updatePostLike(int postId, int userId) throws Exception {
+	public boolean addLikePost(int postId, int userId) throws Exception {
 		Post post = postRepository.findById(postId).orElse(null);
 		User user = userRepository.findById(userId).orElse(null);
-		
-		if(post == null || user == null) {
+
+		if (post == null || user == null) {
 			throw new Exception(Constant.SERVER_ERROR);
 		}
-		
-		Like likeEntity = likeRepository.findByPostAndUser(post, user);
-		
-		if (likeEntity == null) {
-			likeEntity = new Like();
-			likeEntity.setPost(post);
-			likeEntity.setUser(user);
-			likeEntity.setDeleteFlg(Constant.UNDELETED_FLG);
-		} else {
-			likeEntity.setDeleteFlg(Constant.DELETED_FlG);
-		}
-		
-		return likeRepository.save(likeEntity) != null;
+
+		Like like = new Like();
+		like.setPost(post);
+		like.setUser(user);
+		like.setDeleteFlg(Constant.UNDELETED_FLG);
+
+		return likeRepository.save(like) != null;
 	}
-	
-	
+
+	@Override
+	public boolean unlikePost(int postId, int userId) throws Exception {
+		Post post = postRepository.findById(postId).orElse(null);
+		User user = userRepository.findById(userId).orElse(null);
+
+		if (post == null || user == null) {
+			throw new Exception(Constant.SERVER_ERROR);
+		}
+
+		Like like = likeRepository.findByPostAndUser(post, user);
+		like.setDeleteFlg(Constant.DELETED_FlG);
+
+		return likeRepository.save(like) != null;
+	}
 
 }

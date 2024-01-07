@@ -2,15 +2,18 @@ package com.training.socialnetwork.service;
 
 import java.util.List;
 
-import com.training.socialnetwork.entity.Friend;
+import com.training.socialnetwork.dto.response.friend.FriendListDto;
+import com.training.socialnetwork.dto.response.friend.FriendRequestDto;
 
 public interface IFriendService {
 
-	List<Friend> findAllFriendWithStatus(int userId);
+	List<FriendListDto> findAllFriendWithStatus(int userId);
 	
-	boolean createFriendRequest(int userId1, int userId2);
+	List<FriendRequestDto> findAllAddFriendRequest(int userId);
 	
-	boolean acceptFriendRequest(int userId1, int userId2);
+	boolean createFriendRequest(int userId1, int userId2) throws Exception;
+	
+	boolean acceptFriendRequest(int userId1, int userId2) throws Exception;
 	
 	boolean refuseFriendRequest(int userId1, int userId2);
 	

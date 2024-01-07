@@ -13,21 +13,27 @@ import com.training.socialnetwork.entity.Friend;
 public interface FriendRepository extends JpaRepository<Friend, Integer>{
 	
 	@Query(value = "" + 
-			"select f from Friend as f " + 
-			"where f.user1.userId = :userId  or f.user2.userId = :userId " +
-			"and f.status = :status")
+			"select * from friend as f " + 
+			"where f.user_id1 = :userId or f.user_id2 = :userId " +
+			"and f.status = :status", nativeQuery = true)
 	List<Friend> findAllFriendByUserIdAndStatus(@Param(value = "userId") int userId, @Param(value = "status") int status);
 
 	@Query(value = "" + 
-				"select f from Friend as f " + 
-				"where (f.user1.userId1 = :userId1 and f.user2.userId2 = :userId2) " + 
-				"or (f.user1.userId1 = :userId2 and f.user2.userId2 = :userId1) ")
+				"select * from friend as f " + 
+				"where (f.user_id1 = :userId1 and f.user_id2 = :userId2) " + 
+				"or (f.user_id1 = :userId2 and f.user_id2 = :userId1) ", nativeQuery = true)
 	Friend findFriendByUser1AndUser2(@Param(value = "userId1") int userId1, @Param(value = "userId1") int userId2);
 
 	@Query(value = "" + 
-			"select f from Friend as f " + 
-			"where ((f.user1.userId1 = :userId1 and f.user2.userId2 = :userId2) " + 
-			"or (f.user1.userId1 = :userId2 and f.user2.userId2 = :userId1)) " + 
-			"and f.status = :status ")
+			"select * from friend as f " + 
+			"where ((f.user_id1 = :userId1 and f.user_id2 = :userId2) " + 
+			"or (f.user_id1 = :userId2 and f.user_id2 = :userId1)) " + 
+			"and f.status = :status ", nativeQuery = true)
 	Friend findFriendByUserIdAndStatus(@Param(value = "userId1") int userId1, @Param(value = "userId2") int userId2, @Param(value = "status") int status);
+	
+	@Query(value = "" + 
+			"select * from friend as f " + 
+			"where f.user_id1 = :userId " + 
+			"or f.user_id2 = :userId ", nativeQuery = true)
+	List<Friend> findAllByUserId(int userId);
 }

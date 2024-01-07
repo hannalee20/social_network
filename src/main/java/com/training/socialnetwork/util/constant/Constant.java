@@ -19,4 +19,10 @@ public class Constant {
 	public static final Integer DELETED_FlG = 1;
 	
 	public static final String DELETED_SUCCESSFULLY = "Deleted successfully";
+	
+	public static final int FRIENDED_STATUS = 1;
+	
+	public static final int FRIEND_REQUEST = 0;
+	
+	public static final int NOT_FRIEND = 2;
 }
