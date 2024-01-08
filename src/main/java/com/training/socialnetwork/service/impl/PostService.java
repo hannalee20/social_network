@@ -1,8 +1,12 @@
 package com.training.socialnetwork.service.impl;
 
+import java.time.LocalDate;
+import java.time.temporal.TemporalField;
+import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -128,6 +132,16 @@ public class PostService implements IPostService {
 		post.setDeleteFlg(Constant.DELETED_FlG);
 		
 		return postRepository.save(post) != null;
+	}
+
+	@Override
+	public int countPost(int userId) {
+		LocalDate date = LocalDate.now();
+		TemporalField fieldISO = WeekFields.of(Locale.FRANCE).dayOfWeek();
+		LocalDate dateStart = date.with(fieldISO, 1);
+		LocalDate dateEnd = date.with(fieldISO, 7);
+		
+		return postRepository.countPost(userId, dateStart, dateEnd);
 	}
 
 }

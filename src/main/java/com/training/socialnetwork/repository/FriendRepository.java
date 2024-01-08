@@ -1,5 +1,6 @@
 package com.training.socialnetwork.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -36,4 +37,13 @@ public interface FriendRepository extends JpaRepository<Friend, Integer>{
 			"where f.user_id1 = :userId " + 
 			"or f.user_id2 = :userId ", nativeQuery = true)
 	List<Friend> findAllByUserId(int userId);
+	
+	@Query(value = "" + 
+			"select count(f1.user_id1 + f1.user_id2) as friend " + 
+			"from user as u " + 
+			"inner join friend f1 on u.user_id = f1.user_id1  or u.user_id = f1.user_id2 " +
+			"where u.user_id = :userId " + 
+			"and f1.status = 1  " + 
+			"and f1.update_date between ':dateStart' and ':dateEnd' ", nativeQuery = true)
+	int countFriend(@Param(value = "userId") int userId, @Param(value = "dateStart") LocalDate dateStart, @Param(value = "dateEnd") LocalDate dateEnd);
 }

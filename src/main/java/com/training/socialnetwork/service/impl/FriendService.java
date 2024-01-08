@@ -1,6 +1,10 @@
 package com.training.socialnetwork.service.impl;
 
+import java.time.LocalDate;
+import java.time.temporal.TemporalField;
+import java.time.temporal.WeekFields;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -123,6 +127,16 @@ public class FriendService implements IFriendService {
 
 		return friendRequestList.stream().map(friend -> modelMapper.map(friend, FriendRequestDto.class))
 				.collect(Collectors.toList());
+	}
+
+	@Override
+	public int countFriend(int userId) {
+		LocalDate date = LocalDate.now();
+		TemporalField fieldISO = WeekFields.of(Locale.FRANCE).dayOfWeek();
+		LocalDate dateStart = date.with(fieldISO, 1);
+		LocalDate dateEnd = date.with(fieldISO, 7);
+		
+		return friendRepository.countFriend(userId, dateStart, dateEnd);
 	}
 
 }

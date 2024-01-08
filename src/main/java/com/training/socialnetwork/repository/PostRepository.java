@@ -1,5 +1,6 @@
 package com.training.socialnetwork.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,4 +20,12 @@ public interface PostRepository extends JpaRepository<Post, Integer>{
 				"where p.user_id = :userId and f1.status = 1 and f2.status = 1" + 
 				"order by p.update_date ", nativeQuery = true)
 	List<Post> findAllByUserId(@Param(value = "userId") int userId);
+	
+	@Query(value = "" + 
+				"select count(p.post_id) as post " + 
+				"from user as u " + 
+				"inner join post p on u.user_id = p.user_id " +
+				"where u.user_id = :userId " + 
+				"and p.create_date between ':dateStart' and ':dateEnd' ", nativeQuery = true)
+	int countPost(@Param(value = "userId") int userId, @Param(value = "dateStart") LocalDate dateStart, @Param(value = "dateEnd") LocalDate dateEnd);
 }

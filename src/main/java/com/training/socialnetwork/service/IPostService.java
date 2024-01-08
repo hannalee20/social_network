@@ -20,5 +20,7 @@ public interface IPostService {
 	PostUpdatedDto updatePost(PostUpdateDto post, int postId, int userId) throws Exception;
 	
 	boolean deletePost(int postId, int userId) throws Exception;
+	
+	int countPost(int userId);
 
 }

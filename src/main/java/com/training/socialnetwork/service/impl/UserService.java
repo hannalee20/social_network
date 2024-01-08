@@ -23,7 +23,10 @@ import com.training.socialnetwork.dto.response.user.UserSearchDto;
 import com.training.socialnetwork.dto.response.user.UserUpdatedDto;
 import com.training.socialnetwork.entity.Friend;
 import com.training.socialnetwork.entity.User;
+import com.training.socialnetwork.repository.CommentRepository;
 import com.training.socialnetwork.repository.FriendRepository;
+import com.training.socialnetwork.repository.LikeRepository;
+import com.training.socialnetwork.repository.PostRepository;
 import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.IUserService;
 import com.training.socialnetwork.util.constant.Constant;
@@ -33,6 +36,15 @@ public class UserService implements IUserService {
 	
 	@Autowired
 	private UserRepository userRepository;
+	
+	@Autowired
+	private PostRepository postRepository;
+	
+	@Autowired
+	private CommentRepository commentRepository;
+	
+	@Autowired
+	private LikeRepository likeRepository;
 	
 	@Autowired
 	private FriendRepository friendRepository;
@@ -138,13 +150,11 @@ public class UserService implements IUserService {
 		LocalDate dateStart = date.with(fieldISO, 1);
 		LocalDate dateEnd = date.with(fieldISO, 7);
 		
-		User user = userRepository.getReport(userId, dateStart, dateEnd);
-		
 		UserReportDto userReportDto = new UserReportDto();
-		userReportDto.setPostCount(user.getPostList().size());
-		userReportDto.setCommentCount(user.getCommentList().size());
-		userReportDto.setFriendCount(user.getUserId1().size() + user.getUserId2().size());
-		userReportDto.setLikeCount(user.getLikeList().size());
+		userReportDto.setPostCount(postRepository.countPost(userId, dateStart, dateEnd));
+		userReportDto.setCommentCount(commentRepository.countComment(userId, dateStart, dateEnd));
+		userReportDto.setFriendCount(friendRepository.countFriend(userId, dateStart, dateEnd));
+		userReportDto.setLikeCount(likeRepository.countLike(userId, dateStart, dateEnd));
 		
 		return userReportDto;
 	}

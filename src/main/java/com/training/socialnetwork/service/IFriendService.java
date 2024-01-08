@@ -18,4 +18,6 @@ public interface IFriendService {
 	boolean refuseFriendRequest(int userId1, int userId2);
 	
 	boolean unfriend(int userId1, int userId2);
+	
+	int countFriend(int userId);
 }

@@ -1,4 +1,4 @@
-package com.training.socialnetwork.util.constant.generator;
+package com.training.socialnetwork.util.generator;
 
 import java.io.IOException;
 

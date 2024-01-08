@@ -30,7 +30,7 @@ import com.training.socialnetwork.dto.response.user.UserReportDto;
 import com.training.socialnetwork.dto.response.user.UserSearchDto;
 import com.training.socialnetwork.dto.response.user.UserUpdatedDto;
 import com.training.socialnetwork.service.IUserService;
-import com.training.socialnetwork.util.constant.generator.ReportGenerator;
+import com.training.socialnetwork.util.generator.ReportGenerator;
 
 @RestController
 @RequestMapping(value = "/user")

@@ -1,5 +1,10 @@
 package com.training.socialnetwork.service.impl;
 
+import java.time.LocalDate;
+import java.time.temporal.TemporalField;
+import java.time.temporal.WeekFields;
+import java.util.Locale;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -99,6 +104,16 @@ public class CommentService implements ICommentService{
 		}
 		
 		return modelMapper.map(comment, CommentDetailDto.class);
+	}
+
+	@Override
+	public int countComment(int userId) {
+		LocalDate date = LocalDate.now();
+		TemporalField fieldISO = WeekFields.of(Locale.FRANCE).dayOfWeek();
+		LocalDate dateStart = date.with(fieldISO, 1);
+		LocalDate dateEnd = date.with(fieldISO, 7);
+		
+		return commentRepository.countComment(userId, dateStart, dateEnd);
 	}
 
 }

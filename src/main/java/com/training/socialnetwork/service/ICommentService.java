@@ -14,4 +14,6 @@ public interface ICommentService {
 	boolean deleteComment(int commentId, int userId) throws Exception;
 	
 	CommentDetailDto getCommentDetail(int commentId) throws Exception;
+	
+	int countComment(int userId);
 }

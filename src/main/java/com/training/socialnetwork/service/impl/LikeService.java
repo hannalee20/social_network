@@ -1,5 +1,10 @@
 package com.training.socialnetwork.service.impl;
 
+import java.time.LocalDate;
+import java.time.temporal.TemporalField;
+import java.time.temporal.WeekFields;
+import java.util.Locale;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -54,6 +59,16 @@ public class LikeService implements ILikeService {
 		like.setDeleteFlg(Constant.DELETED_FlG);
 
 		return likeRepository.save(like) != null;
+	}
+
+	@Override
+	public int countLike(int userId) {
+		LocalDate date = LocalDate.now();
+		TemporalField fieldISO = WeekFields.of(Locale.FRANCE).dayOfWeek();
+		LocalDate dateStart = date.with(fieldISO, 1);
+		LocalDate dateEnd = date.with(fieldISO, 7);
+		
+		return likeRepository.countLike(userId, dateStart, dateEnd);
 	}
 
 }
