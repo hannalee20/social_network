@@ -80,7 +80,7 @@ public class UserService implements IUserService {
 	@Override
 	public UserLoggedInDto loginUser(String username, String password) throws Exception {
 		User user = userRepository.findByUsername(username);
-		if(user != null && user.getPassword().equals(bCryptPasswordEncoder.encode(user.getPassword()))) {
+		if(user != null && bCryptPasswordEncoder.matches(password, user.getPassword())) {
 			return modelMapper.map(user, UserLoggedInDto.class);
 		}
 		
