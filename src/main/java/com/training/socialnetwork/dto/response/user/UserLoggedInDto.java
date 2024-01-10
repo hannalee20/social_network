@@ -1,10 +1,19 @@
 package com.training.socialnetwork.dto.response.user;
 
+import java.util.List;
+
 public class UserLoggedInDto {
 
 	private int userId;
 	private String username;
-	private int role;
+	private List<String> roles;
+
+	public UserLoggedInDto(int userId, String username, List<String> roles) {
+		super();
+		this.userId = userId;
+		this.username = username;
+		this.roles = roles;
+	}
 
 	public int getUserId() {
 		return userId;
@@ -22,12 +31,12 @@ public class UserLoggedInDto {
 		this.username = username;
 	}
 
-	public int getRole() {
-		return role;
+	public List<String> getRoles() {
+		return roles;
 	}
 
-	public void setRole(int role) {
-		this.role = role;
+	public void setRoles(List<String> roles) {
+		this.roles = roles;
 	}
 
 }

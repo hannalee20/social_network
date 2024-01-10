@@ -2,9 +2,7 @@ package com.training.socialnetwork.security;
 
 import java.security.Key;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -48,7 +46,7 @@ public class JwtUtils {
 
 	public ResponseCookie generateJwtCookie(CustomUserDetail userPrincipal) throws ParseException {
 		String jwt = generateTokenFromUsername(userPrincipal.getUsername());
-		ResponseCookie cookie = ResponseCookie.from(jwtCookie, jwt).path("/api").maxAge(24 * 60 * 60).httpOnly(true)
+		ResponseCookie cookie = ResponseCookie.from(jwtCookie, jwt).path("/user").maxAge(24 * 60 * 60).httpOnly(true)
 				.build();
 
 		return cookie;
@@ -84,9 +82,9 @@ public class JwtUtils {
 	}
 
 	private String generateTokenFromUsername(String username) throws ParseException {
-		SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy", Locale.ENGLISH);
-		Date date = formatter.parse((new Date().getTime()) + jwtExpirationMs);
-		return Jwts.builder().setSubject(username).setIssuedAt(new Date()).setExpiration(date)
+		long miliSec = System.currentTimeMillis() + Long.parseLong(jwtExpirationMs);
+		Date dateTime = new Date(miliSec);
+		return Jwts.builder().setSubject(username).setIssuedAt(new Date()).setExpiration(dateTime)
 				.signWith(key(), SignatureAlgorithm.HS256).compact();
 	}
 }

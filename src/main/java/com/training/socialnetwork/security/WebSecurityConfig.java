@@ -10,7 +10,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -61,7 +60,9 @@ public class WebSecurityConfig {
 			.exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.authorizeHttpRequests(auth -> 
-				auth.antMatchers("/api/user/register").permitAll()
+				auth.antMatchers("/user/register").permitAll()
+				.antMatchers("/user/login").permitAll()
+				.antMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 				.anyRequest().authenticated()
 			);
 		
