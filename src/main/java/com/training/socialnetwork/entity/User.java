@@ -1,81 +1,87 @@
 package com.training.socialnetwork.entity;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 public class User {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int userId;
-	
+
 	@Column
 	private String username;
-	
+
 	@Column
 	private String password;
 
 	@Column
 	private String realName;
-	
+
 	@Column
 	private Date birthDate;
-	
+
 	@Column
 	private int gender;
-	
+
 	@Column
 	private String email;
-	
+
 	@Column
 	private String address;
-	
+
 	@Column
 	private String university;
-	
+
 	@Column
 	private String job;
-	
+
 	@Column
 	private String status;
-	
+
 	@Column
 	private String about;
-	
+
 	@Column
 	private String avatarUrl;
-	
+
+	@ManyToMany
+	@JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+	private Set<Role> roles = new HashSet<>();;
+
 	@Column
-	private int role;
-	
-	@Column 
 	private Date createDate;
-	
+
 	@Column
 	private Date updateDate;
-	
+
 	@OneToMany(mappedBy = "user1")
 	private List<Friend> userId1;
-	
+
 	@OneToMany(mappedBy = "user2")
 	private List<Friend> userId2;
-	
+
 	@OneToMany(mappedBy = "user")
 	private List<Post> postList;
-	
+
 	@OneToMany(mappedBy = "user")
 	private List<Like> likeList;
-	
+
 	@OneToMany(mappedBy = "user")
 	private List<Comment> commentList;
 
@@ -183,14 +189,6 @@ public class User {
 		this.avatarUrl = avatarUrl;
 	}
 
-	public int getRole() {
-		return role;
-	}
-
-	public void setRole(int role) {
-		this.role = role;
-	}
-
 	public Date getCreateDate() {
 		return createDate;
 	}
@@ -246,5 +244,13 @@ public class User {
 	public void setCommentList(List<Comment> commentList) {
 		this.commentList = commentList;
 	}
-	
+
+	public Set<Role> getRoles() {
+		return this.roles;
+	}
+
+	public void setRoles(Set<Role> roles) {
+		this.roles = roles;
+	}
+
 }

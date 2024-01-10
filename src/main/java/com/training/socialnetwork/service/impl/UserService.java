@@ -4,8 +4,10 @@ import java.time.LocalDate;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -22,11 +24,13 @@ import com.training.socialnetwork.dto.response.user.UserReportDto;
 import com.training.socialnetwork.dto.response.user.UserSearchDto;
 import com.training.socialnetwork.dto.response.user.UserUpdatedDto;
 import com.training.socialnetwork.entity.Friend;
+import com.training.socialnetwork.entity.Role;
 import com.training.socialnetwork.entity.User;
 import com.training.socialnetwork.repository.CommentRepository;
 import com.training.socialnetwork.repository.FriendRepository;
 import com.training.socialnetwork.repository.LikeRepository;
 import com.training.socialnetwork.repository.PostRepository;
+import com.training.socialnetwork.repository.RoleRepository;
 import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.IUserService;
 import com.training.socialnetwork.util.constant.Constant;
@@ -50,6 +54,9 @@ public class UserService implements IUserService {
 	private FriendRepository friendRepository;
 	
 	@Autowired
+	private RoleRepository roleRepository;
+	
+	@Autowired
 	private ModelMapper modelMapper;
 	
 	@Autowired
@@ -64,7 +71,10 @@ public class UserService implements IUserService {
 		user.setUsername(userRegisterDto.getUsername());
 		user.setPassword(bCryptPasswordEncoder.encode(userRegisterDto.getPassword()));
 		user.setEmail(userRegisterDto.getEmail());
-		user.setRole(Constant.ROLE_USER);
+		Role role = roleRepository.findByName("USER");
+		Set<Role> roles = new HashSet<>();
+		roles.add(role);
+		user.setRoles(roles);
 		user.setCreateDate(new Date());
 		user.setUpdateDate(new Date());
 		
@@ -100,7 +110,7 @@ public class UserService implements IUserService {
 			
 		user.setUsername(userToUpdate.getUsername());
 		user.setPassword(userToUpdate.getPassword());
-		user.setRole(userToUpdate.getRole());
+		user.setRoles(userToUpdate.getRoles());
 		
 		User userUpdated = userRepository.save(user);
 		

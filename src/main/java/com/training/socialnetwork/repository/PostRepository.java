@@ -14,17 +14,17 @@ import com.training.socialnetwork.entity.Post;
 public interface PostRepository extends JpaRepository<Post, Integer>{
 
 	@Query(value = "" + 
-				"select p.post_id, p.post_id, p.content, p.photo_url from post as p " + 
-				"left join friend f1 on p.user_id = f1.user_id1 " + 
-				"left join friend f2 on p.user_id = f2.user_id2 " + 
+				"select p.post_id, p.post_id, p.content, p.photo_url from posts as p " + 
+				"left join friends f1 on p.user_id = f1.user_id1 " + 
+				"left join friends f2 on p.user_id = f2.user_id2 " + 
 				"where p.user_id = :userId and f1.status = 1 and f2.status = 1" + 
 				"order by p.update_date ", nativeQuery = true)
 	List<Post> findAllByUserId(@Param(value = "userId") int userId);
 	
 	@Query(value = "" + 
 				"select count(p.post_id) as post " + 
-				"from user as u " + 
-				"inner join post p on u.user_id = p.user_id " +
+				"from users as u " + 
+				"inner join posts p on u.user_id = p.user_id " +
 				"where u.user_id = :userId " + 
 				"and p.create_date between ':dateStart' and ':dateEnd' ", nativeQuery = true)
 	int countPost(@Param(value = "userId") int userId, @Param(value = "dateStart") LocalDate dateStart, @Param(value = "dateEnd") LocalDate dateEnd);

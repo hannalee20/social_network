@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.training.socialnetwork.dto.request.user.CustomUserDetails;
+import com.training.socialnetwork.dto.request.user.CustomUserDetail;
 import com.training.socialnetwork.entity.User;
 import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.util.constant.Constant;
@@ -25,7 +25,7 @@ public class CustomUserDetailService implements UserDetailsService {
 			throw new UsernameNotFoundException(Constant.SERVER_ERROR);
 		}
 		
-		return new CustomUserDetails(user);
+		return CustomUserDetail.build(user);
 	}
 
 }

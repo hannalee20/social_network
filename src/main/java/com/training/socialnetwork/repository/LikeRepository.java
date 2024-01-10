@@ -18,8 +18,8 @@ public interface LikeRepository extends JpaRepository<Like, Integer>{
 	
 	@Query(value = "" + 
 			"select count(l.like_id) as likes " + 
-			"from user as u " + 
-			"inner join post p on u.user_id = p.user_id " + 
+			"from users as u " + 
+			"inner join posts p on u.user_id = p.user_id " + 
 			"inner join likes l on p.post_id = l.post_id " +
 			"where u.user_id = :userId " + 
 			"and l.delete_flg = 0 " + 
