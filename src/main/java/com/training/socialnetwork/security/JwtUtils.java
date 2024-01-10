@@ -27,7 +27,7 @@ import io.jsonwebtoken.security.Keys;
 @Component
 public class JwtUtils {
 
-	@Value("${social-network.app.jwtSecre}")
+	@Value("${social-network.app.jwtSecret}")
 	private String jwtSecret;
 
 	@Value("${social-network.app.jwtCookieName}")

@@ -22,7 +22,10 @@ import com.training.socialnetwork.service.impl.CustomUserDetailService;
 public class WebSecurityConfig {
 
 	@Autowired
-	CustomUserDetailService userDetailService;
+	private CustomUserDetailService userDetailService;
+	
+	@Autowired
+	private BCryptPasswordEncoder passwordEncoder;
 	
 	@Autowired
 	private AuthenticationEntryPoint unauthorizedHandler;
@@ -36,7 +39,7 @@ public class WebSecurityConfig {
 	public DaoAuthenticationProvider authenticationProvider() {
 		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
 		authProvider.setUserDetailsService(userDetailService);
-		authProvider.setPasswordEncoder(passwordEncoder());
+		authProvider.setPasswordEncoder(passwordEncoder);
 		
 		return authProvider;
 	}
@@ -47,10 +50,10 @@ public class WebSecurityConfig {
 		return authConfig.getAuthenticationManager();
 	}
 	
-	@Bean
-	  public PasswordEncoder passwordEncoder() {
-	    return new BCryptPasswordEncoder();
-	  }
+//	@Bean
+//	  public PasswordEncoder passwordEncoder() {
+//	    return new BCryptPasswordEncoder();
+//	  }
 	
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
