@@ -28,4 +28,13 @@ public class CustomUserDetailService implements UserDetailsService {
 		return CustomUserDetail.build(user);
 	}
 
+	public UserDetails loadUserByUserId(int userId) {
+		User user = userRepository.findById(userId).orElse(null);
+		
+		if(user == null) {
+			throw new UsernameNotFoundException(Constant.SERVER_ERROR);
+		}
+		
+		return CustomUserDetail.build(user);
+	}
 }

@@ -4,10 +4,8 @@ import java.time.LocalDate;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -71,10 +69,10 @@ public class UserService implements IUserService {
 		user.setUsername(userRegisterDto.getUsername());
 		user.setPassword(bCryptPasswordEncoder.encode(userRegisterDto.getPassword()));
 		user.setEmail(userRegisterDto.getEmail());
-		Role role = roleRepository.findByName("USER");
-		Set<Role> roles = new HashSet<>();
-		roles.add(role);
-		user.setRoles(roles);
+		Role role = roleRepository.findByName("ROLE_USER");
+//		Set<Role> roles = new HashSet<>();
+//		roles.add(role);
+		user.setRole(role);
 		user.setCreateDate(new Date());
 		user.setUpdateDate(new Date());
 		
@@ -110,7 +108,7 @@ public class UserService implements IUserService {
 			
 		user.setUsername(userToUpdate.getUsername());
 		user.setPassword(userToUpdate.getPassword());
-		user.setRoles(userToUpdate.getRoles());
+		user.setRole(userToUpdate.getRole());
 		
 		User userUpdated = userRepository.save(user);
 		

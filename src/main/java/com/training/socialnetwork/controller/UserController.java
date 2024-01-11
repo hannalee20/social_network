@@ -5,22 +5,17 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,9 +25,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.training.socialnetwork.dto.request.user.CustomUserDetail;
 import com.training.socialnetwork.dto.request.user.UserRegisterDto;
 import com.training.socialnetwork.dto.request.user.UserUpdateDto;
+import com.training.socialnetwork.dto.response.user.JwtResponse;
 import com.training.socialnetwork.dto.response.user.UserDetailDto;
 import com.training.socialnetwork.dto.response.user.UserLoggedInDto;
 import com.training.socialnetwork.dto.response.user.UserRegistedDto;
@@ -42,8 +37,6 @@ import com.training.socialnetwork.dto.response.user.UserUpdatedDto;
 import com.training.socialnetwork.security.JwtUtils;
 import com.training.socialnetwork.service.IUserService;
 import com.training.socialnetwork.util.generator.ReportGenerator;
-
-import io.swagger.annotations.Authorization;
 
 @RestController
 @RequestMapping(value = "/user")
@@ -68,27 +61,35 @@ public class UserController {
 	@PostMapping(value = "/login")
 	public ResponseEntity<Object> loginUser(@RequestParam("username") String username,
 			@RequestParam("password") String password) throws Exception {
-		Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-		
-		SecurityContextHolder.getContext().setAuthentication(authentication);
-		CustomUserDetail customUserDetail = (CustomUserDetail) authentication.getPrincipal();
-		ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(customUserDetail);
-		List<String> roles = customUserDetail.getAuthorities().stream()
-				.map(item -> item.getAuthority())
-				.collect(Collectors.toList());
+//		Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+//		
+//		SecurityContextHolder.getContext().setAuthentication(authentication);
+//		CustomUserDetail customUserDetail = (CustomUserDetail) authentication.getPrincipal();
+//		ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(customUserDetail);
+//		List<String> roles = customUserDetail.getAuthorities().stream()
+//				.map(item -> item.getAuthority())
+//				.collect(Collectors.toList());
 		
 //		UserLoggedInDto result = userService.loginUser(username, password);
-		HttpHeaders responseHeaders = new HttpHeaders();
-		responseHeaders.set("userId", Integer.toString(customUserDetail.getUserId()));
-		responseHeaders.set("token", jwtCookie.toString());
-		
-		return new ResponseEntity<Object>(jwtCookie.toString(), responseHeaders, HttpStatus.OK);
+//		HttpHeaders responseHeaders = new HttpHeaders();
+//		responseHeaders.set("userId", Integer.toString(customUserDetail.getUserId()));
+//		responseHeaders.set("token", jwtCookie.toString());
+//		
+//		return new ResponseEntity<Object>(jwtCookie.toString(), responseHeaders, HttpStatus.OK);
 //		
 //		return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
 //				.body(new UserLoggedInDto(customUserDetail.getUserId(),
 //											customUserDetail.getUsername(),
 //											roles));
+		Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+		SecurityContextHolder.getContext().setAuthentication(authentication);
+		UserLoggedInDto result = userService.loginUser(username, password);
 		
+		if(authentication != null) {
+			String jwt= jwtUtils.generateToken(authentication);
+			return ResponseEntity.ok(new JwtResponse(jwt));
+		}
+		return ResponseEntity.ok("fail");
 	}
 
 	@PutMapping(value = "/update/{userId}")
@@ -99,7 +100,6 @@ public class UserController {
 		return new ResponseEntity<Object>(result, HttpStatus.OK);
 	}
 
-	@Authorization(value = "")
 	@GetMapping(value = "/detail/{userId}")
 	public ResponseEntity<Object> getUserInfo(@PathVariable(value = "userId") int userId) throws Exception {
 		UserDetailDto result = userService.getInfo(userId);

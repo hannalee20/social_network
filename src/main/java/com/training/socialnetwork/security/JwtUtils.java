@@ -9,11 +9,13 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
 
 import com.training.socialnetwork.dto.request.user.CustomUserDetail;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -34,6 +36,29 @@ public class JwtUtils {
 	@Value("${social-network.app.jwtExpirationMs}")
 	private String jwtExpirationMs;
 
+	public String generateToken(Authentication authentication) {
+		CustomUserDetail customUserDetail = (CustomUserDetail) authentication.getPrincipal();
+		long miliSec = System.currentTimeMillis() + Long.parseLong(jwtExpirationMs);
+		Date expiryDate  = new Date(miliSec);
+		
+		return Jwts.builder()
+				.setSubject(Integer.toString(customUserDetail.getUserId()))
+				.setIssuedAt(new Date())
+				.setExpiration(expiryDate)
+				.signWith(key(), SignatureAlgorithm.HS512)
+				.compact();
+	}
+	
+	public int getUserIdFromJwt(String token) {
+		Claims claims = Jwts.parserBuilder()
+				.setSigningKey(key())
+				.build()
+				.parseClaimsJws(token)
+				.getBody();
+		
+		return Integer.parseInt(claims.getSubject());
+	}
+	
 	public String getJwtFromCookies(HttpServletRequest request) {
 		Cookie cookie = WebUtils.getCookie(request, jwtCookie);
 
