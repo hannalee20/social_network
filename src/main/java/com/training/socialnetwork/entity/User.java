@@ -9,8 +9,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -60,8 +60,8 @@ public class User {
 //	@ManyToMany
 //	@JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
 //	private Set<Role> roles = new HashSet<>();
-	@OneToOne
-	@JoinColumn(name = "role_id")
+	@ManyToOne
+	@JoinColumn(name = "roleId")
 	private Role role;
 
 	@Column

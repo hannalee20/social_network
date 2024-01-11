@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
@@ -29,7 +30,6 @@ import com.training.socialnetwork.dto.request.user.UserRegisterDto;
 import com.training.socialnetwork.dto.request.user.UserUpdateDto;
 import com.training.socialnetwork.dto.response.user.JwtResponse;
 import com.training.socialnetwork.dto.response.user.UserDetailDto;
-import com.training.socialnetwork.dto.response.user.UserLoggedInDto;
 import com.training.socialnetwork.dto.response.user.UserRegistedDto;
 import com.training.socialnetwork.dto.response.user.UserReportDto;
 import com.training.socialnetwork.dto.response.user.UserSearchDto;
@@ -83,7 +83,6 @@ public class UserController {
 //											roles));
 		Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 		SecurityContextHolder.getContext().setAuthentication(authentication);
-		UserLoggedInDto result = userService.loginUser(username, password);
 		
 		if(authentication != null) {
 			String jwt= jwtUtils.generateToken(authentication);
@@ -108,13 +107,14 @@ public class UserController {
 	}
 	
 	@PostMapping(value = "/search")
-	public List<UserSearchDto> searchUser(@RequestParam("userId") int userId, @RequestParam("keyword") String keyword){
+	public List<UserSearchDto> searchUser(HttpServletRequest request, @RequestParam("keyword") String keyword){
+		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		
 		return userService.searchUser(userId, keyword);
 	}
 	
-	@GetMapping(value = "/export-report/{userId}")
-	public void getReportUser(HttpServletResponse response, @PathVariable(value = "userId") int userId) throws IOException {
+	@GetMapping(value = "/export-report")
+	public void getReportUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		response.setContentType("application/octet-stream");
 		DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
 		String currentDate = dateFormatter.format(new Date());
@@ -123,6 +123,7 @@ public class UserController {
 		String headerValue = "attachment; filename=report_" + currentDate + ".xlsx";
 		response.setHeader(headerKey, headerValue);
 		
+		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		UserReportDto user = userService.getReportUser(userId);
 		
 		ReportGenerator reportGenerator = new ReportGenerator(user);

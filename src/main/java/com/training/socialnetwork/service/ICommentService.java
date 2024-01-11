@@ -7,9 +7,9 @@ import com.training.socialnetwork.dto.response.comment.CommentDetailDto;
 
 public interface ICommentService {
 	
-	CommentCreatedDto createComment(CommentCreateDto comment) throws Exception;
+	CommentCreatedDto createComment(int userId, CommentCreateDto comment) throws Exception;
 	
-	CommentCreatedDto updateComment(CommentUpdateDto comment, int userId) throws Exception;
+	CommentCreatedDto updateComment(CommentUpdateDto comment, int commentId, int userId) throws Exception;
 
 	boolean deleteComment(int commentId, int userId) throws Exception;
 	

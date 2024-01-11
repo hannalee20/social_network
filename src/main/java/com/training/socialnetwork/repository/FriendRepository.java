@@ -23,7 +23,7 @@ public interface FriendRepository extends JpaRepository<Friend, Integer>{
 				"select * from friends as f " + 
 				"where (f.user_id1 = :userId1 and f.user_id2 = :userId2) " + 
 				"or (f.user_id1 = :userId2 and f.user_id2 = :userId1) ", nativeQuery = true)
-	Friend findFriendByUser1AndUser2(@Param(value = "userId1") int userId1, @Param(value = "userId1") int userId2);
+	Friend findFriendByUser1AndUser2(@Param(value = "userId1") int userId1, @Param(value = "userId2") int userId2);
 
 	@Query(value = "" + 
 			"select * from friends as f " + 

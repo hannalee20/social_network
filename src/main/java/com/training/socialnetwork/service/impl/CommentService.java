@@ -38,9 +38,9 @@ public class CommentService implements ICommentService{
 	private ModelMapper modelMapper;
 
 	@Override
-	public CommentCreatedDto createComment(CommentCreateDto commentCreateDto) throws Exception {
+	public CommentCreatedDto createComment(int userId, CommentCreateDto commentCreateDto) throws Exception {
 		Post post = postRepository.findById(commentCreateDto.getPostId()).orElse(null);
-		User user = userRepository.findById(commentCreateDto.getUserId()).orElse(null);
+		User user = userRepository.findById(userId).orElse(null);
 		
 		if (post == null || user == null) {
 			throw new Exception(Constant.SERVER_ERROR);
@@ -60,12 +60,16 @@ public class CommentService implements ICommentService{
 	}
 
 	@Override
-	public CommentCreatedDto updateComment(CommentUpdateDto commentUpdateDto, int userId) throws Exception {
-		Post post = postRepository.findById(commentUpdateDto.getPostId()).orElse(null);
-		User user = userRepository.findById(commentUpdateDto.getUserId()).orElse(null);
-		Comment commentToUpdate = commentRepository.findById(commentUpdateDto.getCommentId()).orElse(null);
+	public CommentCreatedDto updateComment(CommentUpdateDto commentUpdateDto, int commentId, int userId) throws Exception {
+		Comment commentToUpdate = commentRepository.findById(commentId).orElse(null);
 		
-		if (post == null || user == null || commentToUpdate == null || commentUpdateDto.getUserId() != userId) {
+		if (commentToUpdate == null) {
+			throw new Exception(Constant.SERVER_ERROR);
+		}
+		Post post = postRepository.findById(commentToUpdate.getPost().getPostId()).orElse(null);
+		User user = userRepository.findById(userId).orElse(null);
+		
+		if (post == null || user == null || commentToUpdate.getUser().getUserId() != userId) {
 			throw new Exception(Constant.SERVER_ERROR);
 		}
 		

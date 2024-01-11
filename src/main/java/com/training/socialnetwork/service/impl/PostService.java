@@ -40,8 +40,8 @@ public class PostService implements IPostService {
 	private ModelMapper modelMapper;
 
 	@Override
-	public PostCreatedDto createPost(PostCreateDto postCreateDto) throws Exception {
-		User user = userRepository.findById(postCreateDto.getUserId()).orElse(null);
+	public PostCreatedDto createPost(int userId, PostCreateDto postCreateDto) throws Exception {
+		User user = userRepository.findById(userId).orElse(null);
 
 		if (user == null) {
 			throw new Exception(Constant.SERVER_ERROR);
@@ -101,10 +101,10 @@ public class PostService implements IPostService {
 
 	@Override
 	public PostUpdatedDto updatePost(PostUpdateDto postUpdateDto, int postId, int userId) throws Exception {
-		User user = userRepository.findById(postUpdateDto.getUserId()).orElse(null);
+		User user = userRepository.findById(userId).orElse(null);
 		Post postToUpdate = postRepository.findById(postId).orElse(null);
 
-		if (user == null || postToUpdate == null || user.getUserId() != userId) {
+		if (user == null || postToUpdate == null || user.getUserId() != postToUpdate.getUser().getUserId()) {
 			throw new Exception(Constant.SERVER_ERROR);
 		}
 

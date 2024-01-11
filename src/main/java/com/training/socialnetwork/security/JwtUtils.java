@@ -4,14 +4,12 @@ import java.security.Key;
 import java.text.ParseException;
 import java.util.Date;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.WebUtils;
 
 import com.training.socialnetwork.dto.request.user.CustomUserDetail;
 
@@ -45,7 +43,7 @@ public class JwtUtils {
 				.setSubject(Integer.toString(customUserDetail.getUserId()))
 				.setIssuedAt(new Date())
 				.setExpiration(expiryDate)
-				.signWith(key(), SignatureAlgorithm.HS512)
+				.signWith(key(), SignatureAlgorithm.HS256)
 				.compact();
 	}
 	
@@ -59,14 +57,13 @@ public class JwtUtils {
 		return Integer.parseInt(claims.getSubject());
 	}
 	
-	public String getJwtFromCookies(HttpServletRequest request) {
-		Cookie cookie = WebUtils.getCookie(request, jwtCookie);
+	public String getJwt(HttpServletRequest request) {
+		String jwt = request.getHeader("Authorization");
 
-		if (cookie != null) {
-			return cookie.getValue();
-		} else {
-			return null;
-		}
+		if (jwt != null && jwt.startsWith("Bearer ")) {
+            return jwt.substring(7);
+        }
+        return null;
 	}
 
 	public ResponseCookie generateJwtCookie(CustomUserDetail userPrincipal) throws ParseException {

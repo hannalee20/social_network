@@ -9,7 +9,6 @@ public class CommentCreateDto implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	private int postId;
-	private int userId;
 	private String content;
 	private String photoUrl;
 
@@ -20,15 +19,6 @@ public class CommentCreateDto implements Serializable{
 
 	public void setPostId(int postId) {
 		this.postId = postId;
-	}
-
-	@NotNull
-	public int getUserId() {
-		return userId;
-	}
-
-	public void setUserId(int userId) {
-		this.userId = userId;
 	}
 
 	@NotNull

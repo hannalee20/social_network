@@ -3,7 +3,7 @@ package com.training.socialnetwork.dto.response.post;
 public class PostCreatedDto {
 
 	private int postId;
-	private int userid;
+	private int userId;
 	private String username;
 	private String content;
 	private String photoUrl;
@@ -16,12 +16,12 @@ public class PostCreatedDto {
 		this.postId = postId;
 	}
 
-	public int getUserid() {
-		return userid;
+	public int getUserId() {
+		return userId;
 	}
 
-	public void setUserid(int userid) {
-		this.userid = userid;
+	public void setUserId(int userId) {
+		this.userId = userId;
 	}
 
 	public String getUsername() {

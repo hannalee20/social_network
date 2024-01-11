@@ -11,7 +11,7 @@ import com.training.socialnetwork.dto.response.post.PostUpdatedDto;
 
 public interface IPostService {
 	
-	PostCreatedDto createPost(PostCreateDto post) throws Exception;
+	PostCreatedDto createPost(int userId, PostCreateDto post) throws Exception;
 	
 	List<PostListDto> getAllPosts(int userId);
 	
