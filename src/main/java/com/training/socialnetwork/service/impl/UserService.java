@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import com.training.socialnetwork.dto.request.user.UserRegisterDto;
 import com.training.socialnetwork.dto.request.user.UserUpdateDto;
 import com.training.socialnetwork.dto.response.user.UserDetailDto;
-import com.training.socialnetwork.dto.response.user.UserLoggedInDto;
 import com.training.socialnetwork.dto.response.user.UserRegistedDto;
 import com.training.socialnetwork.dto.response.user.UserReportDto;
 import com.training.socialnetwork.dto.response.user.UserSearchDto;
@@ -86,13 +85,13 @@ public class UserService implements IUserService {
 	}
 
 	@Override
-	public UserLoggedInDto loginUser(String username, String password) throws Exception {
+	public boolean loginUser(String username, String password) throws Exception {
 		User user = userRepository.findByUsername(username);
 		if(user != null && bCryptPasswordEncoder.matches(password, user.getPassword())) {
-			return modelMapper.map(user, UserLoggedInDto.class);
+			return true;
 		}
 		
-		throw new Exception(Constant.SERVER_ERROR);
+		throw new Exception(Constant.INVALID_USERNAME_OR_PASSWORD);
 	}
 
 	@Override

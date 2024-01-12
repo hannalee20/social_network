@@ -49,11 +49,6 @@ public class WebSecurityConfig {
 		return authConfig.getAuthenticationManager();
 	}
 	
-//	@Bean
-//	  public PasswordEncoder passwordEncoder() {
-//	    return new BCryptPasswordEncoder();
-//	  }
-	
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http.csrf(csrf -> csrf.disable())
@@ -61,7 +56,7 @@ public class WebSecurityConfig {
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.authorizeHttpRequests(auth -> 
 				auth.antMatchers("/user/register").permitAll()
-				.antMatchers("/user/login").permitAll()
+				.antMatchers("/user/login", "/user/token").permitAll()
 				.antMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 				.anyRequest().authenticated()
 			);

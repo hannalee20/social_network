@@ -1,13 +1,11 @@
 package com.training.socialnetwork.security;
 
 import java.security.Key;
-import java.text.ParseException;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
@@ -66,23 +64,23 @@ public class JwtUtils {
         return null;
 	}
 
-	public ResponseCookie generateJwtCookie(CustomUserDetail userPrincipal) throws ParseException {
-		String jwt = generateTokenFromUsername(userPrincipal.getUsername());
-		ResponseCookie cookie = ResponseCookie.from(jwtCookie, jwt).path("/user").maxAge(24 * 60 * 60).httpOnly(true)
-				.build();
-
-		return cookie;
-	}
-
-	public ResponseCookie getCleanJwtCookie() {
-		ResponseCookie cookie = ResponseCookie.from(jwtCookie, null).path("/api").build();
-
-		return cookie;
-	}
-
-	public String getUsernameFromJwtToken(String token) {
-		return Jwts.parserBuilder().setSigningKey(key()).build().parseClaimsJws(token).getBody().getSubject();
-	}
+//	public ResponseCookie generateJwtCookie(CustomUserDetail userPrincipal) throws ParseException {
+//		String jwt = generateTokenFromUsername(userPrincipal.getUsername());
+//		ResponseCookie cookie = ResponseCookie.from(jwtCookie, jwt).path("/user").maxAge(24 * 60 * 60).httpOnly(true)
+//				.build();
+//
+//		return cookie;
+//	}
+//
+//	public ResponseCookie getCleanJwtCookie() {
+//		ResponseCookie cookie = ResponseCookie.from(jwtCookie, null).path("/api").build();
+//
+//		return cookie;
+//	}
+//
+//	public String getUsernameFromJwtToken(String token) {
+//		return Jwts.parserBuilder().setSigningKey(key()).build().parseClaimsJws(token).getBody().getSubject();
+//	}
 
 	public boolean validateJwtToken(String authToken) throws Exception {
 		try {
@@ -103,10 +101,10 @@ public class JwtUtils {
 		return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
 	}
 
-	private String generateTokenFromUsername(String username) throws ParseException {
-		long miliSec = System.currentTimeMillis() + Long.parseLong(jwtExpirationMs);
-		Date dateTime = new Date(miliSec);
-		return Jwts.builder().setSubject(username).setIssuedAt(new Date()).setExpiration(dateTime)
-				.signWith(key(), SignatureAlgorithm.HS256).compact();
-	}
+//	private String generateTokenFromUsername(String username) throws ParseException {
+//		long miliSec = System.currentTimeMillis() + Long.parseLong(jwtExpirationMs);
+//		Date dateTime = new Date(miliSec);
+//		return Jwts.builder().setSubject(username).setIssuedAt(new Date()).setExpiration(dateTime)
+//				.signWith(key(), SignatureAlgorithm.HS256).compact();
+//	}
 }

@@ -29,12 +29,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.training.socialnetwork.dto.request.user.UserRegisterDto;
 import com.training.socialnetwork.dto.request.user.UserUpdateDto;
 import com.training.socialnetwork.dto.response.user.JwtResponse;
+import com.training.socialnetwork.dto.response.user.OtpResponse;
 import com.training.socialnetwork.dto.response.user.UserDetailDto;
 import com.training.socialnetwork.dto.response.user.UserRegistedDto;
 import com.training.socialnetwork.dto.response.user.UserReportDto;
 import com.training.socialnetwork.dto.response.user.UserSearchDto;
 import com.training.socialnetwork.dto.response.user.UserUpdatedDto;
 import com.training.socialnetwork.security.JwtUtils;
+import com.training.socialnetwork.security.OtpUtils;
 import com.training.socialnetwork.service.IUserService;
 import com.training.socialnetwork.util.generator.ReportGenerator;
 
@@ -50,6 +52,9 @@ public class UserController {
 
 	@Autowired
 	private JwtUtils jwtUtils;
+	
+	@Autowired
+	private OtpUtils otpUtils;
 	
 	@PostMapping(value = "/register")
 	public ResponseEntity<Object> registerUser(@RequestBody UserRegisterDto userRegisterDto) throws Exception {
@@ -70,7 +75,13 @@ public class UserController {
 //				.map(item -> item.getAuthority())
 //				.collect(Collectors.toList());
 		
-//		UserLoggedInDto result = userService.loginUser(username, password);
+		boolean checkLogin = userService.loginUser(username, password);
+		if(checkLogin) {
+			int otp = otpUtils.generateOtp(username);
+			return ResponseEntity.ok(new OtpResponse(String.valueOf(otp)));
+		}
+		
+		return ResponseEntity.ok("fail");
 //		HttpHeaders responseHeaders = new HttpHeaders();
 //		responseHeaders.set("userId", Integer.toString(customUserDetail.getUserId()));
 //		responseHeaders.set("token", jwtCookie.toString());
@@ -81,16 +92,35 @@ public class UserController {
 //				.body(new UserLoggedInDto(customUserDetail.getUserId(),
 //											customUserDetail.getUsername(),
 //											roles));
+//		Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+//		SecurityContextHolder.getContext().setAuthentication(authentication);
+//		
+//		if(authentication != null) {
+//			String jwt = jwtUtils.generateToken(authentication);
+//			return ResponseEntity.ok(new JwtResponse(jwt));
+//		}
+//		return ResponseEntity.ok("fail");
+	}
+
+	@PostMapping(value = "/token")
+	public ResponseEntity<Object> getToken(@RequestParam("username") String username,
+			@RequestParam("password") String password, @RequestParam("otp") int otp) {
 		Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 		
-		if(authentication != null) {
-			String jwt= jwtUtils.generateToken(authentication);
+		int otpFromCache = 0;
+		if (otp >= 0) {
+			otpFromCache = otpUtils.getOtp(username);
+		}
+		if (otpFromCache > 0 && otpFromCache == otp && authentication != null) {
+			otpUtils.clearOtp(username);
+			String jwt = jwtUtils.generateToken(authentication);
 			return ResponseEntity.ok(new JwtResponse(jwt));
 		}
+		
 		return ResponseEntity.ok("fail");
 	}
-
+	
 	@PutMapping(value = "/update/{userId}")
 	public ResponseEntity<Object> updateUser(@RequestBody @Valid UserUpdateDto userUpdateDto,
 			@PathVariable(value = "userId") int userId) throws Exception {
