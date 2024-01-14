@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.training.socialnetwork.dto.request.post.PostCreateDto;
 import com.training.socialnetwork.dto.request.post.PostUpdateDto;
@@ -38,10 +39,10 @@ public class PostController {
 	private JwtUtils jwtUtils;
 
 	@PostMapping(value = "/create")
-	public ResponseEntity<Object> createPost(HttpServletRequest request, @RequestBody PostCreateDto post)
+	public ResponseEntity<Object> createPost(HttpServletRequest request, @RequestParam String content, @RequestParam MultipartFile[] photos)
 			throws Exception {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
-		PostCreatedDto result = postService.createPost(userId, post);
+		PostCreatedDto result = postService.createPost(userId, content, photos);
 
 		return new ResponseEntity<Object>(result, HttpStatus.CREATED);
 	}

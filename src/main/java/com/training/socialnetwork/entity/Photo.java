@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -23,21 +24,17 @@ public class Photo {
 	@JoinColumn(name = "postId")
 	private Post post;
 
-	@ManyToOne
-	@JoinColumn(name = "userId")
-	private User user;
-
 	@Column
 	private String name;
 
 	@Column
-	private int type;
+	private String type;
+	
+	@Lob
+	private byte[] data;
 
 	@Column
 	private Date createDate;
-
-	@Column
-	private Date updateDate;
 
 	@Column
 	private int deleteFlg;
@@ -58,14 +55,6 @@ public class Photo {
 		this.post = post;
 	}
 
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
-	}
-
 	public String getName() {
 		return name;
 	}
@@ -74,12 +63,20 @@ public class Photo {
 		this.name = name;
 	}
 
-	public int getType() {
+	public String getType() {
 		return type;
 	}
 
-	public void setType(int type) {
+	public void setType(String type) {
 		this.type = type;
+	}
+
+	public byte[] getData() {
+		return data;
+	}
+
+	public void setData(byte[] data) {
+		this.data = data;
 	}
 
 	public Date getCreateDate() {
@@ -88,14 +85,6 @@ public class Photo {
 
 	public void setCreateDate(Date createDate) {
 		this.createDate = createDate;
-	}
-
-	public Date getUpdateDate() {
-		return updateDate;
-	}
-
-	public void setUpdateDate(Date updateDate) {
-		this.updateDate = updateDate;
 	}
 
 	public int getDeleteFlg() {

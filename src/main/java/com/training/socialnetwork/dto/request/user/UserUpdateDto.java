@@ -3,8 +3,9 @@ package com.training.socialnetwork.dto.request.user;
 import java.io.Serializable;
 import java.util.Date;
 
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import com.training.socialnetwork.util.constant.Constant;
 
@@ -12,7 +13,6 @@ public class UserUpdateDto implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private int userId;
 	private String realName;
 	private Date birthDate;
 	private int gender;
@@ -22,16 +22,7 @@ public class UserUpdateDto implements Serializable {
 	private String job;
 	private String status;
 	private String about;
-	private String avatarUrl;
-
-	@NotNull(message = Constant.INVALID_ID)
-	public int getUserId() {
-		return userId;
-	}
-
-	public void setUserId(int userId) {
-		this.userId = userId;
-	}
+	private MultipartFile avatarUrl;
 
 	@Pattern(regexp = "^[A-Z]([a-zA-Z]+)?$", message = Constant.INVALID_REAL_NAME)
 	public String getRealName() {
@@ -107,16 +98,12 @@ public class UserUpdateDto implements Serializable {
 		this.about = about;
 	}
 
-	public String getAvatarUrl() {
+	public MultipartFile getAvatarUrl() {
 		return avatarUrl;
 	}
 
-	public void setAvatarUrl(String avatarUrl) {
+	public void setAvatarUrl(MultipartFile avatarUrl) {
 		this.avatarUrl = avatarUrl;
-	}
-
-	public static long getSerialversionuid() {
-		return serialVersionUID;
 	}
 
 }

@@ -2,6 +2,8 @@ package com.training.socialnetwork.service;
 
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.training.socialnetwork.dto.request.user.UserRegisterDto;
 import com.training.socialnetwork.dto.request.user.UserUpdateDto;
 import com.training.socialnetwork.dto.response.user.UserDetailDto;
@@ -16,7 +18,7 @@ public interface IUserService {
 	
 	boolean loginUser(String username, String password) throws Exception;
 	
-	UserUpdatedDto updateInfo(UserUpdateDto user, int userId) throws Exception;
+	UserUpdatedDto updateInfo(UserUpdateDto user, MultipartFile image, int userId, int loggedInUserId) throws Exception;
 	
 	UserDetailDto getInfo(int userId) throws Exception;
 	

@@ -6,12 +6,14 @@ import java.time.temporal.WeekFields;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.training.socialnetwork.dto.request.user.UserRegisterDto;
 import com.training.socialnetwork.dto.request.user.UserUpdateDto;
@@ -95,9 +97,9 @@ public class UserService implements IUserService {
 	}
 
 	@Override
-	public UserUpdatedDto updateInfo(UserUpdateDto userUpdateDto, int userId) throws Exception {
-		User userToUpdate = userRepository.findById(userUpdateDto.getUserId()).orElse(null);
-		User loggedInUser = userRepository.findById(userId).orElse(null);
+	public UserUpdatedDto updateInfo(UserUpdateDto userUpdateDto, MultipartFile image, int userId, int loggedInUserId) throws Exception {
+		User userToUpdate = userRepository.findById(userId).orElse(null);
+		User loggedInUser = userRepository.findById(loggedInUserId).orElse(null);
 		
 		if(userToUpdate == null || loggedInUser == null || userToUpdate.getUserId() != loggedInUser.getUserId()) {
 			throw new Exception(Constant.SERVER_ERROR);
@@ -108,7 +110,9 @@ public class UserService implements IUserService {
 		user.setUsername(userToUpdate.getUsername());
 		user.setPassword(userToUpdate.getPassword());
 		user.setRole(userToUpdate.getRole());
-		
+		if (image != null) {
+			
+		}
 		User userUpdated = userRepository.save(user);
 		
 		if (userUpdated != null) {

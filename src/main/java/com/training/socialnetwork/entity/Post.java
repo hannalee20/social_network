@@ -28,8 +28,8 @@ public class Post {
 	@Column
 	private String content;
 	
-	@Column
-	private String photoUrl;
+	@OneToMany(targetEntity = Photo.class, mappedBy = "post")
+	private List<Photo> listPhoto;
 	
 	@Column
 	private Date createDate;
@@ -70,12 +70,12 @@ public class Post {
 		this.content = content;
 	}
 
-	public String getPhotoUrl() {
-		return photoUrl;
+	public List<Photo> getListPhoto() {
+		return listPhoto;
 	}
 
-	public void setPhotoUrl(String photoUrl) {
-		this.photoUrl = photoUrl;
+	public void setListPhoto(List<Photo> listPhoto) {
+		this.listPhoto = listPhoto;
 	}
 
 	public Date getCreateDate() {

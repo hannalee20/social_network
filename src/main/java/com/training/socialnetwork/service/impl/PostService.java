@@ -12,16 +12,20 @@ import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.training.socialnetwork.dto.request.post.PostCreateDto;
 import com.training.socialnetwork.dto.request.post.PostUpdateDto;
 import com.training.socialnetwork.dto.response.post.PostCreatedDto;
 import com.training.socialnetwork.dto.response.post.PostDetailDto;
 import com.training.socialnetwork.dto.response.post.PostListDto;
 import com.training.socialnetwork.dto.response.post.PostUpdatedDto;
 import com.training.socialnetwork.entity.Comment;
+import com.training.socialnetwork.entity.Photo;
 import com.training.socialnetwork.entity.Post;
 import com.training.socialnetwork.entity.User;
+import com.training.socialnetwork.repository.PhotoRepository;
 import com.training.socialnetwork.repository.PostRepository;
 import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.IPostService;
@@ -35,12 +39,15 @@ public class PostService implements IPostService {
 
 	@Autowired
 	private UserRepository userRepository;
+	
+	@Autowired
+	private PhotoRepository photoRepository;
 
 	@Autowired
 	private ModelMapper modelMapper;
 
 	@Override
-	public PostCreatedDto createPost(int userId, PostCreateDto postCreateDto) throws Exception {
+	public PostCreatedDto createPost(int userId, String content, MultipartFile[] photos) throws Exception {
 		User user = userRepository.findById(userId).orElse(null);
 
 		if (user == null) {
@@ -48,8 +55,30 @@ public class PostService implements IPostService {
 		}
 		Post post = new Post();
 		post.setUser(user);
-		post.setContent(postCreateDto.getContent());
-		post.setPhotoUrl(postCreateDto.getPhotoUrl());
+		post.setContent(content);
+		List<Photo> photoList = new ArrayList<>();
+		if (photos.length > 0) {
+			for (MultipartFile file : photos) {
+				String name = StringUtils.cleanPath(file.getOriginalFilename());
+				Photo photo = new Photo();
+				photo.setPost(post);
+				photo.setName(name);
+				photo.setType(file.getContentType());
+				photo.setData(file.getBytes());
+				
+				photo = photoRepository.save(photo);
+				
+				String photoUrl = ServletUriComponentsBuilder
+				          .fromCurrentContextPath()
+				          .path("/files/")
+				          .path(Integer.toString(photo.getPhotoId()))
+				          .toUriString();
+				
+				photo.setName(photoUrl);
+				photoList.add(photo);
+			}
+		}
+		post.setListPhoto(photoList);
 		post.setLikeList(new ArrayList<>());
 		post.setCommentList(new ArrayList<>());
 		post.setCreateDate(new Date());

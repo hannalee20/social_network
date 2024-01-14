@@ -8,10 +8,10 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,7 +24,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.training.socialnetwork.dto.request.user.UserRegisterDto;
 import com.training.socialnetwork.dto.request.user.UserUpdateDto;
@@ -121,10 +123,11 @@ public class UserController {
 		return ResponseEntity.ok("fail");
 	}
 	
-	@PutMapping(value = "/update/{userId}")
-	public ResponseEntity<Object> updateUser(@RequestBody @Valid UserUpdateDto userUpdateDto,
+	@PutMapping(value = "/update/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<Object> updateUser(HttpServletRequest request, @RequestPart UserUpdateDto userUpdateDto, @RequestPart(required = false) MultipartFile image,
 			@PathVariable(value = "userId") int userId) throws Exception {
-		UserUpdatedDto result = userService.updateInfo(userUpdateDto, userId);
+		int loggedInUserId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
+		UserUpdatedDto result = userService.updateInfo(userUpdateDto, image, userId, loggedInUserId);
 
 		return new ResponseEntity<Object>(result, HttpStatus.OK);
 	}
