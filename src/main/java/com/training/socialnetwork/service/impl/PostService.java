@@ -56,40 +56,43 @@ public class PostService implements IPostService {
 		Post post = new Post();
 		post.setUser(user);
 		post.setContent(content);
+		post.setCreateDate(new Date());
+		post.setUpdateDate(new Date());
+
+		Post postCreated = postRepository.save(post);
+		if (postCreated == null) {
+			throw new Exception(Constant.SERVER_ERROR);
+		}
+		
 		List<Photo> photoList = new ArrayList<>();
+		List<String> photoUrls = new ArrayList<>();
 		if (photos.length > 0) {
 			for (MultipartFile file : photos) {
 				String name = StringUtils.cleanPath(file.getOriginalFilename());
 				Photo photo = new Photo();
-				photo.setPost(post);
+				photo.setPost(postCreated);
 				photo.setName(name);
 				photo.setType(file.getContentType());
 				photo.setData(file.getBytes());
 				
 				photo = photoRepository.save(photo);
-				
+				if (photo == null) {
+					throw new Exception(Constant.SERVER_ERROR);
+				}
 				String photoUrl = ServletUriComponentsBuilder
 				          .fromCurrentContextPath()
 				          .path("/files/")
 				          .path(Integer.toString(photo.getPhotoId()))
 				          .toUriString();
-				
-				photo.setName(photoUrl);
 				photoList.add(photo);
+				photoUrls.add(photoUrl);
 			}
+			postCreated.setListPhoto(photoList);
 		}
-		post.setListPhoto(photoList);
-		post.setLikeList(new ArrayList<>());
-		post.setCommentList(new ArrayList<>());
-		post.setCreateDate(new Date());
-		post.setUpdateDate(new Date());
-
-		Post postCreated = postRepository.save(post);
-
-		if (postCreated != null) {
-			return modelMapper.map(postCreated, PostCreatedDto.class);
-		}
-		throw new Exception(Constant.SERVER_ERROR);
+		
+		PostCreatedDto postCreatedDto = modelMapper.map(postCreated, PostCreatedDto.class);
+		postCreatedDto.setPhotoUrl(photoUrls);
+		return postCreatedDto;
 	}
 
 	@Override

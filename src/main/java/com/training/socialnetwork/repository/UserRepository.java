@@ -13,7 +13,11 @@ import com.training.socialnetwork.entity.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
 
-	public User findByUsername(String username);
+	User findByUsername(String username);
+	
+	User findByEmail(String email);
+	
+	User findByToken(String token);
 
 	@Query(value = "" + "select * from users as u" + "where u.user_id <> :userId "
 			+ "and (lower(u.username) like concat('%', :keyword, '%') "

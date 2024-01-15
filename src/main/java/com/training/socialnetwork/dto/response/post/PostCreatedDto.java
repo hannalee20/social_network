@@ -1,12 +1,14 @@
 package com.training.socialnetwork.dto.response.post;
 
+import java.util.List;
+
 public class PostCreatedDto {
 
 	private int postId;
 	private int userId;
 	private String username;
 	private String content;
-	private String photoUrl;
+	private List<String> photoUrl;
 
 	public int getPostId() {
 		return postId;
@@ -40,11 +42,11 @@ public class PostCreatedDto {
 		this.content = content;
 	}
 
-	public String getPhotoUrl() {
+	public List<String> getPhotoUrl() {
 		return photoUrl;
 	}
 
-	public void setPhotoUrl(String photoUrl) {
+	public void setPhotoUrl(List<String> photoUrl) {
 		this.photoUrl = photoUrl;
 	}
 

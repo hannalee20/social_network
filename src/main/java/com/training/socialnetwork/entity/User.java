@@ -63,6 +63,12 @@ public class User {
 	@ManyToOne
 	@JoinColumn(name = "roleId")
 	private Role role;
+	
+	@Column
+	private String token;
+	
+	@Column
+	private Date tokenCreateDate;
 
 	@Column
 	private Date createDate;
@@ -253,12 +259,20 @@ public class User {
 		this.role = role;
 	}
 
-//	public Set<Role> getRoles() {
-//		return this.roles;
-//	}
-//
-//	public void setRoles(Set<Role> roles) {
-//		this.roles = roles;
-//	}
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
+	}
+
+	public Date getTokenCreateDate() {
+		return tokenCreateDate;
+	}
+
+	public void setTokenCreateDate(Date tokenCreateDate) {
+		this.tokenCreateDate = tokenCreateDate;
+	}
 
 }

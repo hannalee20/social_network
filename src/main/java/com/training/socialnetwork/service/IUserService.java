@@ -25,4 +25,8 @@ public interface IUserService {
 	List<UserSearchDto> searchUser(int userId, String keyword);
 	
 	UserReportDto getReportUser(int userId);
+	
+	String forgotPassword(String email, int userId) throws Exception;
+	
+	String resetPassword(String token, String newPassword) throws Exception;
 }

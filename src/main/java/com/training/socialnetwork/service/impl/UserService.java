@@ -1,5 +1,6 @@
 package com.training.socialnetwork.service.impl;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
@@ -36,34 +37,36 @@ import com.training.socialnetwork.util.constant.Constant;
 
 @Service
 public class UserService implements IUserService {
-	
+
 	@Autowired
 	private UserRepository userRepository;
-	
+
 	@Autowired
 	private PostRepository postRepository;
-	
+
 	@Autowired
 	private CommentRepository commentRepository;
-	
+
 	@Autowired
 	private LikeRepository likeRepository;
-	
+
 	@Autowired
 	private FriendRepository friendRepository;
-	
+
 	@Autowired
 	private RoleRepository roleRepository;
-	
+
 	@Autowired
 	private ModelMapper modelMapper;
-	
+
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
-	
+
+	private static final long EXPIRE_TOKEN = 30;
+
 	@Override
 	public UserRegistedDto createUser(UserRegisterDto userRegisterDto) throws Exception {
-		if(userRepository.findByUsername(userRegisterDto.getUsername()) != null){
+		if (userRepository.findByUsername(userRegisterDto.getUsername()) != null) {
 			throw new Exception(Constant.SERVER_ERROR);
 		}
 		User user = new User();
@@ -76,81 +79,84 @@ public class UserService implements IUserService {
 		user.setRole(role);
 		user.setCreateDate(new Date());
 		user.setUpdateDate(new Date());
-		
+
 		User userRegisted = userRepository.save(user);
-		
+
 		if (userRegisted != null) {
 			return modelMapper.map(userRegisted, UserRegistedDto.class);
 		}
-		
+
 		throw new Exception(Constant.SERVER_ERROR);
 	}
 
 	@Override
 	public boolean loginUser(String username, String password) throws Exception {
 		User user = userRepository.findByUsername(username);
-		if(user != null && bCryptPasswordEncoder.matches(password, user.getPassword())) {
+		if (user != null && bCryptPasswordEncoder.matches(password, user.getPassword())) {
 			return true;
 		}
-		
+
 		throw new Exception(Constant.INVALID_USERNAME_OR_PASSWORD);
 	}
 
 	@Override
-	public UserUpdatedDto updateInfo(UserUpdateDto userUpdateDto, MultipartFile image, int userId, int loggedInUserId) throws Exception {
+	public UserUpdatedDto updateInfo(UserUpdateDto userUpdateDto, MultipartFile image, int userId, int loggedInUserId)
+			throws Exception {
 		User userToUpdate = userRepository.findById(userId).orElse(null);
 		User loggedInUser = userRepository.findById(loggedInUserId).orElse(null);
-		
-		if(userToUpdate == null || loggedInUser == null || userToUpdate.getUserId() != loggedInUser.getUserId()) {
+
+		if (userToUpdate == null || loggedInUser == null || userToUpdate.getUserId() != loggedInUser.getUserId()) {
 			throw new Exception(Constant.SERVER_ERROR);
 		}
-		
+
 		User user = modelMapper.map(userUpdateDto, User.class);
-			
+
 		user.setUsername(userToUpdate.getUsername());
 		user.setPassword(userToUpdate.getPassword());
 		user.setRole(userToUpdate.getRole());
 		if (image != null) {
-			
+
 		}
 		User userUpdated = userRepository.save(user);
-		
+
 		if (userUpdated != null) {
 			return modelMapper.map(userUpdated, UserUpdatedDto.class);
 		}
-		
+
 		throw new Exception(Constant.SERVER_ERROR);
 	}
 
 	@Override
 	public UserDetailDto getInfo(int userId) throws Exception {
 		User user = userRepository.findById(userId).orElse(null);
-		
-		if(user == null) {
+
+		if (user == null) {
 			throw new Exception(Constant.SERVER_ERROR);
 		}
-		
+
 		return modelMapper.map(user, UserDetailDto.class);
 	}
 
 	@Override
 	public List<UserSearchDto> searchUser(int userId, String keyword) {
 		List<User> userList = userRepository.findAllUserByKeyword(userId, keyword);
-		
+
 		List<Friend> friendList = friendRepository.findAllByUserId(userId);
-		
-		List<UserSearchDto> userSearchList = userList.stream().map(user -> modelMapper.map(user, UserSearchDto.class)).collect(Collectors.toList());
-		
+
+		List<UserSearchDto> userSearchList = userList.stream().map(user -> modelMapper.map(user, UserSearchDto.class))
+				.collect(Collectors.toList());
+
 		for (UserSearchDto user : userSearchList) {
 			user.setFriendStatus(Constant.NOT_FRIEND);
 			for (Friend friend : friendList) {
-				if(friend.getUser1().getUserId() == user.getUserId() || friend.getUser2().getUserId() == user.getUserId()) {
+				if (friend.getUser1().getUserId() == user.getUserId()
+						|| friend.getUser2().getUserId() == user.getUserId()) {
 					user.setFriendStatus(friend.getStatus());
 					break;
 				}
 			}
 		}
-		
+
 		return userSearchList;
 	}
 
@@ -160,13 +166,47 @@ public class UserService implements IUserService {
 		TemporalField fieldISO = WeekFields.of(Locale.FRANCE).dayOfWeek();
 		LocalDate dateStart = date.with(fieldISO, 1);
 		LocalDate dateEnd = date.with(fieldISO, 7);
-		
+
 		UserReportDto userReportDto = new UserReportDto();
 		userReportDto.setPostCount(postRepository.countPost(userId, dateStart, dateEnd));
 		userReportDto.setCommentCount(commentRepository.countComment(userId, dateStart, dateEnd));
 		userReportDto.setFriendCount(friendRepository.countFriend(userId, dateStart, dateEnd));
 		userReportDto.setLikeCount(likeRepository.countLike(userId, dateStart, dateEnd));
-		
+
 		return userReportDto;
 	}
+
+	@Override
+	public String forgotPassword(String email, int userId) throws Exception {
+		User user = userRepository.findByEmail(email);
+
+		if (user == null || user.getUserId() != userId) {
+			throw new Exception(Constant.SERVER_ERROR);
+		}
+		String token = UUID.randomUUID().toString();
+		user.setToken(token);
+		user.setTokenCreateDate(new Date());
+
+		user = userRepository.save(user);
+
+		return user.getToken();
+	}
+
+	@Override
+	public String resetPassword(String token, String newPassword) throws Exception {
+		User user = userRepository.findByToken(token);
+		if(user == null) {
+			throw new Exception(Constant.SERVER_ERROR);
+		}
+		
+		if(user.getTokenCreateDate().compareTo(new Date()) > EXPIRE_TOKEN) {
+			throw new Exception(Constant.SERVER_ERROR);
+		}
+		user.setPassword(newPassword);
+		user.setToken(null);
+		user.setTokenCreateDate(null);
+		userRepository.save(user);
+		return "success";
+	}
+
 }

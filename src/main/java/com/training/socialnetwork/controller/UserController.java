@@ -160,8 +160,25 @@ public class UserController {
 		UserReportDto user = userService.getReportUser(userId);
 		
 		ReportGenerator reportGenerator = new ReportGenerator(user);
+		
 		reportGenerator.export(response);
+	}
+	
+	@PostMapping(value = "/forgot-password")
+	public ResponseEntity<Object> forgotPassword(HttpServletRequest request, @RequestParam("email") String email) throws Exception {
+		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
+		String result = userService.forgotPassword(email, userId);
 		
+		if(result != null) {
+			result = "http://localhost:8080/user/reset-password?token=\\" + result;
+		}
+		return ResponseEntity.ok(result);
+	}
+	
+	@PutMapping(value = "/reset-password")
+	public ResponseEntity<Object> resetPassword(@RequestParam("token") String token, @RequestParam("newPassword") String newPassword) throws Exception {
+		String result = userService.resetPassword(token, newPassword);
 		
+		return ResponseEntity.ok(result);
 	}
 }
