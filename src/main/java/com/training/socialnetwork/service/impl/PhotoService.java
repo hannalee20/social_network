@@ -29,6 +29,6 @@ public class PhotoService implements IPhotoService{
 	}
 	
 	public Stream<Photo> getPhoto(int postId) {
-		return photoRepository.findByPostId(postId);
+		return photoRepository.findByPostPostId(postId);
 	}
 }
