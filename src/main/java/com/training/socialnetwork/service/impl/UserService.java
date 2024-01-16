@@ -1,6 +1,8 @@
 package com.training.socialnetwork.service.impl;
 
-import java.time.Duration;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
@@ -100,7 +102,7 @@ public class UserService implements IUserService {
 	}
 
 	@Override
-	public UserUpdatedDto updateInfo(UserUpdateDto userUpdateDto, MultipartFile image, int userId, int loggedInUserId)
+	public UserUpdatedDto updateInfo(UserUpdateDto userUpdateDto, MultipartFile avatar, int userId, int loggedInUserId)
 			throws Exception {
 		User userToUpdate = userRepository.findById(userId).orElse(null);
 		User loggedInUser = userRepository.findById(loggedInUserId).orElse(null);
@@ -114,8 +116,15 @@ public class UserService implements IUserService {
 		user.setUsername(userToUpdate.getUsername());
 		user.setPassword(userToUpdate.getPassword());
 		user.setRole(userToUpdate.getRole());
-		if (image != null) {
-
+		if (avatar != null) {
+			byte[] bytes = avatar.getBytes();
+			Path pathAvatar = Paths.get(".").resolve("profile_avatar");
+			Files.delete(pathAvatar.resolve(user.getAvatarUrl()));
+			String fileName = avatar.getOriginalFilename();
+			String extension = getFileExtension(fileName);
+			fileName = user.getUserId() + "." + extension;
+			Files.write(pathAvatar.resolve(fileName), bytes);
+			user.setAvatarUrl(fileName);
 		}
 		User userUpdated = userRepository.save(user);
 
@@ -125,6 +134,11 @@ public class UserService implements IUserService {
 
 		throw new Exception(Constant.SERVER_ERROR);
 	}
+	
+	private static String getFileExtension(String fileName) {
+        int index = fileName.lastIndexOf('.');
+        return index == -1 ? fileName : fileName.substring(index + 1);
+    }
 
 	@Override
 	public UserDetailDto getInfo(int userId) throws Exception {

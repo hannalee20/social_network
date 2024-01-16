@@ -68,15 +68,6 @@ public class UserController {
 	@PostMapping(value = "/login")
 	public ResponseEntity<Object> loginUser(@RequestParam("username") String username,
 			@RequestParam("password") String password) throws Exception {
-//		Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-//		
-//		SecurityContextHolder.getContext().setAuthentication(authentication);
-//		CustomUserDetail customUserDetail = (CustomUserDetail) authentication.getPrincipal();
-//		ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(customUserDetail);
-//		List<String> roles = customUserDetail.getAuthorities().stream()
-//				.map(item -> item.getAuthority())
-//				.collect(Collectors.toList());
-		
 		boolean checkLogin = userService.loginUser(username, password);
 		if(checkLogin) {
 			int otp = otpUtils.generateOtp(username);
@@ -84,24 +75,6 @@ public class UserController {
 		}
 		
 		return ResponseEntity.ok("fail");
-//		HttpHeaders responseHeaders = new HttpHeaders();
-//		responseHeaders.set("userId", Integer.toString(customUserDetail.getUserId()));
-//		responseHeaders.set("token", jwtCookie.toString());
-//		
-//		return new ResponseEntity<Object>(jwtCookie.toString(), responseHeaders, HttpStatus.OK);
-//		
-//		return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-//				.body(new UserLoggedInDto(customUserDetail.getUserId(),
-//											customUserDetail.getUsername(),
-//											roles));
-//		Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-//		SecurityContextHolder.getContext().setAuthentication(authentication);
-//		
-//		if(authentication != null) {
-//			String jwt = jwtUtils.generateToken(authentication);
-//			return ResponseEntity.ok(new JwtResponse(jwt));
-//		}
-//		return ResponseEntity.ok("fail");
 	}
 
 	@PostMapping(value = "/token")
@@ -124,10 +97,10 @@ public class UserController {
 	}
 	
 	@PutMapping(value = "/update/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<Object> updateUser(HttpServletRequest request, @RequestPart UserUpdateDto userUpdateDto, @RequestPart(required = false) MultipartFile image,
+	public ResponseEntity<Object> updateUser(HttpServletRequest request, @RequestPart UserUpdateDto userUpdateDto, @RequestPart(required = false) MultipartFile avatar,
 			@PathVariable(value = "userId") int userId) throws Exception {
 		int loggedInUserId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
-		UserUpdatedDto result = userService.updateInfo(userUpdateDto, image, userId, loggedInUserId);
+		UserUpdatedDto result = userService.updateInfo(userUpdateDto, avatar, userId, loggedInUserId);
 
 		return new ResponseEntity<Object>(result, HttpStatus.OK);
 	}

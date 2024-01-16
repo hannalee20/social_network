@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.training.socialnetwork.dto.request.post.PostCreateDto;
 import com.training.socialnetwork.dto.request.post.PostUpdateDto;
 import com.training.socialnetwork.dto.response.post.PostCreatedDto;
 import com.training.socialnetwork.dto.response.post.PostDetailDto;
