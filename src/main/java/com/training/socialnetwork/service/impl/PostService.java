@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -96,8 +97,8 @@ public class PostService implements IPostService {
 	}
 
 	@Override
-	public List<PostListDto> getAllPosts(int userId) {
-		List<Post> postList = postRepository.findAllByUserId(userId);
+	public List<PostListDto> getAllPosts(int userId, Pageable page) {
+		List<Post> postList = postRepository.findAllByUserId(userId, page);
 
 		return postList.stream().map(post -> {
 			PostListDto postListDto = modelMapper.map(post, PostListDto.class);

@@ -139,4 +139,24 @@ public class FriendService implements IFriendService {
 		return friendRepository.countFriend(userId, dateStart, dateEnd);
 	}
 
+	@Override
+	public boolean removeFriendRequest(int userId1, int userId2) throws Exception {
+		User user1 = userRepository.findById(userId1).orElse(null);
+		User user2 = userRepository.findById(userId2).orElse(null);
+
+		if (user1 == null || user2 == null) {
+			return false;
+		}
+
+		Friend friend = friendRepository.findFriendByUserIdAndStatus(userId1, userId2, Constant.FRIENDED_STATUS);
+
+		if (friend == null) {
+			return false;
+		}
+
+		friend.setStatus(Constant.NOT_FRIEND);
+
+		return friendRepository.save(friend) != null;
+	}
+
 }

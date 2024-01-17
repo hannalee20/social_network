@@ -91,4 +91,16 @@ public class FriendController {
 		
 		return friendService.findAllAddFriendRequest(userId);
 	}
+	
+	@PostMapping(value = "remove-friend-request")
+	public ResponseEntity<Object> removeFriendRequest(HttpServletRequest request, @RequestParam(value = "userId1") int userId1) throws Exception {
+		int userId2 = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
+		boolean result = friendService.removeFriendRequest(userId1, userId2);
+
+		if (result) {
+			return new ResponseEntity<Object>(result, HttpStatus.CREATED);
+		}
+
+		throw new Exception(Constant.SERVER_ERROR);
+	}
 }

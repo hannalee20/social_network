@@ -2,6 +2,7 @@ package com.training.socialnetwork.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.training.socialnetwork.dto.request.post.PostUpdateDto;
@@ -14,7 +15,7 @@ public interface IPostService {
 	
 	PostCreatedDto createPost(int userId, String content, MultipartFile[] photos) throws Exception;
 	
-	List<PostListDto> getAllPosts(int userId);
+	List<PostListDto> getAllPosts(int userId, Pageable page);
 	
 	PostDetailDto getPost(int postId) throws Exception;
 	

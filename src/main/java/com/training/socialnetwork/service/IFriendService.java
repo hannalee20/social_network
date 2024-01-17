@@ -20,4 +20,6 @@ public interface IFriendService {
 	boolean unfriend(int userId1, int userId2);
 	
 	int countFriend(int userId);
+	
+	boolean removeFriendRequest(int userId1, int userId2) throws Exception;
 }

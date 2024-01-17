@@ -5,6 +5,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -47,10 +49,10 @@ public class PostController {
 	}
 
 	@GetMapping(value = "/timeline")
-	public List<PostListDto> getPostList(HttpServletRequest request) {
+	public List<PostListDto> getPostList(HttpServletRequest request, @RequestParam(defaultValue = "0", required = false) int page, @RequestParam(defaultValue = "5", required = false) int pageSize) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
-
-		return postService.getAllPosts(userId);
+		Pageable paging = PageRequest.of(page, pageSize);
+		return postService.getAllPosts(userId, paging);
 	}
 
 	@GetMapping(value = "/detail/{postId}")

@@ -3,6 +3,7 @@ package com.training.socialnetwork.repository;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,9 +18,9 @@ public interface PostRepository extends JpaRepository<Post, Integer>{
 				"select p.post_id, p.post_id, p.content, p.photo_url from posts as p " + 
 				"left join friends f1 on p.user_id = f1.user_id1 " + 
 				"left join friends f2 on p.user_id = f2.user_id2 " + 
-				"where p.user_id = :userId and f1.status = 1 and f2.status = 1" + 
+				"where p.user_id = :userId and f1.status = 1 and f2.status = 1 " + 
 				"order by p.update_date ", nativeQuery = true)
-	List<Post> findAllByUserId(@Param(value = "userId") int userId);
+	List<Post> findAllByUserId(@Param(value = "userId") int userId, Pageable paging);
 	
 	@Query(value = "" + 
 				"select count(p.post_id) as post " + 
