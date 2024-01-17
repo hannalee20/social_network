@@ -13,6 +13,9 @@ import com.training.socialnetwork.entity.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
 
+	@Query(value = "" + 
+			"select * from users as u " + 
+			"where username = :username ", nativeQuery = true)
 	User findByUsername(String username);
 	
 	User findByEmail(String email);

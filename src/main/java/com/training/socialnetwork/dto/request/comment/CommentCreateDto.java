@@ -2,7 +2,8 @@ package com.training.socialnetwork.dto.request.comment;
 
 import java.io.Serializable;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 
 public class CommentCreateDto implements Serializable{
 
@@ -10,9 +11,9 @@ public class CommentCreateDto implements Serializable{
 	
 	private int postId;
 	private String content;
-	private String photoUrl;
 
-	@NotNull
+	@NotBlank(message = "The postId is required")
+	@Pattern(regexp = "^[0-9]*$", message = "The postId is invalid..")
 	public int getPostId() {
 		return postId;
 	}
@@ -21,21 +22,13 @@ public class CommentCreateDto implements Serializable{
 		this.postId = postId;
 	}
 
-	@NotNull
+	@NotBlank
 	public String getContent() {
 		return content;
 	}
 
 	public void setContent(String content) {
 		this.content = content;
-	}
-
-	public String getPhotoUrl() {
-		return photoUrl;
-	}
-
-	public void setPhotoUrl(String photoUrl) {
-		this.photoUrl = photoUrl;
 	}
 
 }

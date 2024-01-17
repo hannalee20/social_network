@@ -19,23 +19,25 @@ public class LikeController {
 
 	@Autowired
 	private ILikeService likeService;
-	
+
 	@Autowired
 	private JwtUtils jwtUtils;
 
 	@PostMapping(value = "/add")
-	public ResponseEntity<Object> addLike(HttpServletRequest request, @RequestParam(value = "postId") int postId) throws Exception {
+	public ResponseEntity<Object> addLike(HttpServletRequest request, @RequestParam(value = "postId") int postId)
+			throws Exception {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		boolean result = likeService.addLikePost(postId, userId);
-		
+
 		return new ResponseEntity<Object>(result, HttpStatus.OK);
 	}
 
 	@PostMapping(value = "/unlike")
-	public ResponseEntity<Object> unlike(HttpServletRequest request, @RequestParam(value = "postId") int postId) throws Exception {
+	public ResponseEntity<Object> unlike(HttpServletRequest request, @RequestParam(value = "postId") int postId)
+			throws Exception {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		boolean result = likeService.unlikePost(postId, userId);
-		
+
 		return new ResponseEntity<Object>(result, HttpStatus.OK);
 	}
 }

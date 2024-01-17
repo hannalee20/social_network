@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.training.socialnetwork.dto.response.friend.FriendListDto;
@@ -33,8 +34,8 @@ public class FriendService implements IFriendService {
 	private ModelMapper modelMapper;
 
 	@Override
-	public List<FriendListDto> findAllFriendWithStatus(int userId) {
-		List<Friend> friendList = friendRepository.findAllFriendByUserIdAndStatus(userId, Constant.FRIENDED_STATUS);
+	public List<FriendListDto> findAllFriendWithStatus(int userId, Pageable paging) {
+		List<Friend> friendList = friendRepository.findAllFriendByUserIdAndStatus(userId, Constant.FRIENDED_STATUS, paging);
 
 		return friendList.stream().map(friend -> modelMapper.map(friend, FriendListDto.class))
 				.collect(Collectors.toList());
@@ -122,8 +123,8 @@ public class FriendService implements IFriendService {
 	}
 
 	@Override
-	public List<FriendRequestDto> findAllAddFriendRequest(int userId) {
-		List<Friend> friendRequestList = friendRepository.findAllFriendByUserIdAndStatus(userId, Constant.FRIEND_REQUEST);
+	public List<FriendRequestDto> findAllAddFriendRequest(int userId, Pageable paging) {
+		List<Friend> friendRequestList = friendRepository.findAllFriendByUserIdAndStatus(userId, Constant.FRIEND_REQUEST, paging);
 
 		return friendRequestList.stream().map(friend -> modelMapper.map(friend, FriendRequestDto.class))
 				.collect(Collectors.toList());
@@ -133,8 +134,8 @@ public class FriendService implements IFriendService {
 	public int countFriend(int userId) {
 		LocalDate date = LocalDate.now();
 		TemporalField fieldISO = WeekFields.of(Locale.FRANCE).dayOfWeek();
-		LocalDate dateStart = date.with(fieldISO, 1);
-		LocalDate dateEnd = date.with(fieldISO, 7);
+		LocalDate dateStart = date.with(fieldISO, Constant.NUMBER_1);
+		LocalDate dateEnd = date.with(fieldISO, Constant.NUMBER_7);
 		
 		return friendRepository.countFriend(userId, dateStart, dateEnd);
 	}

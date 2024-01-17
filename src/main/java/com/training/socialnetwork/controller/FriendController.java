@@ -5,6 +5,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,10 +32,13 @@ public class FriendController {
 	private JwtUtils jwtUtils;
 
 	@GetMapping(value = "/all-friends")
-	public List<FriendListDto> getFriendList(HttpServletRequest request) {
+	public List<FriendListDto> getFriendList(HttpServletRequest request,
+			@RequestParam(defaultValue = Constant.STRING_0, required = false) int page,
+			@RequestParam(defaultValue = Constant.STRING_5, required = false) int pageSize) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
+		Pageable paging = PageRequest.of(page, pageSize);
 		
-		return friendService.findAllFriendWithStatus(userId);
+		return friendService.findAllFriendWithStatus(userId, paging);
 	}
 
 	@PostMapping(value = "/add-friend")
@@ -86,10 +91,13 @@ public class FriendController {
 	}
 
 	@GetMapping(value = "all-friend-request")
-	public List<FriendRequestDto> getFriendRequestList(HttpServletRequest request) {
+	public List<FriendRequestDto> getFriendRequestList(HttpServletRequest request,
+			@RequestParam(defaultValue = Constant.STRING_0, required = false) int page,
+			@RequestParam(defaultValue = Constant.STRING_5, required = false) int pageSize) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
+		Pageable paging = PageRequest.of(page, pageSize);
 		
-		return friendService.findAllAddFriendRequest(userId);
+		return friendService.findAllAddFriendRequest(userId, paging);
 	}
 	
 	@PostMapping(value = "remove-friend-request")

@@ -75,9 +75,7 @@ public class UserService implements IUserService {
 		user.setUsername(userRegisterDto.getUsername());
 		user.setPassword(bCryptPasswordEncoder.encode(userRegisterDto.getPassword()));
 		user.setEmail(userRegisterDto.getEmail());
-		Role role = roleRepository.findByName("ROLE_USER");
-//		Set<Role> roles = new HashSet<>();
-//		roles.add(role);
+		Role role = roleRepository.findByName(Constant.ROLE_USER);
 		user.setRole(role);
 		user.setCreateDate(new Date());
 		user.setUpdateDate(new Date());
@@ -137,6 +135,7 @@ public class UserService implements IUserService {
 	
 	private static String getFileExtension(String fileName) {
         int index = fileName.lastIndexOf('.');
+        
         return index == -1 ? fileName : fileName.substring(index + 1);
     }
 
@@ -220,7 +219,7 @@ public class UserService implements IUserService {
 		user.setToken(null);
 		user.setTokenCreateDate(null);
 		userRepository.save(user);
-		return "success";
+		return Constant.RESET_PASSWORD_SUCCESSFULLY;
 	}
 
 }

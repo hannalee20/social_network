@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.training.socialnetwork.dto.request.comment.CommentCreateDto;
 import com.training.socialnetwork.dto.request.comment.CommentUpdateDto;
@@ -31,40 +33,53 @@ public class CommentController {
 
 	@Autowired
 	private JwtUtils jwtUtils;
-	
+
 	@PostMapping(value = "/create")
-	public ResponseEntity<Object> createComment(HttpServletRequest request, @RequestBody CommentCreateDto comment) throws Exception {
+	public ResponseEntity<Object> createComment(HttpServletRequest request, @RequestBody CommentCreateDto comment,
+			@RequestParam MultipartFile photo) throws Exception{
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
-		CommentCreatedDto result = commentService.createComment(userId, comment);
+		CommentCreatedDto result;
+		try {
+			result = commentService.createComment(userId, comment, photo);
+		} catch (Exception e) {
+			throw new Exception(Constant.SERVER_ERROR);
+		}
 
 		return new ResponseEntity<Object>(result, HttpStatus.CREATED);
 	}
 
 	@PutMapping(value = "/update/{commentId}")
-	public ResponseEntity<Object> updateComment(HttpServletRequest request, @RequestBody CommentUpdateDto comment, @PathVariable(value = "commentId") int commentId) throws Exception {
+	public ResponseEntity<Object> updateComment(HttpServletRequest request, @RequestBody CommentUpdateDto comment,
+			@PathVariable(value = "commentId") int commentId) throws Exception {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
-		CommentCreatedDto result = commentService.updateComment(comment, commentId, userId);
+		CommentCreatedDto result;
+		try {
+			result = commentService.updateComment(comment, commentId, userId);
+		} catch (Exception e) {
+			throw new Exception(Constant.SERVER_ERROR);
+		}
 
 		return new ResponseEntity<Object>(result, HttpStatus.OK);
 
 	}
 
 	@DeleteMapping(value = "delete/{commentId}")
-	public ResponseEntity<Object> deleteComment(HttpServletRequest request, @PathVariable(value = "commentId") int commentId) throws Exception {
+	public ResponseEntity<Object> deleteComment(HttpServletRequest request,
+			@PathVariable(value = "commentId") int commentId) throws Exception {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		boolean result = commentService.deleteComment(commentId, userId);
-		
-		if(result) {
+
+		if (result) {
 			return new ResponseEntity<Object>(Constant.DELETED_SUCCESSFULLY, HttpStatus.OK);
 		}
-		
+
 		throw new Exception(Constant.SERVER_ERROR);
 	}
-	
+
 	@GetMapping(value = "/detail/{commentId}")
 	public ResponseEntity<Object> getCommentDetail(@PathVariable(value = "commentId") int commentId) throws Exception {
 		CommentDetailDto result = commentService.getCommentDetail(commentId);
-		
+
 		return new ResponseEntity<Object>(result, HttpStatus.OK);
 	}
 }

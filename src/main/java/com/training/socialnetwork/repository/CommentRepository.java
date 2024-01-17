@@ -17,6 +17,7 @@ public interface CommentRepository extends JpaRepository<Comment, Integer>{
 			"from users as u " + 
 			"inner join comments c on u.user_id = c.user_id " +
 			"where u.user_id = :userId " + 
-			"and c.create_date between ':dateStart' and ':dateEnd' ", nativeQuery = true)
+			"and c.create_date between ':dateStart' and ':dateEnd' " + 
+			"and c.delete_flg = 0 ", nativeQuery = true)
 	int countComment(@Param(value = "userId") int userId, @Param(value = "dateStart") LocalDate dateStart, @Param(value = "dateEnd") LocalDate dateEnd);
 }

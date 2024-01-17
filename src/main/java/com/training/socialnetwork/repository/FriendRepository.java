@@ -3,6 +3,7 @@ package com.training.socialnetwork.repository;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,34 +17,39 @@ public interface FriendRepository extends JpaRepository<Friend, Integer>{
 	@Query(value = "" + 
 			"select * from friends as f " + 
 			"where f.user_id1 = :userId or f.user_id2 = :userId " +
-			"and f.status = :status", nativeQuery = true)
-	List<Friend> findAllFriendByUserIdAndStatus(@Param(value = "userId") int userId, @Param(value = "status") int status);
+			"and f.status = :status " + 
+			"and f.delete_flg = 0 ", nativeQuery = true)
+	List<Friend> findAllFriendByUserIdAndStatus(@Param(value = "userId") int userId, @Param(value = "status") int status, Pageable paging);
 
 	@Query(value = "" + 
-				"select * from friends as f " + 
-				"where (f.user_id1 = :userId1 and f.user_id2 = :userId2) " + 
-				"or (f.user_id1 = :userId2 and f.user_id2 = :userId1) ", nativeQuery = true)
+			"select * from friends as f " + 
+			"where (f.user_id1 = :userId1 and f.user_id2 = :userId2) " + 
+			"or (f.user_id1 = :userId2 and f.user_id2 = :userId1) " + 
+			"and f.delete_flg = 0 ", nativeQuery = true)
 	Friend findFriendByUser1AndUser2(@Param(value = "userId1") int userId1, @Param(value = "userId2") int userId2);
 
 	@Query(value = "" + 
 			"select * from friends as f " + 
 			"where ((f.user_id1 = :userId1 and f.user_id2 = :userId2) " + 
 			"or (f.user_id1 = :userId2 and f.user_id2 = :userId1)) " + 
-			"and f.status = :status ", nativeQuery = true)
+			"and f.status = :status " + 
+			"and f.delete_flg = 0 ", nativeQuery = true)
 	Friend findFriendByUserIdAndStatus(@Param(value = "userId1") int userId1, @Param(value = "userId2") int userId2, @Param(value = "status") int status);
 	
 	@Query(value = "" + 
 			"select * from friends as f " + 
 			"where f.user_id1 = :userId " + 
-			"or f.user_id2 = :userId ", nativeQuery = true)
+			"or f.user_id2 = :userId " + 
+			"and f.delete_flg = 0 ", nativeQuery = true)
 	List<Friend> findAllByUserId(int userId);
 	
 	@Query(value = "" + 
-			"select count(f1.user_id1 + f1.user_id2) as friend " + 
+			"select count(f.user_id1 + f.user_id2) as friend " + 
 			"from users as u " + 
-			"inner join friends f1 on u.user_id = f1.user_id1  or u.user_id = f1.user_id2 " +
+			"inner join friends f on u.user_id = f.user_id1  or u.user_id = f.user_id2 " +
 			"where u.user_id = :userId " + 
-			"and f1.status = 1  " + 
-			"and f1.update_date between ':dateStart' and ':dateEnd' ", nativeQuery = true)
+			"and f.status = 1  " + 
+			"and f.update_date between ':dateStart' and ':dateEnd' " + 
+			"and f.delete_flg = 0 ", nativeQuery = true)
 	int countFriend(@Param(value = "userId") int userId, @Param(value = "dateStart") LocalDate dateStart, @Param(value = "dateEnd") LocalDate dateEnd);
 }

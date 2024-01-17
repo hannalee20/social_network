@@ -40,8 +40,8 @@ public class PostController {
 	private JwtUtils jwtUtils;
 
 	@PostMapping(value = "/create")
-	public ResponseEntity<Object> createPost(HttpServletRequest request, @RequestParam String content, @RequestParam MultipartFile[] photos)
-			throws Exception {
+	public ResponseEntity<Object> createPost(HttpServletRequest request, @RequestParam String content,
+			@RequestParam MultipartFile[] photos) throws Exception {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		PostCreatedDto result = postService.createPost(userId, content, photos);
 
@@ -49,7 +49,9 @@ public class PostController {
 	}
 
 	@GetMapping(value = "/timeline")
-	public List<PostListDto> getPostList(HttpServletRequest request, @RequestParam(defaultValue = "0", required = false) int page, @RequestParam(defaultValue = "5", required = false) int pageSize) {
+	public List<PostListDto> getPostList(HttpServletRequest request,
+			@RequestParam(defaultValue = Constant.STRING_0, required = false) int page,
+			@RequestParam(defaultValue = Constant.STRING_5, required = false) int pageSize) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		Pageable paging = PageRequest.of(page, pageSize);
 		return postService.getAllPosts(userId, paging);

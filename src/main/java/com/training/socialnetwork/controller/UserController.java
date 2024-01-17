@@ -48,16 +48,16 @@ public class UserController {
 
 	@Autowired
 	private IUserService userService;
-	
+
 	@Autowired
 	private AuthenticationManager authenticationManager;
 
 	@Autowired
 	private JwtUtils jwtUtils;
-	
+
 	@Autowired
 	private OtpUtils otpUtils;
-	
+
 	@PostMapping(value = "/register")
 	public ResponseEntity<Object> registerUser(@RequestBody UserRegisterDto userRegisterDto) throws Exception {
 		UserRegistedDto result = userService.createUser(userRegisterDto);
@@ -69,36 +69,41 @@ public class UserController {
 	public ResponseEntity<Object> loginUser(@RequestParam("username") String username,
 			@RequestParam("password") String password) throws Exception {
 		boolean checkLogin = userService.loginUser(username, password);
-		if(checkLogin) {
+		
+		if (checkLogin) {
 			int otp = otpUtils.generateOtp(username);
 			return ResponseEntity.ok(new OtpResponse(String.valueOf(otp)));
 		}
-		
+
 		return ResponseEntity.ok("fail");
 	}
 
 	@PostMapping(value = "/token")
 	public ResponseEntity<Object> getToken(@RequestParam("username") String username,
 			@RequestParam("password") String password, @RequestParam("otp") int otp) {
-		Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+		Authentication authentication = authenticationManager
+				.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 		SecurityContextHolder.getContext().setAuthentication(authentication);
-		
+
 		int otpFromCache = 0;
+		
 		if (otp >= 0) {
 			otpFromCache = otpUtils.getOtp(username);
 		}
+		
 		if (otpFromCache > 0 && otpFromCache == otp && authentication != null) {
 			otpUtils.clearOtp(username);
 			String jwt = jwtUtils.generateToken(authentication);
 			return ResponseEntity.ok(new JwtResponse(jwt));
 		}
-		
+
 		return ResponseEntity.ok("fail");
 	}
-	
+
 	@PutMapping(value = "/update/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<Object> updateUser(HttpServletRequest request, @RequestPart UserUpdateDto userUpdateDto, @RequestPart(required = false) MultipartFile avatar,
-			@PathVariable(value = "userId") int userId) throws Exception {
+	public ResponseEntity<Object> updateUser(HttpServletRequest request, @RequestPart UserUpdateDto userUpdateDto,
+			@RequestPart(required = false) MultipartFile avatar, @PathVariable(value = "userId") int userId)
+			throws Exception {
 		int loggedInUserId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		UserUpdatedDto result = userService.updateInfo(userUpdateDto, avatar, userId, loggedInUserId);
 
@@ -111,47 +116,49 @@ public class UserController {
 
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
-	
+
 	@PostMapping(value = "/search")
-	public List<UserSearchDto> searchUser(HttpServletRequest request, @RequestParam("keyword") String keyword){
+	public List<UserSearchDto> searchUser(HttpServletRequest request, @RequestParam("keyword") String keyword) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
-		
+
 		return userService.searchUser(userId, keyword);
 	}
-	
+
 	@GetMapping(value = "/export-report")
 	public void getReportUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		response.setContentType("application/octet-stream");
 		DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
 		String currentDate = dateFormatter.format(new Date());
-		
+
 		String headerKey = "Content-Disposition";
 		String headerValue = "attachment; filename=report_" + currentDate + ".xlsx";
 		response.setHeader(headerKey, headerValue);
-		
+
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		UserReportDto user = userService.getReportUser(userId);
-		
+
 		ReportGenerator reportGenerator = new ReportGenerator(user);
-		
+
 		reportGenerator.export(response);
 	}
-	
+
 	@PostMapping(value = "/forgot-password")
-	public ResponseEntity<Object> forgotPassword(HttpServletRequest request, @RequestParam("email") String email) throws Exception {
+	public ResponseEntity<Object> forgotPassword(HttpServletRequest request, @RequestParam("email") String email)
+			throws Exception {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		String result = userService.forgotPassword(email, userId);
-		
-		if(result != null) {
+
+		if (result != null) {
 			result = "http://localhost:8080/user/reset-password?token=\\" + result;
 		}
 		return ResponseEntity.ok(result);
 	}
-	
+
 	@PutMapping(value = "/reset-password")
-	public ResponseEntity<Object> resetPassword(@RequestParam("token") String token, @RequestParam("newPassword") String newPassword) throws Exception {
+	public ResponseEntity<Object> resetPassword(@RequestParam("token") String token,
+			@RequestParam("newPassword") String newPassword) throws Exception {
 		String result = userService.resetPassword(token, newPassword);
-		
+
 		return ResponseEntity.ok(result);
 	}
 }

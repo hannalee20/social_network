@@ -65,8 +65,8 @@ public class LikeService implements ILikeService {
 	public int countLike(int userId) {
 		LocalDate date = LocalDate.now();
 		TemporalField fieldISO = WeekFields.of(Locale.FRANCE).dayOfWeek();
-		LocalDate dateStart = date.with(fieldISO, 1);
-		LocalDate dateEnd = date.with(fieldISO, 7);
+		LocalDate dateStart = date.with(fieldISO, Constant.NUMBER_1);
+		LocalDate dateEnd = date.with(fieldISO, Constant.NUMBER_7);
 		
 		return likeRepository.countLike(userId, dateStart, dateEnd);
 	}
