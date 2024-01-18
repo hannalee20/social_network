@@ -26,7 +26,7 @@ public interface IUserService {
 	
 	UserReportDto getReportUser(int userId);
 	
-	String forgotPassword(String email, int userId) throws Exception;
+	String forgotPassword(String email) throws Exception;
 	
 	String resetPassword(String token, String newPassword) throws Exception;
 }

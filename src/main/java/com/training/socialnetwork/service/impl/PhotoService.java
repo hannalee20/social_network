@@ -3,6 +3,8 @@ package com.training.socialnetwork.service.impl;
 import java.io.IOException;
 import java.util.stream.Stream;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -13,6 +15,7 @@ import com.training.socialnetwork.repository.PhotoRepository;
 import com.training.socialnetwork.service.IPhotoService;
 
 @Service
+@Transactional
 public class PhotoService implements IPhotoService{
 
 	@Autowired

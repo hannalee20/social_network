@@ -5,6 +5,8 @@ import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.Locale;
 
+import javax.transaction.Transactional;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ import com.training.socialnetwork.service.ICommentService;
 import com.training.socialnetwork.util.constant.Constant;
 
 @Service
+@Transactional
 public class CommentService implements ICommentService {
 
 	@Autowired

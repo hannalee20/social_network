@@ -27,88 +27,107 @@ public class FriendController {
 
 	@Autowired
 	private IFriendService friendService;
-	
+
 	@Autowired
 	private JwtUtils jwtUtils;
 
 	@GetMapping(value = "/all-friends")
-	public List<FriendListDto> getFriendList(HttpServletRequest request,
+	public ResponseEntity<Object> getFriendList(HttpServletRequest request,
 			@RequestParam(defaultValue = Constant.STRING_0, required = false) int page,
 			@RequestParam(defaultValue = Constant.STRING_5, required = false) int pageSize) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		Pageable paging = PageRequest.of(page, pageSize);
-		
-		return friendService.findAllFriendWithStatus(userId, paging);
+		try {
+			List<FriendListDto> friendList = friendService.findAllFriendWithStatus(userId, paging);
+			return new ResponseEntity<>(friendList, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
 	}
 
 	@PostMapping(value = "/add-friend")
 	public ResponseEntity<Object> createFriendRequest(HttpServletRequest request,
 			@RequestParam(value = "userId2") int userId2) throws Exception {
 		int userId1 = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
-		boolean result = friendService.createFriendRequest(userId1, userId2);
+		try {
+			friendService.createFriendRequest(userId1, userId2);
 
-		if (result) {
-			return new ResponseEntity<Object>(result, HttpStatus.CREATED);
+			return new ResponseEntity<Object>(Constant.SEND_FRIEND_REQUEST_SUCCESSFULLY, HttpStatus.CREATED);
+		} catch (Exception e) {
+			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
-		throw new Exception(Constant.SERVER_ERROR);
 	}
 
 	@PostMapping(value = "/accept-friend")
-	public ResponseEntity<Object> acceptFriendRequest(HttpServletRequest request, @RequestParam(value = "userId1") int userId1) throws Exception {
+	public ResponseEntity<Object> acceptFriendRequest(HttpServletRequest request,
+			@RequestParam(value = "userId1") int userId1) throws Exception {
 		int userId2 = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
-		boolean result = friendService.acceptFriendRequest(userId1, userId2);
+		try {
+			friendService.acceptFriendRequest(userId1, userId2);
 
-		if (result) {
-			return new ResponseEntity<Object>(result, HttpStatus.CREATED);
+			return new ResponseEntity<Object>(Constant.ACCEPT_FRIEND_REQUEST_SUCCESSFULLY, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
-		throw new Exception(Constant.SERVER_ERROR);
 	}
 
 	@PostMapping(value = "/refuse-friend")
-	public ResponseEntity<Object> refuseFriendRequest(HttpServletRequest request, @RequestParam(value = "userId1") int userId1) throws Exception {
+	public ResponseEntity<Object> refuseFriendRequest(HttpServletRequest request,
+			@RequestParam(value = "userId1") int userId1) throws Exception {
 		int userId2 = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
-		boolean result = friendService.refuseFriendRequest(userId1, userId2);
+		try {
+			friendService.refuseFriendRequest(userId1, userId2);
 
-		if (result) {
-			return new ResponseEntity<Object>(result, HttpStatus.CREATED);
+			return new ResponseEntity<Object>(Constant.REFUSE_FRIEND_REQUEST_SUCCESSFULLY, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
-		throw new Exception(Constant.SERVER_ERROR);
 	}
 
 	@PostMapping(value = "remove-friend")
-	public ResponseEntity<Object> removeFriend(HttpServletRequest request, @RequestParam(value = "userId1") int userId1) throws Exception {
+	public ResponseEntity<Object> removeFriend(HttpServletRequest request, @RequestParam(value = "userId1") int userId1)
+			throws Exception {
 		int userId2 = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
-		boolean result = friendService.unfriend(userId1, userId2);
+		try {
+			friendService.unfriend(userId1, userId2);
 
-		if (result) {
-			return new ResponseEntity<Object>(result, HttpStatus.CREATED);
+			return new ResponseEntity<Object>(Constant.REMOVE_FRIEND_SUCCESSFULLY, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
-		throw new Exception(Constant.SERVER_ERROR);
 	}
 
 	@GetMapping(value = "all-friend-request")
-	public List<FriendRequestDto> getFriendRequestList(HttpServletRequest request,
+	public ResponseEntity<Object> getFriendRequestList(HttpServletRequest request,
 			@RequestParam(defaultValue = Constant.STRING_0, required = false) int page,
 			@RequestParam(defaultValue = Constant.STRING_5, required = false) int pageSize) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		Pageable paging = PageRequest.of(page, pageSize);
-		
-		return friendService.findAllAddFriendRequest(userId, paging);
-	}
-	
-	@PostMapping(value = "remove-friend-request")
-	public ResponseEntity<Object> removeFriendRequest(HttpServletRequest request, @RequestParam(value = "userId1") int userId1) throws Exception {
-		int userId2 = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
-		boolean result = friendService.removeFriendRequest(userId1, userId2);
 
-		if (result) {
-			return new ResponseEntity<Object>(result, HttpStatus.CREATED);
+		try {
+			List<FriendRequestDto> friendRequestList = friendService.findAllAddFriendRequest(userId, paging);
+			return new ResponseEntity<Object>(friendRequestList, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping(value = "remove-friend-request")
+	public ResponseEntity<Object> removeFriendRequest(HttpServletRequest request,
+			@RequestParam(value = "userId1") int userId1) throws Exception {
+		int userId2 = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
+		try {
+			friendService.removeFriendRequest(userId1, userId2);
+
+			return new ResponseEntity<Object>(Constant.REMOVE_FRIEND_REQUEST_SUCCESSFULLY, HttpStatus.CREATED);
+		} catch (Exception e) {
+			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
-		throw new Exception(Constant.SERVER_ERROR);
 	}
 }

@@ -18,7 +18,7 @@ public class Constant {
 	
 	public static final Integer DELETED_FlG = 1;
 	
-	public static final String DELETED_SUCCESSFULLY = "Deleted successfully";
+	public static final String DELETE_SUCCESSFULLY = "Delete successfully";
 	
 	public static final int FRIENDED_STATUS = 1;
 	
@@ -37,4 +37,16 @@ public class Constant {
 	public static final String ROLE_USER = "ROLE_USER";
 	
 	public static final String RESET_PASSWORD_SUCCESSFULLY = "Reset password successfully";
+	
+	public static final String EXPORT_REPORT_SUCCESSFULLY = "Export report successfully";
+	
+	public static final String SEND_FRIEND_REQUEST_SUCCESSFULLY = "Send friend request successfully";
+	
+	public static final String ACCEPT_FRIEND_REQUEST_SUCCESSFULLY = "Accept friend request successfully";
+	
+	public static final String REFUSE_FRIEND_REQUEST_SUCCESSFULLY = "Refuse friend request successfully";
+	
+	public static final String REMOVE_FRIEND_SUCCESSFULLY = "Remove friend successfully";
+	
+	public static final String REMOVE_FRIEND_REQUEST_SUCCESSFULLY = "Remove friend request successfully";
 }

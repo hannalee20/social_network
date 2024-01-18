@@ -41,49 +41,69 @@ public class PostController {
 
 	@PostMapping(value = "/create")
 	public ResponseEntity<Object> createPost(HttpServletRequest request, @RequestParam String content,
-			@RequestParam MultipartFile[] photos) throws Exception {
+			@RequestParam MultipartFile[] photos) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
-		PostCreatedDto result = postService.createPost(userId, content, photos);
+		try {
+			PostCreatedDto result = postService.createPost(userId, content, photos);
 
-		return new ResponseEntity<Object>(result, HttpStatus.CREATED);
+			return new ResponseEntity<Object>(result, HttpStatus.CREATED);
+		} catch (Exception e) {
+			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
 	}
 
 	@GetMapping(value = "/timeline")
-	public List<PostListDto> getPostList(HttpServletRequest request,
+	public ResponseEntity<Object> getPostList(HttpServletRequest request,
 			@RequestParam(defaultValue = Constant.STRING_0, required = false) int page,
 			@RequestParam(defaultValue = Constant.STRING_5, required = false) int pageSize) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		Pageable paging = PageRequest.of(page, pageSize);
-		return postService.getAllPosts(userId, paging);
+		try {
+			List<PostListDto> postList = postService.getAllPosts(userId, paging);
+			return new ResponseEntity<>(postList, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 	@GetMapping(value = "/detail/{postId}")
-	public ResponseEntity<Object> getPostDetail(@PathVariable(value = "postId") int postId) throws Exception {
-		PostDetailDto result = postService.getPost(postId);
+	public ResponseEntity<Object> getPostDetail(@PathVariable(value = "postId") int postId) {
+		try {
+			PostDetailDto result = postService.getPost(postId);
 
-		return new ResponseEntity<Object>(result, HttpStatus.OK);
+			return new ResponseEntity<Object>(result, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
 	}
 
 	@PutMapping(value = "/update/{postId}")
 	public ResponseEntity<Object> updatePost(HttpServletRequest request, @RequestBody PostUpdateDto post,
-			@PathVariable(value = "postId") int postId) throws Exception {
+			@PathVariable(value = "postId") int postId) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
-		PostUpdatedDto result = postService.updatePost(post, postId, userId);
+		try {
+			PostUpdatedDto result = postService.updatePost(post, postId, userId);
 
-		return new ResponseEntity<Object>(result, HttpStatus.OK);
+			return new ResponseEntity<Object>(result, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 
 	}
 
 	@DeleteMapping(value = "/delete/{postId}")
-	public ResponseEntity<Object> deletePost(HttpServletRequest request, @RequestParam(value = "postId") int postId)
-			throws Exception {
+	public ResponseEntity<Object> deletePost(HttpServletRequest request, @RequestParam(value = "postId") int postId) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
-		boolean result = postService.deletePost(postId, userId);
-		if (result) {
-			return new ResponseEntity<Object>(Constant.DELETED_SUCCESSFULLY, HttpStatus.OK);
+		try {
+			postService.deletePost(postId, userId);
+			
+			return new ResponseEntity<Object>(Constant.DELETE_SUCCESSFULLY, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
-		throw new Exception(Constant.SERVER_ERROR);
 	}
 
 }

@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
+import javax.transaction.Transactional;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +35,7 @@ import com.training.socialnetwork.service.IPostService;
 import com.training.socialnetwork.util.constant.Constant;
 
 @Service
+@Transactional
 public class PostService implements IPostService {
 
 	@Autowired

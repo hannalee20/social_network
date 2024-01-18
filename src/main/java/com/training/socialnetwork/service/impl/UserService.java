@@ -12,6 +12,8 @@ import java.util.Locale;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import javax.transaction.Transactional;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -38,6 +40,7 @@ import com.training.socialnetwork.service.IUserService;
 import com.training.socialnetwork.util.constant.Constant;
 
 @Service
+@Transactional
 public class UserService implements IUserService {
 
 	@Autowired
@@ -96,7 +99,7 @@ public class UserService implements IUserService {
 			return true;
 		}
 
-		throw new Exception(Constant.INVALID_USERNAME_OR_PASSWORD);
+		return false;
 	}
 
 	@Override
@@ -124,6 +127,7 @@ public class UserService implements IUserService {
 			Files.write(pathAvatar.resolve(fileName), bytes);
 			user.setAvatarUrl(fileName);
 		}
+		user.setUpdateDate(new Date());
 		User userUpdated = userRepository.save(user);
 
 		if (userUpdated != null) {
@@ -190,10 +194,10 @@ public class UserService implements IUserService {
 	}
 
 	@Override
-	public String forgotPassword(String email, int userId) throws Exception {
+	public String forgotPassword(String email) throws Exception {
 		User user = userRepository.findByEmail(email);
 
-		if (user == null || user.getUserId() != userId) {
+		if (user == null) {
 			throw new Exception(Constant.SERVER_ERROR);
 		}
 		String token = UUID.randomUUID().toString();
@@ -218,6 +222,7 @@ public class UserService implements IUserService {
 		user.setPassword(newPassword);
 		user.setToken(null);
 		user.setTokenCreateDate(null);
+		user.setUpdateDate(new Date());
 		userRepository.save(user);
 		return Constant.RESET_PASSWORD_SUCCESSFULLY;
 	}

@@ -5,6 +5,8 @@ import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.Locale;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +20,7 @@ import com.training.socialnetwork.service.ILikeService;
 import com.training.socialnetwork.util.constant.Constant;
 
 @Service
+@Transactional
 public class LikeService implements ILikeService {
 
 	@Autowired
