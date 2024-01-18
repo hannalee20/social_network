@@ -8,7 +8,7 @@ public class UserDetailDto {
 	private String username;
 	private String realName;
 	private Date birthDate;
-	private int gender;
+	private String gender;
 	private String address;
 	private String email;
 	private String university;
@@ -49,11 +49,11 @@ public class UserDetailDto {
 		this.birthDate = birthDate;
 	}
 
-	public int getGender() {
+	public String getGender() {
 		return gender;
 	}
 
-	public void setGender(int gender) {
+	public void setGender(String gender) {
 		this.gender = gender;
 	}
 

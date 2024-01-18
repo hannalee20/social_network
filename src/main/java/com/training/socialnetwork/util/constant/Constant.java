@@ -30,6 +30,8 @@ public class Constant {
 	
 	public static final String STRING_5 = "5";
 	
+	public static final int NUMBER_0 = 0;
+	
 	public static final int NUMBER_1 = 1;
 	
 	public static final int NUMBER_7 = 7;
@@ -49,4 +51,10 @@ public class Constant {
 	public static final String REMOVE_FRIEND_SUCCESSFULLY = "Remove friend successfully";
 	
 	public static final String REMOVE_FRIEND_REQUEST_SUCCESSFULLY = "Remove friend request successfully";
+
+	public static final String GENDER_INVALID_MESSAGE = "Gender must be Male/male or Female/female";
+	
+	public static final String MALE = "male";
+	
+	public static final String FEMALE = "female";
 }

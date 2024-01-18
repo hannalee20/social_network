@@ -18,6 +18,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -112,11 +113,10 @@ public class UserController {
 	}
 
 	@PutMapping(value = "/update/{userId}", consumes = {"multipart/form-data"})
-	public ResponseEntity<Object> updateUser(HttpServletRequest request, @RequestParam UserUpdateDto userUpdateDto,
-			@RequestParam(required = false) MultipartFile avatar, @PathVariable(value = "userId") int userId) {
+	public ResponseEntity<Object> updateUser(HttpServletRequest request, @ModelAttribute UserUpdateDto userUpdateDto, @PathVariable(value = "userId") int userId) {
 		int loggedInUserId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		try {
-			UserUpdatedDto result = userService.updateInfo(userUpdateDto, avatar, userId, loggedInUserId);
+			UserUpdatedDto result = userService.updateInfo(userUpdateDto, userUpdateDto.getAvatar(), userId, loggedInUserId);
 
 			return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (Exception e) {

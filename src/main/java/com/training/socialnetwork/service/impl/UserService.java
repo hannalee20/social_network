@@ -1,5 +1,6 @@
 package com.training.socialnetwork.service.impl;
 
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -69,6 +70,7 @@ public class UserService implements IUserService {
 
 	private static final long EXPIRE_TOKEN = 30;
 
+	private static final Path CURRENT_FOLDER = Paths.get(System.getProperty("user.dir"));
 	@Override
 	public UserRegistedDto createUser(UserRegisterDto userRegisterDto) throws Exception {
 		if (userRepository.findByUsername(userRegisterDto.getUsername()) != null) {
@@ -112,23 +114,41 @@ public class UserService implements IUserService {
 			throw new Exception(Constant.SERVER_ERROR);
 		}
 
-		User user = modelMapper.map(userUpdateDto, User.class);
-
-		user.setUsername(userToUpdate.getUsername());
-		user.setPassword(userToUpdate.getPassword());
-		user.setRole(userToUpdate.getRole());
-		if (avatar != null) {
-			byte[] bytes = avatar.getBytes();
-			Path pathAvatar = Paths.get(".").resolve("profile_avatar");
-			Files.delete(pathAvatar.resolve(user.getAvatarUrl()));
-			String fileName = avatar.getOriginalFilename();
-			String extension = getFileExtension(fileName);
-			fileName = user.getUserId() + "." + extension;
-			Files.write(pathAvatar.resolve(fileName), bytes);
-			user.setAvatarUrl(fileName);
+		if(userUpdateDto.getSex() != null) {
+			if(userUpdateDto.getSex().toUpperCase().equals(Constant.MALE)) {
+				userToUpdate.setGender(Constant.NUMBER_0);
+			} else {
+				userToUpdate.setGender(Constant.NUMBER_1);
+			}
 		}
-		user.setUpdateDate(new Date());
-		User userUpdated = userRepository.save(user);
+		userToUpdate = modelMapper.map(userUpdateDto, User.class);
+		
+		userToUpdate.setUsername(userToUpdate.getUsername());
+		userToUpdate.setPassword(userToUpdate.getPassword());
+		userToUpdate.setRole(userToUpdate.getRole());
+		if (avatar != null) {
+//			byte[] bytes = avatar.getBytes();
+//			Path pathAvatar = Paths.get(".").resolve("profile_avatar");
+////			Files.delete(pathAvatar.resolve(user.getAvatarUrl()));
+//			String fileName = avatar.getOriginalFilename();
+//			String extension = getFileExtension(fileName);
+//			fileName = user.getUserId() + "." + extension;
+//			Files.write(pathAvatar.resolve(fileName), bytes);
+//			user.setAvatarUrl(fileName);
+			Path staticPath = Paths.get("static");
+			Path imagePath = Paths.get("images");
+			
+			if(!Files.exists(CURRENT_FOLDER.resolve(staticPath).resolve(imagePath))) {
+				Files.createDirectories(CURRENT_FOLDER.resolve(staticPath).resolve(imagePath));	
+			}
+			Path file = CURRENT_FOLDER.resolve(staticPath).resolve(imagePath).resolve(avatar.getOriginalFilename());
+			try (OutputStream os = Files.newOutputStream(file)) {
+				os.write(avatar.getBytes());
+			}
+			userToUpdate.setAvatarUrl(imagePath.resolve(avatar.getOriginalFilename()).toString());
+		}
+		userToUpdate.setUpdateDate(new Date());
+		User userUpdated = userRepository.save(userToUpdate);
 
 		if (userUpdated != null) {
 			return modelMapper.map(userUpdated, UserUpdatedDto.class);
@@ -151,7 +171,14 @@ public class UserService implements IUserService {
 			throw new Exception(Constant.SERVER_ERROR);
 		}
 
-		return modelMapper.map(user, UserDetailDto.class);
+		UserDetailDto userDetailDto = modelMapper.map(user, UserDetailDto.class);
+		if(user.getGender() == Constant.NUMBER_0) {
+			userDetailDto.setGender(Constant.MALE);
+		} else {
+			userDetailDto.setGender(Constant.FEMALE);
+		}
+		
+		return userDetailDto;
 	}
 
 	@Override

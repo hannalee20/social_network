@@ -5,6 +5,8 @@ import java.util.Date;
 
 import javax.validation.constraints.Pattern;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.training.socialnetwork.util.constant.Constant;
 
 public class UserUpdateDto implements Serializable {
@@ -13,13 +15,14 @@ public class UserUpdateDto implements Serializable {
 
 	private String realName;
 	private Date birthDate;
-	private int gender;
+	private String sex;
 	private String address;
 	private String email;
 	private String university;
 	private String job;
 	private String status;
 	private String about;
+	private MultipartFile avatar;
 
 	@Pattern(regexp = "^[A-Z]([a-zA-Z]+)?$", message = Constant.INVALID_REAL_NAME)
 	public String getRealName() {
@@ -38,18 +41,19 @@ public class UserUpdateDto implements Serializable {
 		this.birthDate = birthDate;
 	}
 
-	public int getGender() {
-		return gender;
+	@Pattern(regexp = "^(Male|Female|male|female)$", message = Constant.GENDER_INVALID_MESSAGE)
+	public String getSex() {
+		return sex;
 	}
 
-	public void setGender(int gender) {
-		this.gender = gender;
+	public void setSex(String sex) {
+		this.sex = sex;
 	}
+
 
 	public String getAddress() {
 		return address;
 	}
-
 	public void setAddress(String address) {
 		this.address = address;
 	}
@@ -93,6 +97,14 @@ public class UserUpdateDto implements Serializable {
 
 	public void setAbout(String about) {
 		this.about = about;
+	}
+
+	public MultipartFile getAvatar() {
+		return avatar;
+	}
+
+	public void setAvatar(MultipartFile avatar) {
+		this.avatar = avatar;
 	}
 
 }
