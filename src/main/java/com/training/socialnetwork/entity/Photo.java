@@ -8,7 +8,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -26,12 +25,6 @@ public class Photo {
 
 	@Column
 	private String name;
-
-	@Column
-	private String type;
-	
-	@Lob
-	private byte[] data;
 
 	@Column
 	private Date createDate;
@@ -61,22 +54,6 @@ public class Photo {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
-	public byte[] getData() {
-		return data;
-	}
-
-	public void setData(byte[] data) {
-		this.data = data;
 	}
 
 	public Date getCreateDate() {

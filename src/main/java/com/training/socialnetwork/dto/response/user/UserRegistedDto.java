@@ -6,7 +6,7 @@ public class UserRegistedDto {
 	private String username;
 	private String password;
 	private String email;
-	private int role;
+	private String role;
 
 	public int getUserId() {
 		return userId;
@@ -40,11 +40,11 @@ public class UserRegistedDto {
 		this.email = email;
 	}
 
-	public int getRole() {
+	public String getRole() {
 		return role;
 	}
 
-	public void setRole(int role) {
+	public void setRole(String role) {
 		this.role = role;
 	}
 

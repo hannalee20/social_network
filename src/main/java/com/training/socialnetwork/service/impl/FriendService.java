@@ -3,6 +3,7 @@ package com.training.socialnetwork.service.impl;
 import java.time.LocalDate;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -61,6 +62,8 @@ public class FriendService implements IFriendService {
 			friend.setUser2(user2);
 		}
 		friend.setStatus(Constant.FRIEND_REQUEST);
+		friend.setCreateDate(new Date());
+		friend.setUpdateDate(new Date());
 		
 		return friendRepository.save(friend) != null;
 	}
@@ -81,6 +84,7 @@ public class FriendService implements IFriendService {
 		}
 
 		friend.setStatus(Constant.FRIENDED_STATUS);
+		friend.setUpdateDate(new Date());
 
 		return friendRepository.save(friend) != null;
 	}
@@ -101,6 +105,7 @@ public class FriendService implements IFriendService {
 		}
 
 		friend.setStatus(Constant.NOT_FRIEND);
+		friend.setUpdateDate(new Date());
 
 		return friendRepository.save(friend) != null;
 	}
@@ -121,6 +126,7 @@ public class FriendService implements IFriendService {
 		}
 
 		friend.setStatus(Constant.NOT_FRIEND);
+		friend.setUpdateDate(new Date());
 
 		return friendRepository.save(friend) != null;
 	}
@@ -159,6 +165,7 @@ public class FriendService implements IFriendService {
 		}
 
 		friend.setStatus(Constant.NOT_FRIEND);
+		friend.setUpdateDate(new Date());
 
 		return friendRepository.save(friend) != null;
 	}

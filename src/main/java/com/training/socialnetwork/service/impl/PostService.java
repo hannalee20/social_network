@@ -15,9 +15,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.training.socialnetwork.dto.request.post.PostUpdateDto;
 import com.training.socialnetwork.dto.response.post.PostCreatedDto;
@@ -33,6 +31,7 @@ import com.training.socialnetwork.repository.PostRepository;
 import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.IPostService;
 import com.training.socialnetwork.util.constant.Constant;
+import com.training.socialnetwork.util.image.ImageUtils;
 
 @Service
 @Transactional
@@ -49,6 +48,9 @@ public class PostService implements IPostService {
 
 	@Autowired
 	private ModelMapper modelMapper;
+	
+	@Autowired
+	private ImageUtils imageUtils;
 
 	@Override
 	public PostCreatedDto createPost(int userId, String content, MultipartFile[] photos) throws Exception {
@@ -72,22 +74,16 @@ public class PostService implements IPostService {
 		List<String> photoUrls = new ArrayList<>();
 		if (photos.length > 0) {
 			for (MultipartFile file : photos) {
-				String name = StringUtils.cleanPath(file.getOriginalFilename());
+				String photoUrl = imageUtils.saveImage(file);
 				Photo photo = new Photo();
 				photo.setPost(postCreated);
-				photo.setName(name);
-				photo.setType(file.getContentType());
-				photo.setData(file.getBytes());
+				photo.setName(photoUrl);
+				photo.setCreateDate(new Date());
 				
 				photo = photoRepository.save(photo);
 				if (photo == null) {
 					throw new Exception(Constant.SERVER_ERROR);
 				}
-				String photoUrl = ServletUriComponentsBuilder
-				          .fromCurrentContextPath()
-				          .path("/files/")
-				          .path(Integer.toString(photo.getPhotoId()))
-				          .toUriString();
 				photoList.add(photo);
 				photoUrls.add(photoUrl);
 			}
@@ -96,19 +92,26 @@ public class PostService implements IPostService {
 		
 		PostCreatedDto postCreatedDto = modelMapper.map(postCreated, PostCreatedDto.class);
 		postCreatedDto.setPhotoUrl(photoUrls);
+		postCreatedDto.setUsername(user.getUsername());
 		return postCreatedDto;
 	}
 
 	@Override
 	public List<PostListDto> getAllPosts(int userId, Pageable page) {
 		List<Post> postList = postRepository.findAllByUserId(userId, page);
-
-		return postList.stream().map(post -> {
+		List<PostListDto> postListDtos = new ArrayList<>();
+		for (Post post : postList) {
+			List<Photo> photoList = post.getListPhoto();
+			List<String> photoUrlList = new ArrayList<>();
+			photoList.stream().map(photo -> photoUrlList.add(photo.getName())).collect(Collectors.toList());
 			PostListDto postListDto = modelMapper.map(post, PostListDto.class);
+			postListDto.setPhotoUrl(photoUrlList);
 			postListDto.setLikeCount(post.getLikeList().size());
 			postListDto.setCommentCount(post.getCommentList().size());
-			return postListDto;
-		}).collect(Collectors.toList());
+			postListDto.setUsername(post.getUser().getUsername());
+			postListDtos.add(postListDto);
+		}
+		return postListDtos;
 	}
 
 	@Override

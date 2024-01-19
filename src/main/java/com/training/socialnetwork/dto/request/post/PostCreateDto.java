@@ -2,12 +2,14 @@ package com.training.socialnetwork.dto.request.post;
 
 import java.io.Serializable;
 
+import org.springframework.web.multipart.MultipartFile;
+
 public class PostCreateDto implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	private String content;
-	private String photoUrl;
+	private MultipartFile[] photos;
 
 	public String getContent() {
 		return content;
@@ -17,12 +19,12 @@ public class PostCreateDto implements Serializable {
 		this.content = content;
 	}
 
-	public String getPhotoUrl() {
-		return photoUrl;
+	public MultipartFile[] getPhotos() {
+		return photos;
 	}
 
-	public void setPhotoUrl(String photoUrl) {
-		this.photoUrl = photoUrl;
+	public void setPhotos(MultipartFile[] photos) {
+		this.photos = photos;
 	}
 
 }

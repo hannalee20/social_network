@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -18,8 +19,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
+import com.training.socialnetwork.dto.request.post.PostCreateDto;
 import com.training.socialnetwork.dto.request.post.PostUpdateDto;
 import com.training.socialnetwork.dto.response.post.PostCreatedDto;
 import com.training.socialnetwork.dto.response.post.PostDetailDto;
@@ -39,12 +40,11 @@ public class PostController {
 	@Autowired
 	private JwtUtils jwtUtils;
 
-	@PostMapping(value = "/create")
-	public ResponseEntity<Object> createPost(HttpServletRequest request, @RequestParam String content,
-			@RequestParam MultipartFile[] photos) {
+	@PostMapping(value = "/create", consumes = {"multipart/form-data"})
+	public ResponseEntity<Object> createPost(HttpServletRequest request, @ModelAttribute PostCreateDto postCreateDto) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		try {
-			PostCreatedDto result = postService.createPost(userId, content, photos);
+			PostCreatedDto result = postService.createPost(userId, postCreateDto.getContent(), postCreateDto.getPhotos());
 
 			return new ResponseEntity<Object>(result, HttpStatus.CREATED);
 		} catch (Exception e) {

@@ -1,9 +1,5 @@
 package com.training.socialnetwork.service.impl;
 
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
@@ -39,6 +35,7 @@ import com.training.socialnetwork.repository.RoleRepository;
 import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.IUserService;
 import com.training.socialnetwork.util.constant.Constant;
+import com.training.socialnetwork.util.image.ImageUtils;
 
 @Service
 @Transactional
@@ -67,10 +64,12 @@ public class UserService implements IUserService {
 
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
+	
+	@Autowired
+	private ImageUtils imageUtils;
 
 	private static final long EXPIRE_TOKEN = 30;
 
-	private static final Path CURRENT_FOLDER = Paths.get(System.getProperty("user.dir"));
 	@Override
 	public UserRegistedDto createUser(UserRegisterDto userRegisterDto) throws Exception {
 		if (userRepository.findByUsername(userRegisterDto.getUsername()) != null) {
@@ -88,7 +87,9 @@ public class UserService implements IUserService {
 		User userRegisted = userRepository.save(user);
 
 		if (userRegisted != null) {
-			return modelMapper.map(userRegisted, UserRegistedDto.class);
+			UserRegistedDto userRegistedDto = new UserRegistedDto();
+			userRegistedDto = modelMapper.map(userRegisted, UserRegistedDto.class);
+			userRegistedDto.setRole(Constant.ROLE_USER);
 		}
 
 		throw new Exception(Constant.SERVER_ERROR);
@@ -114,41 +115,25 @@ public class UserService implements IUserService {
 			throw new Exception(Constant.SERVER_ERROR);
 		}
 
+		User user = new User();
 		if(userUpdateDto.getSex() != null) {
 			if(userUpdateDto.getSex().toUpperCase().equals(Constant.MALE)) {
-				userToUpdate.setGender(Constant.NUMBER_0);
+				user.setGender(Constant.NUMBER_0);
 			} else {
-				userToUpdate.setGender(Constant.NUMBER_1);
+				user.setGender(Constant.NUMBER_1);
 			}
 		}
-		userToUpdate = modelMapper.map(userUpdateDto, User.class);
-		
-		userToUpdate.setUsername(userToUpdate.getUsername());
-		userToUpdate.setPassword(userToUpdate.getPassword());
-		userToUpdate.setRole(userToUpdate.getRole());
+		user = modelMapper.map(userUpdateDto, User.class);
+		user.setUserId(userId);
+		user.setUsername(userToUpdate.getUsername());
+		user.setPassword(userToUpdate.getPassword());
+		user.setRole(userToUpdate.getRole());
 		if (avatar != null) {
-//			byte[] bytes = avatar.getBytes();
-//			Path pathAvatar = Paths.get(".").resolve("profile_avatar");
-////			Files.delete(pathAvatar.resolve(user.getAvatarUrl()));
-//			String fileName = avatar.getOriginalFilename();
-//			String extension = getFileExtension(fileName);
-//			fileName = user.getUserId() + "." + extension;
-//			Files.write(pathAvatar.resolve(fileName), bytes);
-//			user.setAvatarUrl(fileName);
-			Path staticPath = Paths.get("static");
-			Path imagePath = Paths.get("images");
-			
-			if(!Files.exists(CURRENT_FOLDER.resolve(staticPath).resolve(imagePath))) {
-				Files.createDirectories(CURRENT_FOLDER.resolve(staticPath).resolve(imagePath));	
-			}
-			Path file = CURRENT_FOLDER.resolve(staticPath).resolve(imagePath).resolve(avatar.getOriginalFilename());
-			try (OutputStream os = Files.newOutputStream(file)) {
-				os.write(avatar.getBytes());
-			}
-			userToUpdate.setAvatarUrl(imagePath.resolve(avatar.getOriginalFilename()).toString());
+			String avatarUrl = imageUtils.saveImage(avatar);
+			user.setAvatarUrl(avatarUrl);
 		}
-		userToUpdate.setUpdateDate(new Date());
-		User userUpdated = userRepository.save(userToUpdate);
+		user.setUpdateDate(new Date());
+		User userUpdated = userRepository.save(user);
 
 		if (userUpdated != null) {
 			return modelMapper.map(userUpdated, UserUpdatedDto.class);
@@ -157,12 +142,6 @@ public class UserService implements IUserService {
 		throw new Exception(Constant.SERVER_ERROR);
 	}
 	
-	private static String getFileExtension(String fileName) {
-        int index = fileName.lastIndexOf('.');
-        
-        return index == -1 ? fileName : fileName.substring(index + 1);
-    }
-
 	@Override
 	public UserDetailDto getInfo(int userId) throws Exception {
 		User user = userRepository.findById(userId).orElse(null);
@@ -246,7 +225,7 @@ public class UserService implements IUserService {
 		if(user.getTokenCreateDate().compareTo(new Date()) > EXPIRE_TOKEN) {
 			throw new Exception(Constant.SERVER_ERROR);
 		}
-		user.setPassword(newPassword);
+		user.setPassword(bCryptPasswordEncoder.encode(newPassword));
 		user.setToken(null);
 		user.setTokenCreateDate(null);
 		user.setUpdateDate(new Date());

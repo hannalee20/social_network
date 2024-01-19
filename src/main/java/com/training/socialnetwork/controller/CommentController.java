@@ -7,14 +7,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.training.socialnetwork.dto.request.comment.CommentCreateDto;
 import com.training.socialnetwork.dto.request.comment.CommentUpdateDto;
@@ -35,11 +34,10 @@ public class CommentController {
 	private JwtUtils jwtUtils;
 
 	@PostMapping(value = "/create")
-	public ResponseEntity<Object> createComment(HttpServletRequest request, @RequestBody CommentCreateDto comment,
-			@RequestParam MultipartFile photo) {
+	public ResponseEntity<Object> createComment(HttpServletRequest request, @ModelAttribute CommentCreateDto comment) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		try {
-			CommentCreatedDto result = commentService.createComment(userId, comment, photo);
+			CommentCreatedDto result = commentService.createComment(userId, comment, comment.getPhoto());
 			return new ResponseEntity<Object>(result, HttpStatus.CREATED);
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

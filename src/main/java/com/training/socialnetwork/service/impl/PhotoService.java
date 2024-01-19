@@ -1,7 +1,6 @@
 package com.training.socialnetwork.service.impl;
 
 import java.io.IOException;
-import java.util.stream.Stream;
 
 import javax.transaction.Transactional;
 
@@ -25,13 +24,8 @@ public class PhotoService implements IPhotoService{
 		String name = StringUtils.cleanPath(file.getOriginalFilename());
 		Photo photo = new Photo();
 		photo.setName(name);
-		photo.setType(file.getContentType());
-		photo.setData(file.getBytes());
 		
 		return photoRepository.save(photo);
 	}
 	
-	public Stream<Photo> getPhoto(int postId) {
-		return photoRepository.findByPostId(postId);
-	}
 }

@@ -11,7 +11,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.training.socialnetwork.dto.request.comment.CommentCreateDto;
 import com.training.socialnetwork.dto.request.comment.CommentUpdateDto;
@@ -25,6 +24,7 @@ import com.training.socialnetwork.repository.PostRepository;
 import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.ICommentService;
 import com.training.socialnetwork.util.constant.Constant;
+import com.training.socialnetwork.util.image.ImageUtils;
 
 @Service
 @Transactional
@@ -41,6 +41,9 @@ public class CommentService implements ICommentService {
 
 	@Autowired
 	private ModelMapper modelMapper;
+	
+	@Autowired
+	private ImageUtils imageUtils;
 
 	@Override
 	public CommentCreatedDto createComment(int userId, CommentCreateDto commentCreateDto, MultipartFile photo) throws Exception {
@@ -55,8 +58,7 @@ public class CommentService implements ICommentService {
 		comment.setPost(post);
 		comment.setUser(user);
 		if (!photo.isEmpty()) {
-			String photoUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/files/")
-					.path(Integer.toString(post.getPostId())).toUriString();
+			String photoUrl = imageUtils.saveImage(photo);
 			comment.setPhotoUrl(photoUrl);
 		}
 		Comment commentCreated = commentRepository.save(comment);

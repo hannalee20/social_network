@@ -1,6 +1,7 @@
 package com.training.socialnetwork.dto.response.post;
 
 import java.util.Date;
+import java.util.List;
 
 public class PostListDto {
 
@@ -8,7 +9,7 @@ public class PostListDto {
 	private int userId;
 	private String username;
 	private String content;
-	private String photoUrl;
+	private List<String> photoUrl;
 	private Date createDate;
 	private int likeCount;
 	private int commentCount;
@@ -45,11 +46,11 @@ public class PostListDto {
 		this.content = content;
 	}
 
-	public String getPhotoUrl() {
+	public List<String> getPhotoUrl() {
 		return photoUrl;
 	}
 
-	public void setPhotoUrl(String photoUrl) {
+	public void setPhotoUrl(List<String> photoUrl) {
 		this.photoUrl = photoUrl;
 	}
 

@@ -1,6 +1,6 @@
 package com.training.socialnetwork.repository;
 
-import java.util.stream.Stream;
+import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -13,9 +13,9 @@ import com.training.socialnetwork.entity.Photo;
 public interface PhotoRepository extends JpaRepository<Photo, Integer>{
 
 	@Query(value = "" + 
-			"select * from photos as f " + 
+			"select * from photos as p " + 
 			"where p.photo_id = :postId " +
 			"and p.delete_flg = 0 ", nativeQuery = true)
-	Stream<Photo> findByPostId(@Param(value = "postId") int postId);
+	List<Photo> findByPostId(@Param(value = "postId") int postId);
 	
 }
