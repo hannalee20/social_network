@@ -11,17 +11,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
-import com.training.socialnetwork.dto.request.post.PostCreateDto;
-import com.training.socialnetwork.dto.request.post.PostUpdateDto;
 import com.training.socialnetwork.dto.response.post.PostCreatedDto;
 import com.training.socialnetwork.dto.response.post.PostDetailDto;
 import com.training.socialnetwork.dto.response.post.PostListDto;
@@ -40,11 +38,11 @@ public class PostController {
 	@Autowired
 	private JwtUtils jwtUtils;
 
-	@PostMapping(value = "/create", consumes = {"multipart/form-data"})
-	public ResponseEntity<Object> createPost(HttpServletRequest request, @ModelAttribute PostCreateDto postCreateDto) {
+	@PostMapping(value = "/create", consumes = "multipart/form-data")
+	public ResponseEntity<Object> createPost(HttpServletRequest request, @RequestParam String content, @RequestPart(value = "files", required = false) MultipartFile[] photos) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		try {
-			PostCreatedDto result = postService.createPost(userId, postCreateDto.getContent(), postCreateDto.getPhotos());
+			PostCreatedDto result = postService.createPost(userId, content, photos);
 
 			return new ResponseEntity<Object>(result, HttpStatus.CREATED);
 		} catch (Exception e) {
@@ -54,13 +52,13 @@ public class PostController {
 	}
 
 	@GetMapping(value = "/timeline")
-	public ResponseEntity<Object> getPostList(HttpServletRequest request,
+	public ResponseEntity<Object> getTimeline(HttpServletRequest request,
 			@RequestParam(defaultValue = Constant.STRING_0, required = false) int page,
 			@RequestParam(defaultValue = Constant.STRING_5, required = false) int pageSize) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		Pageable paging = PageRequest.of(page, pageSize);
 		try {
-			List<PostListDto> postList = postService.getAllPosts(userId, paging);
+			List<PostListDto> postList = postService.getTimeline(userId, paging);
 			return new ResponseEntity<>(postList, HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -79,12 +77,12 @@ public class PostController {
 
 	}
 
-	@PutMapping(value = "/update/{postId}")
-	public ResponseEntity<Object> updatePost(HttpServletRequest request, @RequestBody PostUpdateDto post,
+	@PutMapping(value = "/update/{postId}", consumes = "multipart/form-data")
+	public ResponseEntity<Object> updatePost(HttpServletRequest request, @RequestParam(required = false) String content, @RequestPart(value = "files", required = false) MultipartFile[] photos,
 			@PathVariable(value = "postId") int postId) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		try {
-			PostUpdatedDto result = postService.updatePost(post, postId, userId);
+			PostUpdatedDto result = postService.updatePost(content, photos, postId, userId);
 
 			return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (Exception e) {

@@ -34,7 +34,7 @@ public class User {
 	private Date birthDate;
 
 	@Column
-	private int gender;
+	private Integer gender;
 
 	@Column
 	private String email;

@@ -3,14 +3,13 @@ package com.training.socialnetwork.service.impl;
 import java.time.LocalDate;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -34,15 +33,29 @@ public class FriendService implements IFriendService {
 	@Autowired
 	private UserRepository userRepository;
 
-	@Autowired
-	private ModelMapper modelMapper;
-
 	@Override
 	public List<FriendListDto> findAllFriendWithStatus(int userId, Pageable paging) {
-		List<Friend> friendList = friendRepository.findAllFriendByUserIdAndStatus(userId, Constant.FRIENDED_STATUS, paging);
+		List<Friend> friendList = friendRepository.findAllFriendByUserIdAndStatus(userId, Constant.FRIENDED_STATUS,
+				paging);
 
-		return friendList.stream().map(friend -> modelMapper.map(friend, FriendListDto.class))
-				.collect(Collectors.toList());
+		List<FriendListDto> friendListDtos = new ArrayList<>();
+
+		for (Friend friend : friendList) {
+			FriendListDto friendListDto = new FriendListDto();
+			friendListDto.setFriendId(friend.getFriendId());
+			if (friend.getUser1().getUserId() == userId) {
+				friendListDto.setUserId(friend.getUser2().getUserId());
+				friendListDto.setUsername(friend.getUser2().getUsername());
+				friendListDto.setAvatar(friend.getUser2().getAvatarUrl());
+			} else {
+				friendListDto.setUserId(friend.getUser1().getUserId());
+				friendListDto.setUsername(friend.getUser1().getUsername());
+				friendListDto.setAvatar(friend.getUser1().getAvatarUrl());
+			}
+
+			friendListDtos.add(friendListDto);
+		}
+		return friendListDtos;
 	}
 
 	@Override
@@ -64,7 +77,7 @@ public class FriendService implements IFriendService {
 		friend.setStatus(Constant.FRIEND_REQUEST);
 		friend.setCreateDate(new Date());
 		friend.setUpdateDate(new Date());
-		
+
 		return friendRepository.save(friend) != null;
 	}
 
@@ -133,10 +146,18 @@ public class FriendService implements IFriendService {
 
 	@Override
 	public List<FriendRequestDto> findAllAddFriendRequest(int userId, Pageable paging) {
-		List<Friend> friendRequestList = friendRepository.findAllFriendByUserIdAndStatus(userId, Constant.FRIEND_REQUEST, paging);
+		List<Friend> friendRequestList = friendRepository.findAllFriendRequest(userId, Constant.FRIEND_REQUEST, paging);
 
-		return friendRequestList.stream().map(friend -> modelMapper.map(friend, FriendRequestDto.class))
-				.collect(Collectors.toList());
+		List<FriendRequestDto> friendRequestDtos = new ArrayList<>();
+
+		for (Friend friendRequest : friendRequestList) {
+			FriendRequestDto friendRequestDto = new FriendRequestDto();
+			friendRequestDto.setUserId(friendRequest.getUser1().getUserId());
+			friendRequestDto.setUsername(friendRequest.getUser1().getUsername());
+			friendRequestDto.setAvatar(friendRequest.getUser1().getAvatarUrl());
+			friendRequestDtos.add(friendRequestDto);
+		}
+		return friendRequestDtos;
 	}
 
 	@Override
@@ -145,7 +166,7 @@ public class FriendService implements IFriendService {
 		TemporalField fieldISO = WeekFields.of(Locale.FRANCE).dayOfWeek();
 		LocalDate dateStart = date.with(fieldISO, Constant.NUMBER_1);
 		LocalDate dateEnd = date.with(fieldISO, Constant.NUMBER_7);
-		
+
 		return friendRepository.countFriend(userId, dateStart, dateEnd);
 	}
 

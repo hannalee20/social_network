@@ -5,26 +5,36 @@ import java.util.Date;
 
 import javax.validation.constraints.Pattern;
 
-import org.springframework.web.multipart.MultipartFile;
-
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.training.socialnetwork.util.constant.Constant;
 
+@JsonInclude(Include.NON_NULL)
 public class UserUpdateDto implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private String realName;
-	private Date birthDate;
-	private String sex;
-	private String address;
-	private String email;
-	private String university;
-	private String job;
-	private String status;
-	private String about;
-	private MultipartFile avatar;
-
 	@Pattern(regexp = "^[A-Z]([a-zA-Z]+)?$", message = Constant.INVALID_REAL_NAME)
+	private String realName;
+	
+	private Date birthDate;
+	
+	@Pattern(regexp = "^(Male|Female|male|female)$", message = Constant.GENDER_INVALID_MESSAGE)
+	private String sex;
+	
+	private String address;
+	
+	@Pattern(regexp = "^[A-Za-z0-9+_.-]+@(.+)$", message = Constant.INVALID_EMAIL)
+	private String email;
+	
+	private String university;
+	
+	private String job;
+	
+	private String status;
+	
+	private String about;
+
 	public String getRealName() {
 		return realName;
 	}
@@ -41,7 +51,6 @@ public class UserUpdateDto implements Serializable {
 		this.birthDate = birthDate;
 	}
 
-	@Pattern(regexp = "^(Male|Female|male|female)$", message = Constant.GENDER_INVALID_MESSAGE)
 	public String getSex() {
 		return sex;
 	}
@@ -50,7 +59,6 @@ public class UserUpdateDto implements Serializable {
 		this.sex = sex;
 	}
 
-
 	public String getAddress() {
 		return address;
 	}
@@ -58,7 +66,6 @@ public class UserUpdateDto implements Serializable {
 		this.address = address;
 	}
 	
-	@Pattern(regexp = "^[A-Za-z0-9+_.-]+@(.+)$", message = Constant.INVALID_EMAIL)
 	public String getEmail() {
 		return email;
 	}
@@ -97,14 +104,6 @@ public class UserUpdateDto implements Serializable {
 
 	public void setAbout(String about) {
 		this.about = about;
-	}
-
-	public MultipartFile getAvatar() {
-		return avatar;
-	}
-
-	public void setAvatar(MultipartFile avatar) {
-		this.avatar = avatar;
 	}
 
 }

@@ -3,6 +3,7 @@ package com.training.socialnetwork.service.impl;
 import java.time.LocalDate;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
+import java.util.Date;
 import java.util.Locale;
 
 import javax.transaction.Transactional;
@@ -41,12 +42,13 @@ public class CommentService implements ICommentService {
 
 	@Autowired
 	private ModelMapper modelMapper;
-	
+
 	@Autowired
 	private ImageUtils imageUtils;
 
 	@Override
-	public CommentCreatedDto createComment(int userId, CommentCreateDto commentCreateDto, MultipartFile photo) throws Exception {
+	public CommentCreatedDto createComment(int userId, CommentCreateDto commentCreateDto, MultipartFile photo)
+			throws Exception {
 		Post post = postRepository.findById(commentCreateDto.getPostId()).orElse(null);
 		User user = userRepository.findById(userId).orElse(null);
 
@@ -57,17 +59,18 @@ public class CommentService implements ICommentService {
 		Comment comment = modelMapper.map(commentCreateDto, Comment.class);
 		comment.setPost(post);
 		comment.setUser(user);
-		if (!photo.isEmpty()) {
+		if (photo != null) {
 			String photoUrl = imageUtils.saveImage(photo);
 			comment.setPhotoUrl(photoUrl);
 		}
+		comment.setCreateDate(new Date());
+		comment.setUpdateDate(new Date());
 		Comment commentCreated = commentRepository.save(comment);
 
-		if (commentCreated != null) {
-			return modelMapper.map(commentCreated, CommentCreatedDto.class);
-		}
+		CommentCreatedDto commentCreatedDto = modelMapper.map(commentCreated, CommentCreatedDto.class);
+		commentCreatedDto.setUsername(commentCreated.getUser().getUsername());
 
-		throw new Exception(Constant.SERVER_ERROR);
+		return commentCreatedDto;
 	}
 
 	@Override

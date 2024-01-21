@@ -3,6 +3,7 @@ package com.training.socialnetwork.dto.response.friend;
 public class FriendListDto {
 
 	private int friendId;
+	private int userId;
 	private String username;
 	private String avatar;
 
@@ -12,6 +13,14 @@ public class FriendListDto {
 
 	public void setFriendId(int friendId) {
 		this.friendId = friendId;
+	}
+
+	public int getUserId() {
+		return userId;
+	}
+
+	public void setUserId(int userId) {
+		this.userId = userId;
 	}
 
 	public String getUsername() {

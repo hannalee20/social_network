@@ -36,6 +36,7 @@ import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.IUserService;
 import com.training.socialnetwork.util.constant.Constant;
 import com.training.socialnetwork.util.image.ImageUtils;
+import com.training.socialnetwork.util.mapper.ObjectMapper;
 
 @Service
 @Transactional
@@ -68,11 +69,14 @@ public class UserService implements IUserService {
 	@Autowired
 	private ImageUtils imageUtils;
 
+	@Autowired
+	private ObjectMapper objectMapper;
+	
 	private static final long EXPIRE_TOKEN = 30;
 
 	@Override
 	public UserRegistedDto createUser(UserRegisterDto userRegisterDto) throws Exception {
-		if (userRepository.findByUsername(userRegisterDto.getUsername()) != null) {
+		if (userRepository.findByUsernameOrEmail(userRegisterDto.getUsername(), userRegisterDto.getEmail()) != null) {
 			throw new Exception(Constant.SERVER_ERROR);
 		}
 		User user = new User();
@@ -90,6 +94,7 @@ public class UserService implements IUserService {
 			UserRegistedDto userRegistedDto = new UserRegistedDto();
 			userRegistedDto = modelMapper.map(userRegisted, UserRegistedDto.class);
 			userRegistedDto.setRole(Constant.ROLE_USER);
+			return userRegistedDto;
 		}
 
 		throw new Exception(Constant.SERVER_ERROR);
@@ -115,25 +120,25 @@ public class UserService implements IUserService {
 			throw new Exception(Constant.SERVER_ERROR);
 		}
 
-		User user = new User();
 		if(userUpdateDto.getSex() != null) {
 			if(userUpdateDto.getSex().toUpperCase().equals(Constant.MALE)) {
-				user.setGender(Constant.NUMBER_0);
+				userToUpdate.setGender(Constant.NUMBER_0);
 			} else {
-				user.setGender(Constant.NUMBER_1);
+				userToUpdate.setGender(Constant.NUMBER_1);
 			}
 		}
-		user = modelMapper.map(userUpdateDto, User.class);
-		user.setUserId(userId);
-		user.setUsername(userToUpdate.getUsername());
-		user.setPassword(userToUpdate.getPassword());
-		user.setRole(userToUpdate.getRole());
+		objectMapper.copyProperties(userUpdateDto, userToUpdate);
+		userToUpdate.setUserId(userId);
+//		userToUpdate.setUsername(userToUpdate.getUsername());
+//		userToUpdate.setPassword(userToUpdate.getPassword());
+//		userToUpdate.setEmail(userToUpdate.getEmail());
+//		userToUpdate.setRole(userToUpdate.getRole());
 		if (avatar != null) {
 			String avatarUrl = imageUtils.saveImage(avatar);
-			user.setAvatarUrl(avatarUrl);
+			userToUpdate.setAvatarUrl(avatarUrl);
 		}
-		user.setUpdateDate(new Date());
-		User userUpdated = userRepository.save(user);
+		userToUpdate.setUpdateDate(new Date());
+		User userUpdated = userRepository.save(userToUpdate);
 
 		if (userUpdated != null) {
 			return modelMapper.map(userUpdated, UserUpdatedDto.class);

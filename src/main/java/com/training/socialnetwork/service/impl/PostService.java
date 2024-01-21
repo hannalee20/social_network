@@ -17,12 +17,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.training.socialnetwork.dto.request.post.PostUpdateDto;
 import com.training.socialnetwork.dto.response.post.PostCreatedDto;
 import com.training.socialnetwork.dto.response.post.PostDetailDto;
 import com.training.socialnetwork.dto.response.post.PostListDto;
 import com.training.socialnetwork.dto.response.post.PostUpdatedDto;
 import com.training.socialnetwork.entity.Comment;
+import com.training.socialnetwork.entity.Like;
 import com.training.socialnetwork.entity.Photo;
 import com.training.socialnetwork.entity.Post;
 import com.training.socialnetwork.entity.User;
@@ -72,7 +72,7 @@ public class PostService implements IPostService {
 		
 		List<Photo> photoList = new ArrayList<>();
 		List<String> photoUrls = new ArrayList<>();
-		if (photos.length > 0) {
+		if (photos != null) {
 			for (MultipartFile file : photos) {
 				String photoUrl = imageUtils.saveImage(file);
 				Photo photo = new Photo();
@@ -97,7 +97,7 @@ public class PostService implements IPostService {
 	}
 
 	@Override
-	public List<PostListDto> getAllPosts(int userId, Pageable page) {
+	public List<PostListDto> getTimeline(int userId, Pageable page) {
 		List<Post> postList = postRepository.findAllByUserId(userId, page);
 		List<PostListDto> postListDtos = new ArrayList<>();
 		for (Post post : postList) {
@@ -106,8 +106,20 @@ public class PostService implements IPostService {
 			photoList.stream().map(photo -> photoUrlList.add(photo.getName())).collect(Collectors.toList());
 			PostListDto postListDto = modelMapper.map(post, PostListDto.class);
 			postListDto.setPhotoUrl(photoUrlList);
-			postListDto.setLikeCount(post.getLikeList().size());
-			postListDto.setCommentCount(post.getCommentList().size());
+			List<Like> likeList = new ArrayList<>();
+			for (Like like : post.getLikeList()) {
+				if(like.getDeleteFlg() != Constant.DELETED_FlG) {
+					likeList.add(like);
+				}
+			}
+			postListDto.setLikeCount(likeList.size());
+			List<Comment> commentList = new ArrayList<>();
+			for (Comment comment : post.getCommentList()) {
+				if(comment.getDeleteFlg() != Constant.DELETED_FlG) {
+					commentList.add(comment);
+				}
+			}
+			postListDto.setCommentCount(commentList.size());
 			postListDto.setUsername(post.getUser().getUsername());
 			postListDtos.add(postListDto);
 		}
@@ -139,7 +151,7 @@ public class PostService implements IPostService {
 	}
 
 	@Override
-	public PostUpdatedDto updatePost(PostUpdateDto postUpdateDto, int postId, int userId) throws Exception {
+	public PostUpdatedDto updatePost(String content, MultipartFile[] photos, int postId, int userId) throws Exception {
 		User user = userRepository.findById(userId).orElse(null);
 		Post postToUpdate = postRepository.findById(postId).orElse(null);
 
@@ -147,18 +159,38 @@ public class PostService implements IPostService {
 			throw new Exception(Constant.SERVER_ERROR);
 		}
 
-		Post post = modelMapper.map(postUpdateDto, Post.class);
-		post.setLikeList(postToUpdate.getLikeList());
-		post.setCommentList(postToUpdate.getCommentList());
-		post.setDeleteFlg(postToUpdate.getDeleteFlg());
-
-		Post postUpdated = postRepository.save(post);
-
-		if (postUpdated != null) {
-			return modelMapper.map(postUpdated, PostUpdatedDto.class);
+//		Post post = new Post();
+		postToUpdate.setContent(content);
+		List<String> photoUrls = new ArrayList<>();
+		if (photos != null) {
+			List<Photo> photoList = new ArrayList<>();
+			for (MultipartFile file : photos) {
+				String photoUrl = imageUtils.saveImage(file);
+				Photo photo = new Photo();
+				photo.setPost(postToUpdate);
+				photo.setName(photoUrl);
+				photo.setCreateDate(new Date());
+				
+				photo = photoRepository.save(photo);
+				if (photo == null) {
+					throw new Exception(Constant.SERVER_ERROR);
+				}
+				photoList.add(photo);
+				photoUrls.add(photoUrl);
+			}
+			postToUpdate.setListPhoto(photoList);
 		}
+		postToUpdate.setUpdateDate(new Date());
+//		post.setLikeList(postToUpdate.getLikeList());
+//		post.setCommentList(postToUpdate.getCommentList());
+//		post.setDeleteFlg(postToUpdate.getDeleteFlg());
 
-		throw new Exception(Constant.SERVER_ERROR);
+		postToUpdate = postRepository.save(postToUpdate);
+
+		PostUpdatedDto postUpdatedDto = modelMapper.map(postToUpdate, PostUpdatedDto.class);
+		postUpdatedDto.setPhotoUrls(photoUrls);
+		
+		return postUpdatedDto;
 	}
 
 	@Override

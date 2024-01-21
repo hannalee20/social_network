@@ -9,6 +9,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.training.socialnetwork.dto.request.user.UserRegisterDto;
 import com.training.socialnetwork.dto.request.user.UserUpdateDto;
 import com.training.socialnetwork.dto.response.user.JwtResponse;
@@ -57,6 +60,9 @@ public class UserController {
 
 	@Autowired
 	private OtpUtils otpUtils;
+	
+	@Autowired
+	private ObjectMapper objectMapper;
 
 	@PostMapping(value = "/register")
 	public ResponseEntity<Object> registerUser(@RequestBody UserRegisterDto userRegisterDto) {
@@ -111,12 +117,12 @@ public class UserController {
 	}
 
 	@PatchMapping(value = "/update/{userId}", consumes = {"multipart/form-data"})
-	public ResponseEntity<Object> updateUser(HttpServletRequest request, @ModelAttribute UserUpdateDto userUpdateDto, @PathVariable(value = "userId") int userId) {
+	public ResponseEntity<Object> updateUser(HttpServletRequest request, @ParameterObject @ModelAttribute UserUpdateDto userUpdateDto, @RequestParam(value = "file", required = false) MultipartFile avatar, @PathVariable(value = "userId") int userId) {
 		int loggedInUserId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		try {
-			UserUpdatedDto result = userService.updateInfo(userUpdateDto, userUpdateDto.getAvatar(), userId, loggedInUserId);
+			UserUpdatedDto result = userService.updateInfo(userUpdateDto, avatar, userId, loggedInUserId);
 
-			return new ResponseEntity<Object>(result, HttpStatus.OK);
+			return new ResponseEntity<Object>(objectMapper.writeValueAsString(result), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}

@@ -2,8 +2,17 @@ package com.training.socialnetwork.dto.response.friend;
 
 public class FriendRequestDto {
 
+	private int userId;
 	private String username;
 	private String avatar;
+
+	public int getUserId() {
+		return userId;
+	}
+
+	public void setUserId(int userId) {
+		this.userId = userId;
+	}
 
 	public String getUsername() {
 		return username;
