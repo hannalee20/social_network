@@ -30,7 +30,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.training.socialnetwork.dto.request.user.UserLoginDto;
 import com.training.socialnetwork.dto.request.user.UserRegisterDto;
+import com.training.socialnetwork.dto.request.user.UserTokenDto;
 import com.training.socialnetwork.dto.request.user.UserUpdateDto;
 import com.training.socialnetwork.dto.response.user.JwtResponse;
 import com.training.socialnetwork.dto.response.user.OtpResponse;
@@ -77,16 +79,15 @@ public class UserController {
 	}
 
 	@PostMapping(value = "/login")
-	public ResponseEntity<Object> loginUser(@RequestParam("username") String username,
-			@RequestParam("password") String password) throws Exception {
+	public ResponseEntity<Object> loginUser(@RequestBody UserLoginDto userLoginDto) throws Exception {
 		try {
-			boolean checkLogin = userService.loginUser(username, password);
+			boolean checkLogin = userService.loginUser(userLoginDto.getUsername(), userLoginDto.getPassword());
 
 			if (checkLogin) {
-				int otp = otpUtils.generateOtp(username);
+				int otp = otpUtils.generateOtp(userLoginDto.getUsername());
 				return ResponseEntity.ok(new OtpResponse(String.valueOf(otp)));
 			} else {
-				return ResponseEntity.ok(Constant.INVALID_USERNAME_OR_PASSWORD);
+				return new ResponseEntity<Object>(Constant.INVALID_USERNAME_OR_PASSWORD, HttpStatus.BAD_REQUEST);
 			}
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -95,25 +96,24 @@ public class UserController {
 	}
 
 	@PostMapping(value = "/token")
-	public ResponseEntity<Object> getToken(@RequestParam("username") String username,
-			@RequestParam("password") String password, @RequestParam("otp") int otp) {
+	public ResponseEntity<Object> getToken(@RequestBody UserTokenDto userTokenDto) {
 		Authentication authentication = authenticationManager
-				.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+				.authenticate(new UsernamePasswordAuthenticationToken(userTokenDto.getUsername(), userTokenDto.getPassword()));
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 
 		int otpFromCache = 0;
 
-		if (otp >= 0) {
-			otpFromCache = otpUtils.getOtp(username);
+		if (userTokenDto.getOtp() >= 0) {
+			otpFromCache = otpUtils.getOtp(userTokenDto.getUsername());
 		}
 
-		if (otpFromCache > 0 && otpFromCache == otp && authentication != null) {
-			otpUtils.clearOtp(username);
+		if (otpFromCache > 0 && otpFromCache == userTokenDto.getOtp() && authentication != null) {
+			otpUtils.clearOtp(userTokenDto.getUsername());
 			String jwt = jwtUtils.generateToken(authentication);
 			return ResponseEntity.ok(new JwtResponse(jwt));
+		} else {
+			return new ResponseEntity<Object>(Constant.SERVER_ERROR, HttpStatus.BAD_REQUEST);
 		}
-
-		return ResponseEntity.ok(Constant.SERVER_ERROR);
 	}
 
 	@PatchMapping(value = "/update/{userId}", consumes = {"multipart/form-data"})
