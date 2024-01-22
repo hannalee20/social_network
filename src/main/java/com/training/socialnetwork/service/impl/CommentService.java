@@ -17,6 +17,7 @@ import com.training.socialnetwork.dto.request.comment.CommentCreateDto;
 import com.training.socialnetwork.dto.request.comment.CommentUpdateDto;
 import com.training.socialnetwork.dto.response.comment.CommentCreatedDto;
 import com.training.socialnetwork.dto.response.comment.CommentDetailDto;
+import com.training.socialnetwork.dto.response.comment.CommentUpdatedDto;
 import com.training.socialnetwork.entity.Comment;
 import com.training.socialnetwork.entity.Post;
 import com.training.socialnetwork.entity.User;
@@ -74,7 +75,7 @@ public class CommentService implements ICommentService {
 	}
 
 	@Override
-	public CommentCreatedDto updateComment(CommentUpdateDto commentUpdateDto, int commentId, int userId)
+	public CommentUpdatedDto updateComment(CommentUpdateDto commentUpdateDto, int commentId, int userId)
 			throws Exception {
 		Comment commentToUpdate = commentRepository.findById(commentId).orElse(null);
 
@@ -94,11 +95,10 @@ public class CommentService implements ICommentService {
 
 		Comment commentUpdated = commentRepository.save(comment);
 
-		if (commentUpdated != null) {
-			return modelMapper.map(commentUpdated, CommentCreatedDto.class);
-		}
-
-		throw new Exception(Constant.SERVER_ERROR);
+		CommentUpdatedDto commentUpdatedDto = modelMapper.map(commentUpdated, CommentUpdatedDto.class);
+		commentUpdatedDto.setUsername(commentUpdated.getUser().getUsername());
+		
+		return commentUpdatedDto;
 	}
 
 	@Override
@@ -122,7 +122,10 @@ public class CommentService implements ICommentService {
 			throw new Exception(Constant.SERVER_ERROR);
 		}
 
-		return modelMapper.map(comment, CommentDetailDto.class);
+		CommentDetailDto commentDetailDto = modelMapper.map(comment, CommentDetailDto.class);
+		commentDetailDto.setUsername(comment.getUser().getUsername());
+		
+		return commentDetailDto;
 	}
 
 	@Override

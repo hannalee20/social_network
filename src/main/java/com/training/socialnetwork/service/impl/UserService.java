@@ -90,14 +90,14 @@ public class UserService implements IUserService {
 
 		User userRegisted = userRepository.save(user);
 
-		if (userRegisted != null) {
+//		if (userRegisted != null) {
 			UserRegistedDto userRegistedDto = new UserRegistedDto();
 			userRegistedDto = modelMapper.map(userRegisted, UserRegistedDto.class);
 			userRegistedDto.setRole(Constant.ROLE_USER);
 			return userRegistedDto;
-		}
-
-		throw new Exception(Constant.SERVER_ERROR);
+//		}
+//
+//		throw new Exception(Constant.SERVER_ERROR);
 	}
 
 	@Override

@@ -20,9 +20,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.training.socialnetwork.dto.request.comment.CommentCreateDto;
 import com.training.socialnetwork.dto.request.comment.CommentUpdateDto;
-import com.training.socialnetwork.dto.request.user.UserUpdateDto;
 import com.training.socialnetwork.dto.response.comment.CommentCreatedDto;
 import com.training.socialnetwork.dto.response.comment.CommentDetailDto;
+import com.training.socialnetwork.dto.response.comment.CommentUpdatedDto;
 import com.training.socialnetwork.security.JwtUtils;
 import com.training.socialnetwork.service.ICommentService;
 import com.training.socialnetwork.util.constant.Constant;
@@ -53,7 +53,7 @@ public class CommentController {
 			@PathVariable(value = "commentId") int commentId) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		try {
-			CommentCreatedDto result = commentService.updateComment(comment, commentId, userId);
+			CommentUpdatedDto result = commentService.updateComment(comment, commentId, userId);
 
 			return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (Exception e) {
