@@ -1,13 +1,12 @@
 package com.training.socialnetwork.service;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import javax.transaction.Transactional;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -17,6 +16,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -46,6 +48,12 @@ public class UserServiceTest {
 	
 	@Autowired
 	public OtpUtils otpUtils;
+	
+	@Mock
+	private Authentication authentication;
+
+	@Mock
+	private AuthenticationManager authenticationManager;
 
 //	@Mock
 //	private ObjectMapper objectMapper;
@@ -132,7 +140,7 @@ public class UserServiceTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(request))
 				.andExpect(status().isBadRequest())
-				.andExpect(content().json(Constant.INVALID_USERNAME_OR_PASSWORD));
+				.andExpect(jsonPath("$.message").value(Constant.INVALID_USERNAME_OR_PASSWORD));
 	}
 	
 	@Test
@@ -143,10 +151,13 @@ public class UserServiceTest {
 		String request = JSonHelper.toJson(userTokenDto).orElse("");
 		userTokenDto.setOtp(231453);
 		
+		when(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userTokenDto.getUsername(), userTokenDto.getPassword())))
+				.thenReturn(authentication);
 		mockMvc.perform(post("/user/token")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(request))
 				.andExpect(status().isOk());
 //				.andExpect(content().json(Constant.INVALID_USERNAME_OR_PASSWORD));
 	}
+	
 }
