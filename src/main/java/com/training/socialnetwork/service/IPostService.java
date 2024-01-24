@@ -22,6 +22,6 @@ public interface IPostService {
 	
 	boolean deletePost(int postId, int userId) throws Exception;
 	
-	int countPost(int userId);
+//	int countPost(int userId);
 
 }

@@ -23,6 +23,6 @@ public interface LikeRepository extends JpaRepository<Like, Integer>{
 			"inner join likes l on p.post_id = l.post_id " +
 			"where u.user_id = :userId " + 
 			"and l.delete_flg = 0 " + 
-			"and l.create_date between ':dateStart' and ':dateEnd' ", nativeQuery = true)
+			"and l.create_date >= :dateStart <= :dateEnd ", nativeQuery = true)
 	int countLike(@Param(value = "userId") int userId, @Param(value = "dateStart") LocalDate dateStart, @Param(value = "dateEnd") LocalDate dateEnd);
 }

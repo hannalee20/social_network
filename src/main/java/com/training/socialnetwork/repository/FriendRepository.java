@@ -52,7 +52,6 @@ public interface FriendRepository extends JpaRepository<Friend, Integer>{
 			"inner join friends f on u.user_id = f.user_id1  or u.user_id = f.user_id2 " +
 			"where u.user_id = :userId " + 
 			"and f.status = 1  " + 
-			"and f.update_date between ':dateStart' and ':dateEnd' " + 
-			"and f.delete_flg = 0 ", nativeQuery = true)
+			"and f.update_date >= :dateStart <= :dateEnd ", nativeQuery = true)
 	int countFriend(@Param(value = "userId") int userId, @Param(value = "dateStart") LocalDate dateStart, @Param(value = "dateEnd") LocalDate dateEnd);
 }

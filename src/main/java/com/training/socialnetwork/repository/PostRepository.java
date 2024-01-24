@@ -30,7 +30,7 @@ public interface PostRepository extends JpaRepository<Post, Integer>{
 				"from users as u " + 
 				"inner join posts p on u.user_id = p.user_id " +
 				"where u.user_id = :userId " + 
-				"and p.create_date between ':dateStart' and ':dateEnd' " +
+				"and p.create_date >= :dateStart <= :dateEnd " +
 				"and p.delete_flg = 0 ", nativeQuery = true)
 	int countPost(@Param(value = "userId") int userId, @Param(value = "dateStart") LocalDate dateStart, @Param(value = "dateEnd") LocalDate dateEnd);
 }

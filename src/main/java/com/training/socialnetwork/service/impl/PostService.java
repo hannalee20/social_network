@@ -1,12 +1,8 @@
 package com.training.socialnetwork.service.impl;
 
-import java.time.LocalDate;
-import java.time.temporal.TemporalField;
-import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
@@ -205,14 +201,14 @@ public class PostService implements IPostService {
 		return postRepository.save(post) != null;
 	}
 
-	@Override
-	public int countPost(int userId) {
-		LocalDate date = LocalDate.now();
-		TemporalField fieldISO = WeekFields.of(Locale.FRANCE).dayOfWeek();
-		LocalDate dateStart = date.with(fieldISO, 1);
-		LocalDate dateEnd = date.with(fieldISO, 7);
-		
-		return postRepository.countPost(userId, dateStart, dateEnd);
-	}
+//	@Override
+//	public int countPost(int userId) {
+//		LocalDate date = LocalDate.now();
+//		TemporalField fieldISO = WeekFields.of(Locale.FRANCE).dayOfWeek();
+//		Date dateStart = Date.from(date.with(fieldISO, 1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+//		Date dateEnd = Date.from(date.with(fieldISO, 7).atStartOfDay(ZoneId.systemDefault()).toInstant());
+//		
+//		return postRepository.countPost(userId, dateStart, dateEnd);
+//	}
 
 }

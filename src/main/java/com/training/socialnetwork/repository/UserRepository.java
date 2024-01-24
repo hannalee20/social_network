@@ -28,7 +28,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 	
 	User findByToken(String token);
 
-	@Query(value = "" + "select * from users as u" + "where u.user_id <> :userId "
+	@Query(value = "" + "select * from users as u " + "where u.user_id <> :userId "
 			+ "and (lower(u.username) like concat('%', :keyword, '%') "
 			+ "or lower(u.real_name) like concat('%', :keyword, '%')) ", nativeQuery = true)
 	List<User> findAllUserByKeyword(@Param(value = "userId") int userId, @Param(value = "keyword") String keyword);

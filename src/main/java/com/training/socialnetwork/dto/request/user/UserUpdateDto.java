@@ -24,9 +24,6 @@ public class UserUpdateDto implements Serializable {
 	
 	private String address;
 	
-	@Pattern(regexp = "^[A-Za-z0-9+_.-]+@(.+)$", message = Constant.INVALID_EMAIL)
-	private String email;
-	
 	private String university;
 	
 	private String job;
@@ -64,14 +61,6 @@ public class UserUpdateDto implements Serializable {
 	}
 	public void setAddress(String address) {
 		this.address = address;
-	}
-	
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
 	}
 
 	public String getUniversity() {

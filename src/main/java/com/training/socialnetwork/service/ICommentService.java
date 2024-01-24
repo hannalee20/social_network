@@ -18,5 +18,5 @@ public interface ICommentService {
 	
 	CommentDetailDto getCommentDetail(int commentId) throws Exception;
 	
-	int countComment(int userId);
+//	int countComment(int userId);
 }

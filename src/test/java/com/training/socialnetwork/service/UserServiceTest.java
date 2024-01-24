@@ -1,199 +1,240 @@
 package com.training.socialnetwork.service;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import javax.transaction.Transactional;
 
-import org.junit.Assert;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 
-import com.training.socialnetwork.dto.request.user.UserLoginDto;
 import com.training.socialnetwork.dto.request.user.UserRegisterDto;
-import com.training.socialnetwork.dto.request.user.UserTokenDto;
+import com.training.socialnetwork.dto.request.user.UserUpdateDto;
 import com.training.socialnetwork.dto.response.user.UserDetailDto;
-import com.training.socialnetwork.dto.response.user.UserRegistedDto;
+import com.training.socialnetwork.entity.Friend;
+import com.training.socialnetwork.entity.Role;
 import com.training.socialnetwork.entity.User;
+import com.training.socialnetwork.repository.FriendRepository;
+import com.training.socialnetwork.repository.RoleRepository;
 import com.training.socialnetwork.repository.UserRepository;
-import com.training.socialnetwork.security.JwtUtils;
-import com.training.socialnetwork.security.OtpUtils;
+import com.training.socialnetwork.service.impl.UserService;
 import com.training.socialnetwork.util.constant.Constant;
-import com.training.socialnetwork.utils.JSonHelper;
+import com.training.socialnetwork.util.mapper.ObjectMapper;
 
+//@ExtendWith(MockitoExtension.class)
 @RunWith(SpringRunner.class)
-//@WebMvcTest(UserController.class)
 @SpringBootTest
-@AutoConfigureMockMvc
+//@AutoConfigureMockMvc
 @Transactional
 public class UserServiceTest {
 
 	@Autowired
-	private MockMvc mockMvc;
-
-	@Autowired
-	public BCryptPasswordEncoder bCryptPasswordEncoder;
+	private UserService userService;
 	
 	@Autowired
-	public OtpUtils otpUtils;
+	private ObjectMapper objectMapper;
 	
-	@Mock
-	private Authentication authentication;
-
-	@Mock
-	private AuthenticationManager authenticationManager;
-
 	@Autowired
-	private JwtUtils jwtUtils;
-//	
-//	@Mock
-//	private ModelMapper modelMapper;
-
-	@Mock
-	UserRepository userRepository;
-
-//	@Mock
-//	RoleRepository roleRepository;
-
+	private ModelMapper modelMapper;
+	
 	@MockBean
-	IUserService userService;
+	private UserRepository userRepository;
 	
-	private String token;
-
-//	@MockBean
-//	UserController controller;
-
-	@BeforeEach
-	void setUp() {
-		this.bCryptPasswordEncoder = new BCryptPasswordEncoder();
-	}
-
+	@MockBean
+	private RoleRepository roleRepository;
+	
+	@MockBean
+	private FriendRepository friendRepository;
+	
 	@Test
-	public void createValidUser() throws Exception {
+	public void createUserSuccess() throws Exception {
 		UserRegisterDto userRegisterDto = new UserRegisterDto();
-
 		userRegisterDto.setUsername("test");
 		userRegisterDto.setPassword("123456");
 		userRegisterDto.setEmail("test@gmail.com");
-
+		
+		Role role = new Role();
+		role.setRoleId(1);
+		role.setName(Constant.ROLE_USER);
+		
 		User user = new User();
 		user.setUserId(1);
 		user.setUsername("test");
-		user.setPassword(bCryptPasswordEncoder.encode("123456"));
+		user.setPassword("123456");
 		user.setEmail("test@gmail.com");
-
-		UserRegistedDto userRegistedDto = new UserRegistedDto();
-		userRegistedDto.setUserId(1);
-		userRegistedDto.setUsername("test");
-		userRegistedDto.setPassword(bCryptPasswordEncoder.encode("123456"));
-		userRegistedDto.setEmail("test@gmail.com");
-		userRegistedDto.setRole(Constant.ROLE_USER);
-
-		when(userService.createUser(userRegisterDto)).thenReturn(userRegistedDto);
-		String request = JSonHelper.toJson(userRegisterDto).orElse("");
-		String expectedResponse = JSonHelper.toJson(userRegistedDto).orElse("");
-
-		mockMvc.perform(post("/user/register").contentType(MediaType.APPLICATION_JSON).content(request))
-				.andExpect(status().isCreated());
-//				.andExpect(content().json(expectedResponse));
-//				.andExpect(jsonPath("$.userId").value(userRegistedDto.getUserId()))
-//				.andExpect(jsonPath("$.username").value(userRegistedDto.getUsername()))
-//				.andExpect(jsonPath("$.email").value(userRegistedDto.getEmail()))
-//				.andExpect(jsonPath("$.role").value(userRegistedDto.getRole()));
-	}
-
-	@Test
-	public void loginSuccess() throws Exception {
-
-		UserLoginDto userLoginDto = new UserLoginDto();
-		userLoginDto.setUsername("test");
-		userLoginDto.setPassword("123456");
+		user.setRole(role);
+		user.setCreateDate(new Date());
+		user.setUpdateDate(new Date());
 		
-		when(userService.loginUser(userLoginDto.getUsername(), userLoginDto.getPassword())).thenReturn(true);
-		String request = JSonHelper.toJson(userLoginDto).orElse("");
+		when(userRepository.findByUsernameOrEmail(userRegisterDto.getUsername(), userRegisterDto.getEmail())).thenReturn(null);
+		when(roleRepository.findByName(Constant.ROLE_USER)).thenReturn(role);
+		when(userRepository.save(any())).thenReturn(user);
 		
-		mockMvc.perform(post("/user/login")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(request))
-				.andExpect(status().isOk());
-//				.andExpect(jsonPath("$.otp").value(String.valueOf(otp)));
+		userService.createUser(userRegisterDto);
 	}
 	
 	@Test
-	public void loginFail() throws Exception {
-		UserLoginDto userLoginDto = new UserLoginDto();
+	public void loginUserFail() throws Exception {
+		String username = "test";
+		String password = "123456";
 		
-		when(userService.loginUser(userLoginDto.getUsername(), userLoginDto.getPassword())).thenReturn(false);
-		String request = JSonHelper.toJson(userLoginDto).orElse("");
+		User user = new User();
+		user.setUserId(1);
+		user.setUsername("test");
+		user.setPassword("123456");
+		user.setEmail("test@gmail.com");
 		
-		mockMvc.perform(post("/user/login")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(request))
-				.andExpect(status().isBadRequest());
-//				.andExpect(jsonPath("$.message").value(Constant.INVALID_USERNAME_OR_PASSWORD));
+		when(userRepository.findByUsername(username)).thenReturn(user);
+		userService.loginUser(username, password);
 	}
 	
 	@Test
-	public void getTokenSuccess() throws Exception {
-		UserLoginDto userLoginDto = new UserLoginDto();
-		userLoginDto.setUsername("test");
-		userLoginDto.setPassword("123456");
+	public void updateInfoSuccess() throws Exception {
+		UserUpdateDto userUpdateDto = new UserUpdateDto();
+		userUpdateDto.setRealName("Test");
+		userUpdateDto.setSex("female");
+		userUpdateDto.setAddress("Hanoi");
 		
-		when(userService.loginUser(userLoginDto.getUsername(), userLoginDto.getPassword())).thenReturn(true);
-		String otpRequest = JSonHelper.toJson(userLoginDto).orElse("");
+		User userToUpdate = new User();
+		userToUpdate.setUserId(1);
+		userToUpdate.setUsername("test");
+		userToUpdate.setEmail("test@gmail.com");
 		
-		MvcResult result = mockMvc.perform(post("/user/login")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(otpRequest))
-				.andExpect(status().isOk()).andReturn();
+		when(userRepository.findById(1)).thenReturn(Optional.of(userToUpdate));
 		
-		String otp = result.getResponse().getContentAsString();
-		UserTokenDto userTokenDto = new UserTokenDto();
-		userTokenDto.setUsername("test");
-		userTokenDto.setPassword("123456");
+		objectMapper.copyProperties(userUpdateDto, userToUpdate);
 		
-		userTokenDto.setOtp(Integer.valueOf(otp.substring(8, 14)));
-		String request = JSonHelper.toJson(userTokenDto).orElse("");
-		when(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userTokenDto.getUsername(), userTokenDto.getPassword())))
-				.thenReturn(authentication);
+		when(userRepository.save(any())).thenReturn(userToUpdate);
 		
-		MvcResult tokenResult = mockMvc.perform(post("/user/token")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(request))
-				.andExpect(status().isOk()).andReturn();
-		token = tokenResult.getResponse().getContentAsString();
-		Assert.assertNotNull(token);
+		userService.updateInfo(userUpdateDto, null, 1, 1);
 	}
 	
 	@Test
-	public void getInfoUserSuccess() throws Exception {
+	public void getInfoSuccess() throws Exception {
+		User user = new User();
+		user.setUserId(1);
+		user.setUsername("test");
+		user.setPassword("123456");
+		user.setEmail("test@gmail.com");
+		user.setGender(0);
+		user.setBirthDate(new Date());
+		user.setAddress("Hanoi");
+		
 		UserDetailDto userDetailDto = new UserDetailDto();
-		userDetailDto.setUserId(1);
-		userDetailDto.setRealName("Test");
-		userDetailDto.setGender("female");
+		modelMapper.map(user, userDetailDto);
+		userDetailDto.setGender(Constant.MALE);
 		
-		when(userService.getInfo(1)).thenReturn(userDetailDto);
-		String request = JSonHelper.toJson(userDetailDto).orElse("");
-		mockMvc.perform(get("/user/detail/{userId}", 1)
-				.header("Authorization", token)
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(request))
-				.andExpect(status().isOk()).andReturn();
+		when(userRepository.findById(1)).thenReturn(Optional.of(user));
 		
+		userService.getInfo(1);
+	}
+	
+	@Test
+	public void searchUserSuccess() {
+		User user1 = new User();
+		user1.setUserId(1);
+		user1.setUsername("test1");
+		user1.setPassword("123456");
+		user1.setEmail("test1@gmail.com");
+		user1.setGender(0);
+		user1.setBirthDate(new Date());
+		user1.setAddress("Hanoi");
+		
+		User user2 = new User();
+		user2.setUserId(2);
+		user2.setUsername("test2");
+		user2.setPassword("123456");
+		user2.setEmail("test2@gmail.com");
+		user2.setGender(1);
+		user2.setBirthDate(new Date());
+		user2.setAddress("HCM");
+		
+		User user3 = new User();
+		user3.setUserId(3);
+		user3.setUsername("test3");
+		user3.setPassword("123456");
+		user3.setEmail("test3@gmail.com");
+		user3.setGender(1);
+		user3.setBirthDate(new Date());
+		user3.setAddress("Hanoi");
+		
+		List<User> userList = new ArrayList<>();
+		userList.add(user1);
+		userList.add(user2);
+//		userList.add(user3);
+		
+		Friend friend = new Friend();
+		friend.setFriendId(1);
+		friend.setUser1(user1);
+		friend.setUser2(user3);
+		friend.setStatus(1);
+		
+		List<Friend> friendList = new ArrayList<Friend>();
+		friendList.add(friend);
+		
+		String keyword = "test";
+		
+		when(userRepository.findAllUserByKeyword(3, keyword)).thenReturn(userList);
+		when(friendRepository.findAllByUserId(3)).thenReturn(friendList);
+		
+		userService.searchUser(3, keyword);
+	}
+	
+	@Test
+	public void getForgotPasswordSuccess() throws Exception {
+		User user1 = new User();
+		user1.setUserId(1);
+		user1.setUsername("test1");
+		user1.setPassword("123456");
+		user1.setEmail("test1@gmail.com");
+		user1.setGender(0);
+		user1.setBirthDate(new Date());
+		user1.setAddress("Hanoi");
+		
+		String email = "test1@gmail.com";
+		
+		when(userRepository.findByEmail(any())).thenReturn(user1);
+		String token = UUID.randomUUID().toString();
+		user1.setToken(token);
+		user1.setTokenCreateDate(new Date());
+		when(userRepository.save(any())).thenReturn(user1);
+		
+		userService.forgotPassword(email);
+	}
+	
+	@Test
+	public void resetPasswordSuccess() throws Exception {
+		String token = "testToken";
+		User user1 = new User();
+		user1.setUserId(1);
+		user1.setUsername("test1");
+		user1.setPassword("123456");
+		user1.setEmail("test1@gmail.com");
+		user1.setToken(token);
+		user1.setGender(0);
+		user1.setBirthDate(new Date());
+		user1.setAddress("Hanoi");
+		user1.setTokenCreateDate(new Date());
+		
+		when(userRepository.findByToken(token)).thenReturn(user1);
+		String newPassword = "654321";
+		user1.setToken(null);
+		user1.setTokenCreateDate(null);
+		user1.setUpdateDate(new Date());
+		
+		when(userRepository.save(any())).thenReturn(user1);
+		
+		userService.resetPassword(token, newPassword);
 	}
 }

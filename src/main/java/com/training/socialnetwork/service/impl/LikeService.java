@@ -1,10 +1,5 @@
 package com.training.socialnetwork.service.impl;
 
-import java.time.LocalDate;
-import java.time.temporal.TemporalField;
-import java.time.temporal.WeekFields;
-import java.util.Locale;
-
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,14 +59,14 @@ public class LikeService implements ILikeService {
 		return likeRepository.save(like) != null;
 	}
 
-	@Override
-	public int countLike(int userId) {
-		LocalDate date = LocalDate.now();
-		TemporalField fieldISO = WeekFields.of(Locale.FRANCE).dayOfWeek();
-		LocalDate dateStart = date.with(fieldISO, Constant.NUMBER_1);
-		LocalDate dateEnd = date.with(fieldISO, Constant.NUMBER_7);
-		
-		return likeRepository.countLike(userId, dateStart, dateEnd);
-	}
+//	@Override
+//	public int countLike(int userId) {
+//		LocalDate date = LocalDate.now();
+//		TemporalField fieldISO = WeekFields.of(Locale.FRANCE).dayOfWeek();
+//		Date dateStart = Date.from(date.with(fieldISO, 1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+//		Date dateEnd = Date.from(date.with(fieldISO, 7).atStartOfDay(ZoneId.systemDefault()).toInstant());
+//		
+//		return likeRepository.countLike(userId, dateStart, dateEnd);
+//	}
 
 }

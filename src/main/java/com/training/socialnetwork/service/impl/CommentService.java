@@ -1,10 +1,6 @@
 package com.training.socialnetwork.service.impl;
 
-import java.time.LocalDate;
-import java.time.temporal.TemporalField;
-import java.time.temporal.WeekFields;
 import java.util.Date;
-import java.util.Locale;
 
 import javax.transaction.Transactional;
 
@@ -128,14 +124,14 @@ public class CommentService implements ICommentService {
 		return commentDetailDto;
 	}
 
-	@Override
-	public int countComment(int userId) {
-		LocalDate date = LocalDate.now();
-		TemporalField fieldISO = WeekFields.of(Locale.FRANCE).dayOfWeek();
-		LocalDate dateStart = date.with(fieldISO, 1);
-		LocalDate dateEnd = date.with(fieldISO, 7);
-
-		return commentRepository.countComment(userId, dateStart, dateEnd);
-	}
+//	@Override
+//	public int countComment(int userId) {
+//		LocalDate date = LocalDate.now();
+//		TemporalField fieldISO = WeekFields.of(Locale.FRANCE).dayOfWeek();
+//		Date dateStart = Date.from(date.with(fieldISO, 1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+//		Date dateEnd = Date.from(date.with(fieldISO, 7).atStartOfDay(ZoneId.systemDefault()).toInstant());
+//
+//		return commentRepository.countComment(userId, dateStart, dateEnd);
+//	}
 
 }
