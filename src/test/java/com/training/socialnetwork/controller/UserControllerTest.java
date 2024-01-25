@@ -1,14 +1,15 @@
 package com.training.socialnetwork.controller;
 
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import javax.transaction.Transactional;
 
-import org.junit.Assert;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,7 @@ import com.training.socialnetwork.utils.JSonHelper;
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class UserControllerTest {
 
 	@Autowired
@@ -78,10 +80,39 @@ public class UserControllerTest {
 
 //	@MockBean
 //	UserController controller;
-
-	@BeforeEach
-	void setUp() {
+	
+	
+	@BeforeAll
+	void setUp() throws Exception {
 		this.bCryptPasswordEncoder = new BCryptPasswordEncoder();
+		UserLoginDto userLoginDto = new UserLoginDto();
+		userLoginDto.setUsername("test");
+		userLoginDto.setPassword("123456");
+		
+		when(userService.loginUser(userLoginDto.getUsername(), userLoginDto.getPassword())).thenReturn(true);
+		String otpRequest = JSonHelper.toJson(userLoginDto).orElse("");
+		
+		MvcResult result = mockMvc.perform(post("/user/login")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(otpRequest))
+				.andExpect(status().isOk()).andReturn();
+		
+		String otp = result.getResponse().getContentAsString();
+		UserTokenDto userTokenDto = new UserTokenDto();
+		userTokenDto.setUsername("test");
+		userTokenDto.setPassword("123456");
+		
+		userTokenDto.setOtp(Integer.valueOf(otp.substring(8, 14)));
+		String request = JSonHelper.toJson(userTokenDto).orElse("");
+		when(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userTokenDto.getUsername(), userTokenDto.getPassword())))
+				.thenReturn(authentication);
+		
+		MvcResult tokenResult = mockMvc.perform(post("/user/token")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(request))
+				.andExpect(status().isOk()).andReturn();
+		String token1 = tokenResult.getResponse().getContentAsString();
+		token = token1.substring(8, 135);
 	}
 
 	@Test
@@ -173,12 +204,10 @@ public class UserControllerTest {
 		when(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userTokenDto.getUsername(), userTokenDto.getPassword())))
 				.thenReturn(authentication);
 		
-		MvcResult tokenResult = mockMvc.perform(post("/user/token")
+		mockMvc.perform(post("/user/token")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(request))
 				.andExpect(status().isOk()).andReturn();
-		token = tokenResult.getResponse().getContentAsString();
-		Assert.assertNotNull(token);
 	}
 	
 	@Test
@@ -191,7 +220,7 @@ public class UserControllerTest {
 		when(userService.getInfo(1)).thenReturn(userDetailDto);
 		String request = JSonHelper.toJson(userDetailDto).orElse("");
 		mockMvc.perform(get("/user/detail/{userId}", 1)
-				.header("Authorization", token)
+				.header("Authorization", "Bearer " + token)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(request))
 				.andExpect(status().isOk()).andReturn();
