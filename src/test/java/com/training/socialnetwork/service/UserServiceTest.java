@@ -3,9 +3,13 @@ package com.training.socialnetwork.service;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
+import java.time.temporal.TemporalField;
+import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -17,15 +21,20 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.training.socialnetwork.dto.request.user.UserRegisterDto;
 import com.training.socialnetwork.dto.request.user.UserUpdateDto;
 import com.training.socialnetwork.dto.response.user.UserDetailDto;
+import com.training.socialnetwork.dto.response.user.UserReportDto;
 import com.training.socialnetwork.entity.Friend;
 import com.training.socialnetwork.entity.Role;
 import com.training.socialnetwork.entity.User;
+import com.training.socialnetwork.repository.CommentRepository;
 import com.training.socialnetwork.repository.FriendRepository;
+import com.training.socialnetwork.repository.LikeRepository;
+import com.training.socialnetwork.repository.PostRepository;
 import com.training.socialnetwork.repository.RoleRepository;
 import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.impl.UserService;
@@ -56,6 +65,15 @@ public class UserServiceTest {
 	
 	@MockBean
 	private FriendRepository friendRepository;
+	
+	@MockBean
+	private PostRepository postRepository;
+	
+	@MockBean
+	private LikeRepository likeRepository;
+	
+	@MockBean
+	private CommentRepository commentRepository;
 	
 	@Test
 	public void createUserSuccess() throws Exception {
@@ -101,6 +119,8 @@ public class UserServiceTest {
 	
 	@Test
 	public void updateInfoSuccess() throws Exception {
+		MockMultipartFile avatar =
+                new MockMultipartFile("data2", "filename2.jpg", "multipart/form-data", "some xml".getBytes());
 		UserUpdateDto userUpdateDto = new UserUpdateDto();
 		userUpdateDto.setRealName("Test");
 		userUpdateDto.setSex("female");
@@ -117,7 +137,7 @@ public class UserServiceTest {
 		
 		when(userRepository.save(any())).thenReturn(userToUpdate);
 		
-		userService.updateInfo(userUpdateDto, null, 1, 1);
+		userService.updateInfo(userUpdateDto, avatar, 1, 1);
 	}
 	
 	@Test
@@ -214,6 +234,33 @@ public class UserServiceTest {
 	}
 	
 	@Test
+	public void getReportUserSuccess() {
+		LocalDate date = LocalDate.now();
+		TemporalField fieldISO = WeekFields.of(Locale.FRANCE).dayOfWeek();
+		LocalDate dateStart = date.with(fieldISO, 1);
+		LocalDate dateEnd = date.with(fieldISO, 7);
+		
+		UserReportDto userReportDto = new UserReportDto();
+		int userId = 1;
+		int postCount = 1;
+		int commentCount = 2;
+		int friendCount = 3;
+		int likeCount = 4;
+		
+		when(postRepository.countPost(userId, dateStart, dateEnd)).thenReturn(postCount);
+		when(commentRepository.countComment(userId, dateStart, dateEnd)).thenReturn(commentCount);
+		when(friendRepository.countFriend(userId, dateStart, dateEnd)).thenReturn(friendCount);
+		when(likeRepository.countLike(userId, dateStart, dateEnd)).thenReturn(likeCount);
+		
+		userReportDto.setPostCount(postCount);
+		userReportDto.setCommentCount(commentCount);
+		userReportDto.setFriendCount(friendCount);
+		userReportDto.setLikeCount(likeCount);
+		
+		userService.getReportUser(userId);
+	}
+	
+	@Test
 	public void resetPasswordSuccess() throws Exception {
 		String token = "testToken";
 		User user1 = new User();
@@ -226,12 +273,10 @@ public class UserServiceTest {
 		user1.setBirthDate(new Date());
 		user1.setAddress("Hanoi");
 		user1.setTokenCreateDate(new Date());
+		user1.setCreateDate(new Date());
 		
 		when(userRepository.findByToken(token)).thenReturn(user1);
 		String newPassword = "654321";
-		user1.setToken(null);
-		user1.setTokenCreateDate(null);
-		user1.setUpdateDate(new Date());
 		
 		when(userRepository.save(any())).thenReturn(user1);
 		

@@ -1,9 +1,8 @@
 package com.training.socialnetwork.controller;
 
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import javax.transaction.Transactional;
 
@@ -32,12 +31,14 @@ import com.training.socialnetwork.dto.response.user.UserDetailDto;
 import com.training.socialnetwork.dto.response.user.UserRegistedDto;
 import com.training.socialnetwork.entity.User;
 import com.training.socialnetwork.repository.UserRepository;
+import com.training.socialnetwork.security.JwtUtils;
 import com.training.socialnetwork.security.OtpUtils;
 import com.training.socialnetwork.service.IUserService;
 import com.training.socialnetwork.util.constant.Constant;
 import com.training.socialnetwork.utils.JSonHelper;
 
 @RunWith(SpringRunner.class)
+//@WebMvcTest(UserController.class)
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
@@ -58,13 +59,25 @@ public class UserControllerTest {
 	@Mock
 	private AuthenticationManager authenticationManager;
 
+	@Autowired
+	private JwtUtils jwtUtils;
+//	
+//	@Mock
+//	private ModelMapper modelMapper;
+
 	@Mock
 	UserRepository userRepository;
+
+//	@Mock
+//	RoleRepository roleRepository;
 
 	@MockBean
 	IUserService userService;
 	
 	private String token;
+
+//	@MockBean
+//	UserController controller;
 
 	@BeforeEach
 	void setUp() {

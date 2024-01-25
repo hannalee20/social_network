@@ -181,7 +181,8 @@ public class UserController {
 	@PostMapping(value = "/forgot-password")
 	public ResponseEntity<Object> forgotPassword(@RequestParam("email") String email) {
 		try {
-			String result = userService.forgotPassword(email);
+			String result = userService.forgotPassword(email)
+;
 			if (result != null) {
 				result = "http://localhost:8080/user/reset-password?token=" + result;
 			}

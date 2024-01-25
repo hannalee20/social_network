@@ -175,7 +175,7 @@ public class FriendService implements IFriendService {
 			return false;
 		}
 
-		Friend friend = friendRepository.findFriendByUserIdAndStatus(userId1, userId2, Constant.FRIENDED_STATUS);
+		Friend friend = friendRepository.findFriendByUserIdAndStatus(userId1, userId2, Constant.FRIEND_REQUEST);
 
 		if (friend == null) {
 			return false;
