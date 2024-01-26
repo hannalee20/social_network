@@ -152,7 +152,7 @@ public class FriendServiceTest {
 
 		when(userRepository.findById(any())).thenReturn(Optional.of(user1));
 		when(userRepository.findById(any())).thenReturn(Optional.of(user2));
-		when(friendRepository.findFriendByUser1AndUser2(userId1, userId2)).thenReturn(null);
+		when(friendRepository.findFriendByUserIdAndStatus(userId1, userId2, Constant.FRIEND_REQUEST)).thenReturn(friend1);
 		when(friendRepository.save(any())).thenReturn(friend1);
 
 		friendService.acceptFriendRequest(userId1, userId2);
