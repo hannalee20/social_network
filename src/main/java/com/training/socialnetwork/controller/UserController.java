@@ -30,8 +30,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.training.socialnetwork.dto.request.user.UserForgotPasswordDto;
 import com.training.socialnetwork.dto.request.user.UserLoginDto;
 import com.training.socialnetwork.dto.request.user.UserRegisterDto;
+import com.training.socialnetwork.dto.request.user.UserResetPasswordDto;
 import com.training.socialnetwork.dto.request.user.UserTokenDto;
 import com.training.socialnetwork.dto.request.user.UserUpdateDto;
 import com.training.socialnetwork.dto.response.user.JwtResponse;
@@ -142,8 +144,8 @@ public class UserController {
 
 	}
 
-	@PostMapping(value = "/search")
-	public ResponseEntity<Object> searchUser(HttpServletRequest request, @RequestParam("keyword") String keyword) {
+	@GetMapping(value = "/search")
+	public ResponseEntity<Object> searchUser(HttpServletRequest request, @RequestParam(value = "keyword") String keyword) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 
 		try {
@@ -179,15 +181,14 @@ public class UserController {
 	}
 
 	@PostMapping(value = "/forgot-password")
-	public ResponseEntity<Object> forgotPassword(@RequestParam("email") String email) {
+	public ResponseEntity<Object> forgotPassword(@RequestBody UserForgotPasswordDto userForgotPasswordDto) {
 		try {
-			String result = userService.forgotPassword(email)
-;
+			String result = userService.forgotPassword(userForgotPasswordDto.getEmail());
 			if (result != null) {
 				result = "http://localhost:8080/user/reset-password?token=" + result;
 			}
 			
-			return ResponseEntity.ok(result);
+			return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -195,12 +196,11 @@ public class UserController {
 	}
 
 	@PutMapping(value = "/reset-password")
-	public ResponseEntity<Object> resetPassword(@RequestParam("token") String token,
-			@RequestParam("newPassword") String newPassword) {
+	public ResponseEntity<Object> resetPassword(@RequestBody UserResetPasswordDto userResetPasswordDto) {
 		try {
-			String result = userService.resetPassword(token, newPassword);
+			String result = userService.resetPassword(userResetPasswordDto.getToken(), userResetPasswordDto.getNewPassword());
 			
-			return ResponseEntity.ok(result);
+			return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}

@@ -12,14 +12,12 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.training.socialnetwork.dto.request.comment.CommentCreateDto;
-import com.training.socialnetwork.dto.request.comment.CommentUpdateDto;
 import com.training.socialnetwork.dto.response.comment.CommentCreatedDto;
 import com.training.socialnetwork.dto.response.comment.CommentDetailDto;
 import com.training.socialnetwork.dto.response.comment.CommentUpdatedDto;
@@ -48,12 +46,11 @@ public class CommentController {
 		}
 	}
 
-	@PutMapping(value = "/update/{commentId}")
-	public ResponseEntity<Object> updateComment(HttpServletRequest request, @RequestBody CommentUpdateDto comment,
-			@PathVariable(value = "commentId") int commentId) {
+	@PutMapping(value = "/update/{commentId}", consumes = {"multipart/form-data"})
+	public ResponseEntity<Object> updateComment(HttpServletRequest request, @PathVariable(value = "commentId") int commentId, @RequestParam String content, @RequestParam(value = "file", required = false) MultipartFile photo) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		try {
-			CommentUpdatedDto result = commentService.updateComment(comment, commentId, userId);
+			CommentUpdatedDto result = commentService.updateComment(content, photo, commentId, userId);
 
 			return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (Exception e) {

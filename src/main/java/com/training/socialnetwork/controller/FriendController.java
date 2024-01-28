@@ -46,7 +46,7 @@ public class FriendController {
 
 	}
 
-	@PostMapping(value = "/add-friend")
+	@PostMapping(value = "/add-request")
 	public ResponseEntity<Object> createFriendRequest(HttpServletRequest request,
 			@RequestParam(value = "userId2") int userId2) throws Exception {
 		int userId1 = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
@@ -60,7 +60,7 @@ public class FriendController {
 
 	}
 
-	@PostMapping(value = "/accept-friend")
+	@PostMapping(value = "/accept-request")
 	public ResponseEntity<Object> acceptFriendRequest(HttpServletRequest request,
 			@RequestParam(value = "userId1") int userId1) throws Exception {
 		int userId2 = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
@@ -74,7 +74,7 @@ public class FriendController {
 
 	}
 
-	@PostMapping(value = "/refuse-friend")
+	@PostMapping(value = "/refuse-request")
 	public ResponseEntity<Object> refuseFriendRequest(HttpServletRequest request,
 			@RequestParam(value = "userId1") int userId1) throws Exception {
 		int userId2 = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
@@ -124,7 +124,7 @@ public class FriendController {
 		try {
 			friendService.removeFriendRequest(userId1, userId2);
 
-			return new ResponseEntity<Object>(Constant.REMOVE_FRIEND_REQUEST_SUCCESSFULLY, HttpStatus.CREATED);
+			return new ResponseEntity<Object>(Constant.REMOVE_FRIEND_REQUEST_SUCCESSFULLY, HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}

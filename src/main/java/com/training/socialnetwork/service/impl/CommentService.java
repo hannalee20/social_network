@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.training.socialnetwork.dto.request.comment.CommentCreateDto;
-import com.training.socialnetwork.dto.request.comment.CommentUpdateDto;
 import com.training.socialnetwork.dto.response.comment.CommentCreatedDto;
 import com.training.socialnetwork.dto.response.comment.CommentDetailDto;
 import com.training.socialnetwork.dto.response.comment.CommentUpdatedDto;
@@ -71,7 +70,7 @@ public class CommentService implements ICommentService {
 	}
 
 	@Override
-	public CommentUpdatedDto updateComment(CommentUpdateDto commentUpdateDto, int commentId, int userId)
+	public CommentUpdatedDto updateComment(String content, MultipartFile photo, int commentId, int userId)
 			throws Exception {
 		Comment commentToUpdate = commentRepository.findById(commentId).orElse(null);
 
@@ -84,12 +83,14 @@ public class CommentService implements ICommentService {
 		if (post == null || user == null || commentToUpdate.getUser().getUserId() != userId) {
 			throw new Exception(Constant.SERVER_ERROR);
 		}
+		
+		commentToUpdate.setContent(content);
+		if(photo != null) {
+			String photoUrl = imageUtils.saveImage(photo);
+			commentToUpdate.setPhotoUrl(photoUrl);
+		}
 
-		Comment comment = modelMapper.map(commentToUpdate, Comment.class);
-		comment.setPost(commentToUpdate.getPost());
-		comment.setUser(commentToUpdate.getUser());
-
-		Comment commentUpdated = commentRepository.save(comment);
+		Comment commentUpdated = commentRepository.save(commentToUpdate);
 
 		CommentUpdatedDto commentUpdatedDto = modelMapper.map(commentUpdated, CommentUpdatedDto.class);
 		commentUpdatedDto.setUsername(commentUpdated.getUser().getUsername());

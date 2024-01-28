@@ -14,7 +14,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.training.socialnetwork.dto.request.comment.CommentCreateDto;
-import com.training.socialnetwork.dto.request.comment.CommentUpdateDto;
 import com.training.socialnetwork.entity.Comment;
 import com.training.socialnetwork.entity.Post;
 import com.training.socialnetwork.entity.User;
@@ -83,6 +82,10 @@ public class CommentServiceTest {
 	public void updateCommentSuccess() throws Exception {
 		int commentId = 1;
 		int userId = 1;
+		String content = "content update";
+		MockMultipartFile photo1 =
+                new MockMultipartFile("data1", "filename1.jpg", "multipart/form-data", "some xml".getBytes());
+		
 		User user = new User();
 		user.setUserId(1);
 		user.setUsername("test");
@@ -92,21 +95,19 @@ public class CommentServiceTest {
 		post.setPostId(1);
 		post.setContent("content post");
 		
-		CommentUpdateDto commentUpdateDto = new CommentUpdateDto();
-		commentUpdateDto.setContent("comment content");
-		
 		Comment comment = new Comment();
 		comment.setCommentId(1);
 		comment.setPost(post);
 		comment.setUser(user);
 		comment.setContent("comment update content");
+		comment.setPhotoUrl(imageUtils.saveImage(photo1));
 		
 		when(commentRepository.findById(any())).thenReturn(Optional.of(comment));
 		when(postRepository.findById(any())).thenReturn(Optional.of(post));
 		when(userRepository.findById(any())).thenReturn(Optional.of(user));
 		when(commentRepository.save(any())).thenReturn(comment);
 		
-		commentService.updateComment(commentUpdateDto, commentId, userId);
+		commentService.updateComment(content, photo1, commentId, userId);
 	}
 	
 	@Test

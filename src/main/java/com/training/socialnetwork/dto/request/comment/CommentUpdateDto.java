@@ -2,12 +2,14 @@ package com.training.socialnetwork.dto.request.comment;
 
 import java.io.Serializable;
 
+import org.springframework.web.multipart.MultipartFile;
+
 public class CommentUpdateDto implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	private String content;
-	private String photoUrl;
+	private MultipartFile photoUrl;
 
 	public String getContent() {
 		return content;
@@ -17,11 +19,11 @@ public class CommentUpdateDto implements Serializable {
 		this.content = content;
 	}
 
-	public String getPhotoUrl() {
+	public MultipartFile getPhotoUrl() {
 		return photoUrl;
 	}
 
-	public void setPhotoUrl(String photoUrl) {
+	public void setPhotoUrl(MultipartFile photoUrl) {
 		this.photoUrl = photoUrl;
 	}
 
