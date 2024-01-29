@@ -3,6 +3,7 @@ package com.training.socialnetwork.service.impl;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.training.socialnetwork.entity.Like;
@@ -12,6 +13,7 @@ import com.training.socialnetwork.repository.LikeRepository;
 import com.training.socialnetwork.repository.PostRepository;
 import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.ILikeService;
+import com.training.socialnetwork.util.CustomException;
 import com.training.socialnetwork.util.constant.Constant;
 
 @Service
@@ -32,16 +34,22 @@ public class LikeService implements ILikeService {
 		Post post = postRepository.findById(postId).orElse(null);
 		User user = userRepository.findById(userId).orElse(null);
 
-		if (post == null || user == null) {
-			throw new Exception(Constant.SERVER_ERROR);
+		if (post == null) {
+			throw new CustomException(HttpStatus.NOT_FOUND, "Post does not exist");
 		}
-
-		Like like = new Like();
-		like.setPost(post);
-		like.setUser(user);
-		like.setDeleteFlg(Constant.UNDELETED_FLG);
-
-		return likeRepository.save(like) != null;
+		
+		Like like = likeRepository.findByPostAndUser(post, user);
+		if (like != null && like.getDeleteFlg() == Constant.DELETED_FlG) {
+			
+			throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, "You have liked this post");
+		} else {
+			like = new Like();
+			like.setPost(post);
+			like.setUser(user);
+			like.setDeleteFlg(Constant.UNDELETED_FLG);
+			
+			return likeRepository.save(like) != null;
+		}
 	}
 
 	@Override
@@ -49,24 +57,19 @@ public class LikeService implements ILikeService {
 		Post post = postRepository.findById(postId).orElse(null);
 		User user = userRepository.findById(userId).orElse(null);
 
-		if (post == null || user == null) {
-			throw new Exception(Constant.SERVER_ERROR);
+		if (post == null) {
+			throw new CustomException(HttpStatus.NOT_FOUND, "Post does not exist");
 		}
 
 		Like like = likeRepository.findByPostAndUser(post, user);
-		like.setDeleteFlg(Constant.DELETED_FlG);
+		
+		if (like != null && like.getDeleteFlg() == Constant.UNDELETED_FLG) {
+			like.setDeleteFlg(Constant.DELETED_FlG);
 
-		return likeRepository.save(like) != null;
+			return likeRepository.save(like) != null;
+		} else {
+			throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, "You haven't liked this post");
+		}
 	}
-
-//	@Override
-//	public int countLike(int userId) {
-//		LocalDate date = LocalDate.now();
-//		TemporalField fieldISO = WeekFields.of(Locale.FRANCE).dayOfWeek();
-//		Date dateStart = Date.from(date.with(fieldISO, 1).atStartOfDay(ZoneId.systemDefault()).toInstant());
-//		Date dateEnd = Date.from(date.with(fieldISO, 7).atStartOfDay(ZoneId.systemDefault()).toInstant());
-//		
-//		return likeRepository.countLike(userId, dateStart, dateEnd);
-//	}
 
 }

@@ -6,6 +6,7 @@ import javax.transaction.Transactional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,6 +21,7 @@ import com.training.socialnetwork.repository.CommentRepository;
 import com.training.socialnetwork.repository.PostRepository;
 import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.ICommentService;
+import com.training.socialnetwork.util.CustomException;
 import com.training.socialnetwork.util.constant.Constant;
 import com.training.socialnetwork.util.image.ImageUtils;
 
@@ -48,8 +50,8 @@ public class CommentService implements ICommentService {
 		Post post = postRepository.findById(commentCreateDto.getPostId()).orElse(null);
 		User user = userRepository.findById(userId).orElse(null);
 
-		if (post == null || user == null) {
-			throw new Exception(Constant.SERVER_ERROR);
+		if (post == null) {
+			throw new CustomException(HttpStatus.NOT_FOUND, "Post does not exist");
 		}
 
 		Comment comment = modelMapper.map(commentCreateDto, Comment.class);
@@ -75,13 +77,16 @@ public class CommentService implements ICommentService {
 		Comment commentToUpdate = commentRepository.findById(commentId).orElse(null);
 
 		if (commentToUpdate == null) {
-			throw new Exception(Constant.SERVER_ERROR);
+			throw new CustomException(HttpStatus.NOT_FOUND, "Comment does not exist");
 		}
 		Post post = postRepository.findById(commentToUpdate.getPost().getPostId()).orElse(null);
-		User user = userRepository.findById(userId).orElse(null);
 
-		if (post == null || user == null || commentToUpdate.getUser().getUserId() != userId) {
-			throw new Exception(Constant.SERVER_ERROR);
+		if (post == null) {
+			throw new CustomException(HttpStatus.NOT_FOUND, "Post does not exist");
+		}
+		
+		if (commentToUpdate.getUser().getUserId() != userId) {
+			throw new CustomException(HttpStatus.FORBIDDEN, "You do not have permission to update");
 		}
 		
 		commentToUpdate.setContent(content);
@@ -101,11 +106,15 @@ public class CommentService implements ICommentService {
 	@Override
 	public boolean deleteComment(int commentId, int userId) throws Exception {
 		Comment comment = commentRepository.findById(commentId).orElse(null);
-		User user = userRepository.findById(userId).orElse(null);
 
-		if (comment == null || user == null || comment.getUser().getUserId() != userId) {
-			throw new Exception(Constant.SERVER_ERROR);
+		if (comment == null) {
+			throw new CustomException(HttpStatus.NOT_FOUND, "Comment does not exist");
 		}
+		
+		if (comment.getUser().getUserId() != userId) {
+			throw new CustomException(HttpStatus.FORBIDDEN, "You do not have permission to update");
+		}
+		
 		comment.setDeleteFlg(Constant.DELETED_FlG);
 
 		return commentRepository.save(comment) != null;
@@ -116,7 +125,7 @@ public class CommentService implements ICommentService {
 		Comment comment = commentRepository.findById(commentId).orElse(null);
 
 		if (comment == null) {
-			throw new Exception(Constant.SERVER_ERROR);
+			throw new CustomException(HttpStatus.NOT_FOUND, "Comment does not exist");
 		}
 
 		CommentDetailDto commentDetailDto = modelMapper.map(comment, CommentDetailDto.class);
@@ -124,15 +133,5 @@ public class CommentService implements ICommentService {
 		
 		return commentDetailDto;
 	}
-
-//	@Override
-//	public int countComment(int userId) {
-//		LocalDate date = LocalDate.now();
-//		TemporalField fieldISO = WeekFields.of(Locale.FRANCE).dayOfWeek();
-//		Date dateStart = Date.from(date.with(fieldISO, 1).atStartOfDay(ZoneId.systemDefault()).toInstant());
-//		Date dateEnd = Date.from(date.with(fieldISO, 7).atStartOfDay(ZoneId.systemDefault()).toInstant());
-//
-//		return commentRepository.countComment(userId, dateStart, dateEnd);
-//	}
 
 }

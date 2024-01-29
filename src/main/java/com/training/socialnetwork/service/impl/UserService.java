@@ -14,6 +14,7 @@ import javax.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,6 +36,7 @@ import com.training.socialnetwork.repository.PostRepository;
 import com.training.socialnetwork.repository.RoleRepository;
 import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.IUserService;
+import com.training.socialnetwork.util.CustomException;
 import com.training.socialnetwork.util.constant.Constant;
 import com.training.socialnetwork.util.image.ImageUtils;
 import com.training.socialnetwork.util.mapper.ObjectMapper;
@@ -77,8 +79,12 @@ public class UserService implements IUserService {
 
 	@Override
 	public UserRegistedDto createUser(UserRegisterDto userRegisterDto) throws Exception {
-		if (userRepository.findByUsernameOrEmail(userRegisterDto.getUsername(), userRegisterDto.getEmail()) != null) {
-			throw new Exception(Constant.SERVER_ERROR);
+		if (userRepository.findByEmail(userRegisterDto.getEmail()) != null) {
+			throw new CustomException(HttpStatus.BAD_REQUEST, "Email already exists");
+		}
+		
+		if (userRepository.findByUsername(userRegisterDto.getUsername()) != null) {
+			throw new CustomException(HttpStatus.BAD_REQUEST, "Username already exists");
 		}
 		User user = new User();
 		user.setUsername(userRegisterDto.getUsername());
@@ -113,10 +119,14 @@ public class UserService implements IUserService {
 		User userToUpdate = userRepository.findById(userId).orElse(null);
 		User loggedInUser = userRepository.findById(loggedInUserId).orElse(null);
 
-		if (userToUpdate == null || loggedInUser == null || userToUpdate.getUserId() != loggedInUser.getUserId()) {
-			throw new Exception(Constant.SERVER_ERROR);
+		if (userToUpdate == null|| userToUpdate.getUserId() != loggedInUser.getUserId()) {
+			throw new CustomException(HttpStatus.NOT_FOUND, "User does not exist");
 		}
-
+		
+		if (userToUpdate.getUserId() != loggedInUser.getUserId()) {
+			throw new CustomException(HttpStatus.FORBIDDEN, "You do not have permission to update");
+		}
+		
 		if (userUpdateDto.getSex() != null) {
 			if (userUpdateDto.getSex().toUpperCase().equals(Constant.MALE)) {
 				userToUpdate.setGender(Constant.NUMBER_0);
@@ -145,7 +155,7 @@ public class UserService implements IUserService {
 		User user = userRepository.findById(userId).orElse(null);
 
 		if (user == null) {
-			throw new Exception(Constant.SERVER_ERROR);
+			throw new CustomException(HttpStatus.NOT_FOUND, "User does not exist");
 		}
 
 		UserDetailDto userDetailDto = modelMapper.map(user, UserDetailDto.class);
@@ -202,7 +212,7 @@ public class UserService implements IUserService {
 		User user = userRepository.findByEmail(email);
 
 		if (user == null) {
-			throw new Exception(Constant.SERVER_ERROR);
+			throw new CustomException(HttpStatus.NOT_FOUND, "User does not exist");
 		}
 		String token = UUID.randomUUID().toString();
 		user.setToken(token);
@@ -217,11 +227,11 @@ public class UserService implements IUserService {
 	public String resetPassword(String token, String newPassword) throws Exception {
 		User user = userRepository.findByToken(token);
 		if (user == null) {
-			throw new Exception(Constant.TOKEN_INVALID);
+			throw new CustomException(HttpStatus.BAD_REQUEST, Constant.TOKEN_INVALID);
 		}
 
 		if (user.getTokenCreateDate().compareTo(new Date()) > EXPIRE_TOKEN) {
-			throw new Exception(Constant.TOKEN_HAS_EXPIRED);
+			throw new CustomException(HttpStatus.BAD_REQUEST, Constant.TOKEN_HAS_EXPIRED);
 		}
 		user.setPassword(bCryptPasswordEncoder.encode(newPassword));
 		user.setToken(null);

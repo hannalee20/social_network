@@ -9,10 +9,14 @@ public class Constant {
 	public static final Integer ROLE_USER_NUMBER = 1;
 	
 	public static final String SERVER_ERROR = "Server error";
+	
+	public static final String INVALID = "Invalid";
 
 	public static final String INVALID_ID = "Invalid id";
 
 	public static final String INVALID_REAL_NAME = "Invalid real name";
+	
+	public static final String NO_RESULT = "No result";
 	
 	public static final Integer UNDELETED_FLG = 0;
 	

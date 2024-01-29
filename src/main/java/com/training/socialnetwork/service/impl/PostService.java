@@ -10,6 +10,7 @@ import javax.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,6 +27,7 @@ import com.training.socialnetwork.repository.PhotoRepository;
 import com.training.socialnetwork.repository.PostRepository;
 import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.IPostService;
+import com.training.socialnetwork.util.CustomException;
 import com.training.socialnetwork.util.constant.Constant;
 import com.training.socialnetwork.util.image.ImageUtils;
 
@@ -53,7 +55,7 @@ public class PostService implements IPostService {
 		User user = userRepository.findById(userId).orElse(null);
 
 		if (user == null) {
-			throw new Exception(Constant.SERVER_ERROR);
+			throw new CustomException(HttpStatus.NOT_FOUND, "Post does not exist");
 		}
 		Post post = new Post();
 		post.setUser(user);
@@ -127,7 +129,7 @@ public class PostService implements IPostService {
 		Post post = postRepository.findById(postId).orElse(null);
 
 		if (post == null) {
-			throw new Exception(Constant.SERVER_ERROR);
+			throw new CustomException(HttpStatus.NOT_FOUND, "Post does not exist");
 		}
 
 		PostDetailDto postDetailDto = modelMapper.map(post, PostDetailDto.class);
@@ -151,11 +153,14 @@ public class PostService implements IPostService {
 		User user = userRepository.findById(userId).orElse(null);
 		Post postToUpdate = postRepository.findById(postId).orElse(null);
 
-		if (user == null || postToUpdate == null || user.getUserId() != postToUpdate.getUser().getUserId()) {
-			throw new Exception(Constant.SERVER_ERROR);
+		if (postToUpdate == null || user.getUserId() != postToUpdate.getUser().getUserId()) {
+			throw new CustomException(HttpStatus.NOT_FOUND, "Post does not exist");
+		}
+		
+		if (user.getUserId() != postToUpdate.getUser().getUserId()) {
+			throw new CustomException(HttpStatus.FORBIDDEN, "You do not have permission to update");
 		}
 
-//		Post post = new Post();
 		postToUpdate.setContent(content);
 		List<String> photoUrls = new ArrayList<>();
 		if (photos != null) {
@@ -177,10 +182,6 @@ public class PostService implements IPostService {
 			postToUpdate.setListPhoto(photoList);
 		}
 		postToUpdate.setUpdateDate(new Date());
-//		post.setLikeList(postToUpdate.getLikeList());
-//		post.setCommentList(postToUpdate.getCommentList());
-//		post.setDeleteFlg(postToUpdate.getDeleteFlg());
-
 		postToUpdate = postRepository.save(postToUpdate);
 
 		PostUpdatedDto postUpdatedDto = modelMapper.map(postToUpdate, PostUpdatedDto.class);
@@ -194,21 +195,11 @@ public class PostService implements IPostService {
 		Post post = postRepository.findById(postId).orElse(null);
 		
 		if (post.getUser().getUserId() != userId) {
-			throw new Exception(Constant.SERVER_ERROR);
+			throw new CustomException(HttpStatus.FORBIDDEN, "You do not have permission to update");
 		}
 		post.setDeleteFlg(Constant.DELETED_FlG);
 		
 		return postRepository.save(post) != null;
 	}
-
-//	@Override
-//	public int countPost(int userId) {
-//		LocalDate date = LocalDate.now();
-//		TemporalField fieldISO = WeekFields.of(Locale.FRANCE).dayOfWeek();
-//		Date dateStart = Date.from(date.with(fieldISO, 1).atStartOfDay(ZoneId.systemDefault()).toInstant());
-//		Date dateEnd = Date.from(date.with(fieldISO, 7).atStartOfDay(ZoneId.systemDefault()).toInstant());
-//		
-//		return postRepository.countPost(userId, dateStart, dateEnd);
-//	}
 
 }

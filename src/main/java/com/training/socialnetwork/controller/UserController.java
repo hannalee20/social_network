@@ -116,7 +116,7 @@ public class UserController {
 			String jwt = jwtUtils.generateToken(authentication);
 			return ResponseEntity.ok(new JwtResponse(jwt));
 		} else {
-			return new ResponseEntity<Object>(Constant.SERVER_ERROR, HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<Object>(Constant.INVALID, HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -155,7 +155,13 @@ public class UserController {
 		
 		try {
 			List<UserSearchDto> userSearchList = userService.searchUser(userId, keyword, paging);
-			return new ResponseEntity<Object>(userSearchList, HttpStatus.OK);
+			
+			if(userSearchList.isEmpty()) {
+				return new ResponseEntity<Object>(Constant.NO_RESULT, HttpStatus.NO_CONTENT);
+			} else {
+				return new ResponseEntity<Object>(userSearchList, HttpStatus.OK);
+			}
+			
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}

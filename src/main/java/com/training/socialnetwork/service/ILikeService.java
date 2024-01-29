@@ -6,5 +6,4 @@ public interface ILikeService {
 	
 	boolean unlikePost(int postId, int userId) throws Exception;
 	
-//	int countLike(int userId);
 }

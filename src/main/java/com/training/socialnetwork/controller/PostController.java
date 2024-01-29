@@ -59,7 +59,12 @@ public class PostController {
 		Pageable paging = PageRequest.of(page, pageSize);
 		try {
 			List<PostListDto> postList = postService.getTimeline(userId, paging);
-			return new ResponseEntity<>(postList, HttpStatus.OK);
+			if(postList != null) {
+				return new ResponseEntity<>(postList, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(Constant.NO_RESULT, HttpStatus.NO_CONTENT);
+			}
+			
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -101,7 +106,6 @@ public class PostController {
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-
 	}
 
 }

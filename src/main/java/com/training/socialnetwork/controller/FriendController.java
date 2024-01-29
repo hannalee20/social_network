@@ -39,7 +39,11 @@ public class FriendController {
 		Pageable paging = PageRequest.of(page, pageSize);
 		try {
 			List<FriendListDto> friendList = friendService.findAllFriendWithStatus(userId, paging);
-			return new ResponseEntity<>(friendList, HttpStatus.OK);
+			if(friendList != null ) {
+				return new ResponseEntity<>(friendList, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(Constant.NO_RESULT, HttpStatus.NO_CONTENT);
+			}
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -111,7 +115,12 @@ public class FriendController {
 
 		try {
 			List<FriendRequestDto> friendRequestList = friendService.findAllAddFriendRequest(userId, paging);
-			return new ResponseEntity<Object>(friendRequestList, HttpStatus.OK);
+			if (friendRequestList != null) {
+				return new ResponseEntity<Object>(friendRequestList, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<Object>(Constant.NO_RESULT, HttpStatus.NO_CONTENT);
+			}
+			
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}

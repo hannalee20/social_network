@@ -8,6 +8,7 @@ import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.training.socialnetwork.dto.response.friend.FriendListDto;
@@ -17,6 +18,7 @@ import com.training.socialnetwork.entity.User;
 import com.training.socialnetwork.repository.FriendRepository;
 import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.IFriendService;
+import com.training.socialnetwork.util.CustomException;
 import com.training.socialnetwork.util.constant.Constant;
 
 @Service
@@ -59,8 +61,8 @@ public class FriendService implements IFriendService {
 		User user1 = userRepository.findById(userId1).orElse(null);
 		User user2 = userRepository.findById(userId2).orElse(null);
 
-		if (user1 == null || user2 == null) {
-			throw new Exception(Constant.SERVER_ERROR);
+		if (user2 == null) {
+			throw new CustomException(HttpStatus.NOT_FOUND, "User does not exist");
 		}
 
 		Friend friend = friendRepository.findFriendByUser1AndUser2(userId1, userId2);
@@ -80,16 +82,15 @@ public class FriendService implements IFriendService {
 	@Override
 	public boolean acceptFriendRequest(int userId1, int userId2) throws Exception {
 		User user1 = userRepository.findById(userId1).orElse(null);
-		User user2 = userRepository.findById(userId2).orElse(null);
 
-		if (user1 == null || user2 == null) {
-			throw new Exception(Constant.SERVER_ERROR);
+		if (user1 == null) {
+			throw new CustomException(HttpStatus.NOT_FOUND, "User does not exist");
 		}
 
 		Friend friend = friendRepository.findFriendByUserIdAndStatus(userId1, userId2, Constant.FRIEND_REQUEST);
 
 		if (friend == null) {
-			throw new Exception(Constant.SERVER_ERROR);
+			throw new CustomException(HttpStatus.NOT_FOUND, "Friend request does not exist");
 		}
 
 		friend.setStatus(Constant.FRIENDED_STATUS);
@@ -101,16 +102,15 @@ public class FriendService implements IFriendService {
 	@Override
 	public boolean refuseFriendRequest(int userId1, int userId2) {
 		User user1 = userRepository.findById(userId1).orElse(null);
-		User user2 = userRepository.findById(userId2).orElse(null);
-
-		if (user1 == null || user2 == null) {
-			return false;
+		
+		if (user1 == null) {
+			throw new CustomException(HttpStatus.NOT_FOUND, "User does not exist");
 		}
 
 		Friend friend = friendRepository.findFriendByUserIdAndStatus(userId1, userId2, Constant.FRIEND_REQUEST);
 
 		if (friend == null) {
-			return false;
+			throw new CustomException(HttpStatus.NOT_FOUND, "Friend request does not exist");
 		}
 
 		friend.setStatus(Constant.NOT_FRIEND);
@@ -125,13 +125,13 @@ public class FriendService implements IFriendService {
 		User user2 = userRepository.findById(userId2).orElse(null);
 
 		if (user1 == null || user2 == null) {
-			return false;
+			throw new CustomException(HttpStatus.NOT_FOUND, "User does not exist");
 		}
 
 		Friend friend = friendRepository.findFriendByUserIdAndStatus(userId1, userId2, Constant.FRIENDED_STATUS);
 
 		if (friend == null) {
-			return false;
+			throw new CustomException(HttpStatus.NOT_FOUND, "Friend request does not exist");
 		}
 
 		friend.setStatus(Constant.NOT_FRIEND);
@@ -159,16 +159,15 @@ public class FriendService implements IFriendService {
 	@Override
 	public boolean removeFriendRequest(int userId1, int userId2) throws Exception {
 		User user1 = userRepository.findById(userId1).orElse(null);
-		User user2 = userRepository.findById(userId2).orElse(null);
 
-		if (user1 == null || user2 == null) {
-			return false;
+		if (user1 == null) {
+			throw new CustomException(HttpStatus.NOT_FOUND, "User does not exist");
 		}
 
 		Friend friend = friendRepository.findFriendByUserIdAndStatus(userId1, userId2, Constant.FRIEND_REQUEST);
 
 		if (friend == null) {
-			return false;
+			throw new CustomException(HttpStatus.NOT_FOUND, "Friend request does not exist");
 		}
 
 		friend.setStatus(Constant.NOT_FRIEND);
