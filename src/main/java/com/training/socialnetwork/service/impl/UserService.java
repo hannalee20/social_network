@@ -13,6 +13,7 @@ import javax.transaction.Transactional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -65,13 +66,13 @@ public class UserService implements IUserService {
 
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
-	
+
 	@Autowired
 	private ImageUtils imageUtils;
 
 	@Autowired
 	private ObjectMapper objectMapper;
-	
+
 	private static final long EXPIRE_TOKEN = 30;
 
 	@Override
@@ -90,14 +91,10 @@ public class UserService implements IUserService {
 
 		User userRegisted = userRepository.save(user);
 
-//		if (userRegisted != null) {
-			UserRegistedDto userRegistedDto = new UserRegistedDto();
-			userRegistedDto = modelMapper.map(userRegisted, UserRegistedDto.class);
-			userRegistedDto.setRole(Constant.ROLE_USER);
-			return userRegistedDto;
-//		}
-//
-//		throw new Exception(Constant.SERVER_ERROR);
+		UserRegistedDto userRegistedDto = new UserRegistedDto();
+		userRegistedDto = modelMapper.map(userRegisted, UserRegistedDto.class);
+		userRegistedDto.setRole(Constant.ROLE_USER);
+		return userRegistedDto;
 	}
 
 	@Override
@@ -120,8 +117,8 @@ public class UserService implements IUserService {
 			throw new Exception(Constant.SERVER_ERROR);
 		}
 
-		if(userUpdateDto.getSex() != null) {
-			if(userUpdateDto.getSex().toUpperCase().equals(Constant.MALE)) {
+		if (userUpdateDto.getSex() != null) {
+			if (userUpdateDto.getSex().toUpperCase().equals(Constant.MALE)) {
 				userToUpdate.setGender(Constant.NUMBER_0);
 			} else {
 				userToUpdate.setGender(Constant.NUMBER_1);
@@ -129,10 +126,6 @@ public class UserService implements IUserService {
 		}
 		objectMapper.copyProperties(userUpdateDto, userToUpdate);
 		userToUpdate.setUserId(userId);
-//		userToUpdate.setUsername(userToUpdate.getUsername());
-//		userToUpdate.setPassword(userToUpdate.getPassword());
-//		userToUpdate.setEmail(userToUpdate.getEmail());
-//		userToUpdate.setRole(userToUpdate.getRole());
 		if (avatar != null) {
 			String avatarUrl = imageUtils.saveImage(avatar);
 			userToUpdate.setAvatarUrl(avatarUrl);
@@ -146,7 +139,7 @@ public class UserService implements IUserService {
 
 		throw new Exception(Constant.SERVER_ERROR);
 	}
-	
+
 	@Override
 	public UserDetailDto getInfo(int userId) throws Exception {
 		User user = userRepository.findById(userId).orElse(null);
@@ -156,17 +149,17 @@ public class UserService implements IUserService {
 		}
 
 		UserDetailDto userDetailDto = modelMapper.map(user, UserDetailDto.class);
-		if(user.getGender() == Constant.NUMBER_0) {
+		if (user.getGender() == Constant.NUMBER_0) {
 			userDetailDto.setGender(Constant.MALE);
 		} else {
 			userDetailDto.setGender(Constant.FEMALE);
 		}
-		
+
 		return userDetailDto;
 	}
 
 	@Override
-	public List<UserSearchDto> searchUser(int userId, String keyword) {
+	public List<UserSearchDto> searchUser(int userId, String keyword, Pageable paging) {
 		List<User> userList = userRepository.findAllUserByKeyword(userId, keyword);
 
 		List<Friend> friendList = friendRepository.findAllByUserId(userId);
@@ -223,12 +216,12 @@ public class UserService implements IUserService {
 	@Override
 	public String resetPassword(String token, String newPassword) throws Exception {
 		User user = userRepository.findByToken(token);
-		if(user == null) {
-			throw new Exception(Constant.SERVER_ERROR);
+		if (user == null) {
+			throw new Exception(Constant.TOKEN_INVALID);
 		}
-		
-		if(user.getTokenCreateDate().compareTo(new Date()) > EXPIRE_TOKEN) {
-			throw new Exception(Constant.SERVER_ERROR);
+
+		if (user.getTokenCreateDate().compareTo(new Date()) > EXPIRE_TOKEN) {
+			throw new Exception(Constant.TOKEN_HAS_EXPIRED);
 		}
 		user.setPassword(bCryptPasswordEncoder.encode(newPassword));
 		user.setToken(null);

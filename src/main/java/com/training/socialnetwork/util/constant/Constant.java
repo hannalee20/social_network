@@ -54,6 +54,10 @@ public class Constant {
 
 	public static final String GENDER_INVALID_MESSAGE = "Gender must be Male/male or Female/female";
 	
+	public static final String TOKEN_HAS_EXPIRED = "Token has expired";
+	
+	public static final String TOKEN_INVALID = "Token invalid";
+	
 	public static final String MALE = "male";
 	
 	public static final String FEMALE = "female";

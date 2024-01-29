@@ -156,16 +156,6 @@ public class FriendService implements IFriendService {
 		return friendRequestDtos;
 	}
 
-//	@Override
-//	public int countFriend(int userId) {
-//		LocalDate date = LocalDate.now();
-//		TemporalField fieldISO = WeekFields.of(Locale.FRANCE).dayOfWeek();
-//		Date dateStart = Date.from(date.with(fieldISO, 1).atStartOfDay(ZoneId.systemDefault()).toInstant());
-//		Date dateEnd = Date.from(date.with(fieldISO, 7).atStartOfDay(ZoneId.systemDefault()).toInstant());
-//
-//		return friendRepository.countFriend(userId, dateStart, dateEnd);
-//	}
-
 	@Override
 	public boolean removeFriendRequest(int userId1, int userId2) throws Exception {
 		User user1 = userRepository.findById(userId1).orElse(null);

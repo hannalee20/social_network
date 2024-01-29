@@ -192,7 +192,6 @@ public class UserServiceTest {
 		List<User> userList = new ArrayList<>();
 		userList.add(user1);
 		userList.add(user2);
-//		userList.add(user3);
 		
 		Friend friend = new Friend();
 		friend.setFriendId(1);
@@ -208,7 +207,7 @@ public class UserServiceTest {
 		when(userRepository.findAllUserByKeyword(3, keyword)).thenReturn(userList);
 		when(friendRepository.findAllByUserId(3)).thenReturn(friendList);
 		
-		userService.searchUser(3, keyword);
+		userService.searchUser(3, keyword, null);
 	}
 	
 	@Test

@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -145,11 +147,14 @@ public class UserController {
 	}
 
 	@GetMapping(value = "/search")
-	public ResponseEntity<Object> searchUser(HttpServletRequest request, @RequestParam(value = "keyword") String keyword) {
+	public ResponseEntity<Object> searchUser(HttpServletRequest request, @RequestParam(value = "keyword") String keyword,
+			@RequestParam(defaultValue = Constant.STRING_0, required = false) int page,
+			@RequestParam(defaultValue = Constant.STRING_5, required = false) int pageSize) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
-
+		Pageable paging = PageRequest.of(page, pageSize);
+		
 		try {
-			List<UserSearchDto> userSearchList = userService.searchUser(userId, keyword);
+			List<UserSearchDto> userSearchList = userService.searchUser(userId, keyword, paging);
 			return new ResponseEntity<Object>(userSearchList, HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

@@ -1,9 +1,13 @@
 package com.training.socialnetwork.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
@@ -42,10 +46,10 @@ import com.training.socialnetwork.dto.request.user.UserTokenDto;
 import com.training.socialnetwork.dto.response.comment.CommentCreatedDto;
 import com.training.socialnetwork.dto.response.comment.CommentDetailDto;
 import com.training.socialnetwork.dto.response.comment.CommentUpdatedDto;
-import com.training.socialnetwork.security.JwtUtils;
 import com.training.socialnetwork.service.ICommentService;
 import com.training.socialnetwork.service.IUserService;
 import com.training.socialnetwork.service.impl.CustomUserDetailService;
+import com.training.socialnetwork.util.constant.Constant;
 import com.training.socialnetwork.utils.JSonHelper;
 
 @RunWith(SpringRunner.class)
@@ -54,22 +58,19 @@ import com.training.socialnetwork.utils.JSonHelper;
 @Transactional
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CommentControllerTest {
-	
+
 	@Autowired
 	private MockMvc mockMvc;
-	
-	@Autowired
-	private JwtUtils jwtUtils;
-	
+
 	@MockBean
 	private ICommentService commentService;
-	
+
 	@MockBean
 	private AuthenticationManager authenticationManager;
-	
+
 	@MockBean
 	private Authentication authentication;
-	
+
 	@MockBean
 	private UserDetails userDetails;
 
@@ -78,7 +79,7 @@ public class CommentControllerTest {
 
 	@MockBean
 	private CustomUserDetailService customUserDetailService;
-	
+
 	private String token;
 
 	@BeforeAll
@@ -117,83 +118,136 @@ public class CommentControllerTest {
 				.andExpect(status().isOk()).andReturn();
 		token = tokenResult.getResponse().getContentAsString().substring(8, 133);
 	}
-	
+
 	@Test
 	public void createCommentSuccess() throws Exception {
-		int loggedInUserId = jwtUtils.getUserIdFromJwt(token);
-		
 		CommentCreateDto commentCreateDto = new CommentCreateDto();
 		commentCreateDto.setPostId(1);
 		commentCreateDto.setContent("create content");
-		
-		MockMultipartFile photo = new MockMultipartFile("data", "photo.png", "multipart/form-data", "some data".getBytes());
-		
+
+		MockMultipartFile photo = new MockMultipartFile("data", "photo.png", "multipart/form-data",
+				"some data".getBytes());
+
 		CommentCreatedDto commentCreatedDto = new CommentCreatedDto();
-		
-		when(commentService.createComment(loggedInUserId, commentCreateDto, photo)).thenReturn(commentCreatedDto);
+		commentCreatedDto.setCommentId(1);
+		commentCreatedDto.setPostId(1);
+		commentCreatedDto.setUserId(1);
+		commentCreatedDto.setUsername("test");
+		commentCreatedDto.setContent("create content");
+		commentCreatedDto.setPhotoUrl("photo.png");
+
+		when(commentService.createComment(anyInt(), any(), any())).thenReturn(commentCreatedDto);
 		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
-		
+
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.putIfAbsent("commentCreateDto", commentCreateDto);
 		requestBody.putIfAbsent("photo", photo);
-		
+
 		String request = JSonHelper.toJson(requestBody).orElse("");
-		
-		mockMvc.perform(post("/comment/create")
-				.header("AUTHORIZATION", "Bearer " + token)
-				.contentType(MediaType.MULTIPART_FORM_DATA)
-				.content(request))
-				.andExpect(status().isCreated()).andReturn();
+
+		mockMvc.perform(post("/comment/create").header("AUTHORIZATION", "Bearer " + token)
+				.contentType(MediaType.MULTIPART_FORM_DATA).content(request)).andExpect(status().isCreated())
+				.andExpect(jsonPath("$.username").value(commentCreatedDto.getUsername()))
+				.andExpect(jsonPath("$.commentId").value(commentCreatedDto.getCommentId()))
+				.andExpect(jsonPath("$.postId").value(commentCreatedDto.getPostId()))
+				.andExpect(jsonPath("$.content").value(commentCreatedDto.getContent()))
+				.andExpect(jsonPath("$.photoUrl").value(commentCreatedDto.getPhotoUrl()));
 	}
-	
+
+	@Test
+	public void createCommentFail() throws Exception {
+		CommentCreateDto commentCreateDto = new CommentCreateDto();
+		commentCreateDto.setPostId(1);
+		commentCreateDto.setContent("create content");
+
+		MockMultipartFile photo = new MockMultipartFile("data", "photo.png", "multipart/form-data",
+				"some data".getBytes());
+
+		when(commentService.createComment(anyInt(), any(), any())).thenThrow(new Exception());
+		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
+
+		Map<String, Object> requestBody = new HashMap<>();
+		requestBody.putIfAbsent("commentCreateDto", commentCreateDto);
+		requestBody.putIfAbsent("photo", photo);
+
+		String request = JSonHelper.toJson(requestBody).orElse("");
+
+		mockMvc.perform(post("/comment/create").header("AUTHORIZATION", "Bearer " + token)
+				.contentType(MediaType.MULTIPART_FORM_DATA).content(request))
+				.andExpect(status().isInternalServerError());
+	}
+
 	@Test
 	public void deleteCommentSuccess() throws Exception {
-		int loggedInUserId = jwtUtils.getUserIdFromJwt(token);
 		int commentId = 1;
-		
-		when(commentService.deleteComment(commentId, loggedInUserId)).thenReturn(true);
+
+		when(commentService.deleteComment(anyInt(), anyInt())).thenReturn(true);
 		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
-		
-		mockMvc.perform(delete("/comment/delete/{commentId}", commentId)
-				.header("AUTHORIZATION", "Bearer " + token)
-				.contentType(MediaType.APPLICATION_JSON)
-				.param("commentId", Integer.toString(commentId)))
-				.andExpect(status().isOk()).andReturn();
+
+		mockMvc.perform(delete("/comment/delete/{commentId}", commentId).header("AUTHORIZATION", "Bearer " + token)
+				.contentType(MediaType.APPLICATION_JSON).param("commentId", Integer.toString(commentId)))
+				.andExpect(status().isOk()).andExpect(content().string(Constant.DELETE_SUCCESSFULLY));
 	}
-	
+
+	@Test
+	public void deleteCommentFail() throws Exception {
+		int commentId = 1;
+
+		when(commentService.deleteComment(anyInt(), anyInt())).thenThrow(new Exception());
+		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
+
+		mockMvc.perform(delete("/comment/delete/{commentId}", commentId).header("AUTHORIZATION", "Bearer " + token)
+				.contentType(MediaType.APPLICATION_JSON).param("commentId", Integer.toString(commentId)))
+				.andExpect(status().isInternalServerError());
+	}
+
 	@Test
 	public void updateCommentSuccess() throws Exception {
-		int loggedInUserId = jwtUtils.getUserIdFromJwt(token);
-		int commentId = 1;
 		String content = "update content";
 		MockMultipartFile photo1 = new MockMultipartFile("data1", "filename1.jpg", "multipart/form-data",
 				"some xml".getBytes());
-		
+
 		CommentUpdatedDto commentUpdatedDto = new CommentUpdatedDto();
-		
-		when(commentService.updateComment(content, photo1, commentId, loggedInUserId)).thenReturn(commentUpdatedDto);
+		commentUpdatedDto.setContent(content);
+		commentUpdatedDto.setPhotoUrl(photo1.getOriginalFilename());
+
+		when(commentService.updateComment(any(), any(), anyInt(), anyInt())).thenReturn(commentUpdatedDto);
 		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
-		
-		mockMvc.perform(MockMvcRequestBuilders.multipart(HttpMethod.PUT, "/comment/update/{commentId}", 1)
-				.file(photo1)
-				.header("AUTHORIZATION", "Bearer " + token)
-				.contentType(MediaType.MULTIPART_FORM_DATA)
-				.param("content", content))
-				.andExpect(status().isOk()).andReturn();
+
+		mockMvc.perform(MockMvcRequestBuilders.multipart(HttpMethod.PUT, "/comment/update/{commentId}", 1).file(photo1)
+				.header("AUTHORIZATION", "Bearer " + token).contentType(MediaType.MULTIPART_FORM_DATA)
+				.param("content", content)).andExpect(status().isOk())
+				.andExpect(jsonPath("$.content").value(commentUpdatedDto.getContent()))
+				.andExpect(jsonPath("$.photoUrl").value(commentUpdatedDto.getPhotoUrl()));
 	}
-	
+
+	@Test
+	public void updateCommentFail() throws Exception {
+		String content = "update content";
+		MockMultipartFile photo1 = new MockMultipartFile("data1", "filename1.jpg", "multipart/form-data",
+				"some xml".getBytes());
+
+		when(commentService.updateComment(any(), any(), anyInt(), anyInt())).thenThrow(new Exception());
+		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
+
+		mockMvc.perform(MockMvcRequestBuilders.multipart(HttpMethod.PUT, "/comment/update/{commentId}", 1).file(photo1)
+				.header("AUTHORIZATION", "Bearer " + token).contentType(MediaType.MULTIPART_FORM_DATA)
+				.param("content", content)).andExpect(status().isInternalServerError());
+	}
+
 	@Test
 	public void getCommentDetailSuccess() throws Exception {
-		int commentId = 1;
-		
 		CommentDetailDto commentDetailDto = new CommentDetailDto();
-		
-		when(commentService.getCommentDetail(commentId)).thenReturn(commentDetailDto);
+		commentDetailDto.setContent("comment content");
+		commentDetailDto.setCommentId(1);
+		commentDetailDto.setUserId(1);
+		commentDetailDto.setPostId(1);
+
+		when(commentService.getCommentDetail(anyInt())).thenReturn(commentDetailDto);
 		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
-		
-		mockMvc.perform(get("/comment/detail/{commentId}", 1)
-				.header("AUTHORIZATION", "Bearer " + token)
-				.contentType(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk()).andReturn();
+
+		mockMvc.perform(get("/comment/detail/{commentId}", 1).header("AUTHORIZATION", "Bearer " + token)
+				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+				.andExpect(jsonPath("$.content").value(commentDetailDto.getContent()));
 	}
 }

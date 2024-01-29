@@ -1,8 +1,13 @@
 package com.training.socialnetwork.controller;
 
+import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
@@ -34,11 +39,11 @@ import com.training.socialnetwork.dto.request.user.UserLoginDto;
 import com.training.socialnetwork.dto.request.user.UserTokenDto;
 import com.training.socialnetwork.dto.response.friend.FriendListDto;
 import com.training.socialnetwork.dto.response.friend.FriendRequestDto;
-import com.training.socialnetwork.security.JwtUtils;
 import com.training.socialnetwork.service.IFriendService;
 import com.training.socialnetwork.service.IPostService;
 import com.training.socialnetwork.service.IUserService;
 import com.training.socialnetwork.service.impl.CustomUserDetailService;
+import com.training.socialnetwork.util.constant.Constant;
 import com.training.socialnetwork.utils.JSonHelper;
 
 @RunWith(SpringRunner.class)
@@ -50,9 +55,6 @@ public class FriendControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;
-
-	@Autowired
-	private JwtUtils jwtUtils;
 
 	@MockBean
 	private IFriendService friendService;
@@ -116,8 +118,6 @@ public class FriendControllerTest {
 
 	@Test
 	public void getFriendListSuccess() throws Exception {
-		int loggedInUserId = jwtUtils.getUserIdFromJwt(token);
-
 		FriendListDto friendListDto = new FriendListDto();
 		friendListDto.setFriendId(1);
 		friendListDto.setUserId(2);
@@ -126,69 +126,92 @@ public class FriendControllerTest {
 		List<FriendListDto> friendList = new ArrayList<>();
 		friendList.add(friendListDto);
 
-		when(friendService.findAllFriendWithStatus(loggedInUserId, null)).thenReturn(friendList);
+		when(friendService.findAllFriendWithStatus(anyInt(), any())).thenReturn(friendList);
 		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
 
 		mockMvc.perform(get("/friend/all-friends").header("AUTHORIZATION", "Bearer " + token))
-				.andExpect(status().isOk()).andReturn();
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasSize(1)));
 	}
 
 	@Test
 	public void createFriendRequestSuccess() throws Exception {
-		int loggedInUserId = jwtUtils.getUserIdFromJwt(token);
 		int userId2 = 2;
 
-		when(friendService.createFriendRequest(loggedInUserId, userId2)).thenReturn(true);
+		when(friendService.createFriendRequest(anyInt(), anyInt())).thenReturn(true);
 		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
 
 		mockMvc.perform(post("/friend/add-request").header("AUTHORIZATION", "Bearer " + token)
 				.contentType(MediaType.APPLICATION_JSON).param("userId2", Integer.toString(userId2)))
-				.andExpect(status().isCreated()).andReturn();
+				.andExpect(status().isCreated())
+				.andExpect(content().string(Constant.SEND_FRIEND_REQUEST_SUCCESSFULLY));
+	}
+	
+	@Test
+	public void createFriendRequestFail() throws Exception {
+		int userId2 = 2;
+
+		when(friendService.createFriendRequest(anyInt(), anyInt())).thenThrow(new Exception());
+		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
+
+		mockMvc.perform(post("/friend/add-request").header("AUTHORIZATION", "Bearer " + token)
+				.contentType(MediaType.APPLICATION_JSON).param("userId2", Integer.toString(userId2)))
+				.andExpect(status().isInternalServerError());
 	}
 
 	@Test
 	public void acceptFriendSuccess() throws Exception {
-		int loggedInUserId = jwtUtils.getUserIdFromJwt(token);
 		int userId1 = 2;
 
-		when(friendService.acceptFriendRequest(userId1, loggedInUserId)).thenReturn(true);
+		when(friendService.acceptFriendRequest(anyInt(), anyInt())).thenReturn(true);
 		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
 
 		mockMvc.perform(post("/friend/accept-request").header("AUTHORIZATION", "Bearer " + token)
 				.contentType(MediaType.APPLICATION_JSON).param("userId1", Integer.toString(userId1)))
-				.andExpect(status().isOk()).andReturn();
+				.andExpect(status().isOk())
+				.andExpect(content().string(Constant.ACCEPT_FRIEND_REQUEST_SUCCESSFULLY));
 	}
 
 	@Test
-	public void refuseFriendRequestSuccess() throws Exception {
-		int loggedInUserId = jwtUtils.getUserIdFromJwt(token);
+	public void acceptFriendFail() throws Exception {
 		int userId1 = 2;
 
-		when(friendService.refuseFriendRequest(userId1, loggedInUserId)).thenReturn(true);
+		when(friendService.acceptFriendRequest(anyInt(), anyInt())).thenThrow(new Exception());
+		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
+
+		mockMvc.perform(post("/friend/accept-request").header("AUTHORIZATION", "Bearer " + token)
+				.contentType(MediaType.APPLICATION_JSON).param("userId1", Integer.toString(userId1)))
+				.andExpect(status().isInternalServerError());
+	}
+	
+	@Test
+	public void refuseFriendRequestSuccess() throws Exception {
+		int userId1 = 2;
+
+		when(friendService.refuseFriendRequest(anyInt(), anyInt())).thenReturn(true);
 		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
 
 		mockMvc.perform(post("/friend/refuse-request").header("AUTHORIZATION", "Bearer " + token)
 				.contentType(MediaType.APPLICATION_JSON).param("userId1", Integer.toString(userId1)))
-				.andExpect(status().isOk()).andReturn();
+				.andExpect(status().isOk())
+				.andExpect(content().string(Constant.REFUSE_FRIEND_REQUEST_SUCCESSFULLY));
 	}
 
 	@Test
 	public void removeFriend() throws Exception {
-		int loggedInUserId = jwtUtils.getUserIdFromJwt(token);
 		int userId1 = 2;
 
-		when(friendService.unfriend(userId1, loggedInUserId)).thenReturn(true);
+		when(friendService.unfriend(anyInt(), anyInt())).thenReturn(true);
 		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
 
 		mockMvc.perform(post("/friend/remove-friend").header("AUTHORIZATION", "Bearer " + token)
 				.contentType(MediaType.APPLICATION_JSON).param("userId1", Integer.toString(userId1)))
-				.andExpect(status().isOk()).andReturn();
+				.andExpect(status().isOk())
+				.andExpect(content().string(Constant.REMOVE_FRIEND_SUCCESSFULLY));
 	}
 
 	@Test
 	public void getFriendRequestListSuccess() throws Exception {
-		int loggedInUserId = jwtUtils.getUserIdFromJwt(token);
-
 		FriendRequestDto friendRequestDto = new FriendRequestDto();
 		friendRequestDto.setUserId(2);
 		friendRequestDto.setUsername("test");
@@ -196,23 +219,24 @@ public class FriendControllerTest {
 		List<FriendRequestDto> friendRequestList = new ArrayList<>();
 		friendRequestList.add(friendRequestDto);
 
-		when(friendService.findAllAddFriendRequest(loggedInUserId, null)).thenReturn(friendRequestList);
+		when(friendService.findAllAddFriendRequest(anyInt(), any())).thenReturn(friendRequestList);
 		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
 
 		mockMvc.perform(get("/friend/all-friend-request").header("AUTHORIZATION", "Bearer " + token))
-				.andExpect(status().isOk()).andReturn();
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasSize(1)));
 	}
 	
 	@Test
 	public void removeFriendRequestSuccess() throws Exception {
-		int loggedInUserId = jwtUtils.getUserIdFromJwt(token);
 		int userId1 = 2;
 
-		when(friendService.removeFriendRequest(userId1, loggedInUserId)).thenReturn(true);
+		when(friendService.removeFriendRequest(anyInt(), anyInt())).thenReturn(true);
 		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
 
 		mockMvc.perform(post("/friend/remove-friend-request").header("AUTHORIZATION", "Bearer " + token)
 				.contentType(MediaType.APPLICATION_JSON).param("userId1", Integer.toString(userId1)))
-				.andExpect(status().isOk()).andReturn();
+				.andExpect(status().isOk())
+				.andExpect(content().string(Constant.REMOVE_FRIEND_REQUEST_SUCCESSFULLY));
 	}
 }

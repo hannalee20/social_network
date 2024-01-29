@@ -1,5 +1,7 @@
 package com.training.socialnetwork.controller;
 
+import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -8,9 +10,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -56,9 +58,8 @@ import com.training.socialnetwork.dto.response.user.UserReportDto;
 import com.training.socialnetwork.dto.response.user.UserSearchDto;
 import com.training.socialnetwork.dto.response.user.UserUpdatedDto;
 import com.training.socialnetwork.entity.User;
-import com.training.socialnetwork.security.JwtUtils;
-import com.training.socialnetwork.service.IUserService;
 import com.training.socialnetwork.service.impl.CustomUserDetailService;
+import com.training.socialnetwork.service.impl.UserService;
 import com.training.socialnetwork.util.constant.Constant;
 import com.training.socialnetwork.utils.JSonHelper;
 
@@ -75,9 +76,6 @@ public class UserControllerTest {
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 	
-	@Autowired
-	private JwtUtils jwtUtils;
-	
 	@MockBean
 	private Authentication authentication;
 
@@ -88,7 +86,7 @@ public class UserControllerTest {
 	private UserDetails userDetails;
 
 	@MockBean
-	private IUserService userService;
+	private UserService userService;
 	
 	@MockBean
 	private CustomUserDetailService customUserDetailService;
@@ -155,20 +153,17 @@ public class UserControllerTest {
 		userRegistedDto.setEmail("test@gmail.com");
 		userRegistedDto.setRole(Constant.ROLE_USER);
 
-		when(userService.createUser(userRegisterDto)).thenReturn(userRegistedDto);
+		when(userService.createUser(any())).thenReturn(userRegistedDto);
 		String request = JSonHelper.toJson(userRegisterDto).orElse("");
-		String expectedResponse = JSonHelper.toJson(userRegistedDto).orElse("");
-
+		
 		mockMvc.perform(post("/user/register").contentType(MediaType.APPLICATION_JSON).content(request))
 				.andExpect(status().isCreated())
-//				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-				.andExpect(content().json(expectedResponse));
-//				.andDo(print())
-//				.andExpect(jsonPath("$.username").value(userRegistedDto.getUserId()))
-//				.andExpect(jsonPath("$.username").value(userRegistedDto.getUsername()))
-//				.andExpect(jsonPath("$.email").value(userRegistedDto.getEmail()))
-//				.andExpect(jsonPath("$.role").value(userRegistedDto.getRole()));
-	}
+				.andDo(print())
+				.andExpect(jsonPath("$.userId").value(userRegistedDto.getUserId()))
+				.andExpect(jsonPath("$.username").value(userRegistedDto.getUsername()))
+				.andExpect(jsonPath("$.email").value(userRegistedDto.getEmail()))
+				.andExpect(jsonPath("$.role").value(userRegistedDto.getRole()));
+		}
 
 	@Test
 	public void loginSuccess() throws Exception {
@@ -184,7 +179,6 @@ public class UserControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(request))
 				.andExpect(status().isOk());
-//				.andExpect(jsonPath("$.otp").value(String.valueOf(otp)));
 	}
 	
 	@Test
@@ -197,12 +191,12 @@ public class UserControllerTest {
 		mockMvc.perform(post("/user/login")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(request))
-				.andExpect(status().isBadRequest());
-//				.andExpect(jsonPath("$.message").value(Constant.INVALID_USERNAME_OR_PASSWORD));
+				.andExpect(status().isBadRequest())
+				.andExpect(content().string(Constant.INVALID_USERNAME_OR_PASSWORD));
 	}
 	
 	@Test
-	public void getInfoUserSuccess() throws Exception {
+	public void getUserInfoSuccess() throws Exception {
 		int userId = 1;
 		UserDetailDto userDetailDto = new UserDetailDto();
 		userDetailDto.setUserId(1);
@@ -217,15 +211,31 @@ public class UserControllerTest {
 				.header("AUTHORIZATION", "Bearer " + token)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(request))
-				.andExpect(status().isOk()).andReturn();
+				.andExpect(status().isOk())
+				.andDo(print())
+				.andExpect(jsonPath("$.userId").value(1))
+				.andExpect(jsonPath("$.realName").value("Test"))
+				.andExpect(jsonPath("$.gender").value("female"));
+	}
+	
+	@Test
+	public void getUserInfoFail() throws Exception {
+		int userId = 1;
 		
+		when(userService.getInfo(anyInt())).thenThrow(new Exception());
+		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
+		
+		String request = JSonHelper.toJson(userId).orElse("");
+		mockMvc.perform(get("/user/detail/{userId}", userId)
+				.header("AUTHORIZATION", "Bearer " + token)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(request))
+				.andExpect(status().isInternalServerError());
 	}
 	
 	@Test
 	public void updateUserSuccess() throws Exception {
-		
 		int userId = 1;
-		int loggedInUserId = jwtUtils.getUserIdFromJwt(token);
 		UserUpdateDto userUpdateDto = new UserUpdateDto();
 		userUpdateDto.setBirthDate(new Date());
 		userUpdateDto.setAddress("HCM");
@@ -233,8 +243,10 @@ public class UserControllerTest {
 		MultipartFile avatar = new MockMultipartFile("data2", "filename2.jpg", "multipart/form-data", "some xml".getBytes());
 		
 		UserUpdatedDto userUpdatedDto = new UserUpdatedDto();
-
-		when(userService.updateInfo(userUpdateDto, avatar, userId, loggedInUserId)).thenReturn(userUpdatedDto);
+		userUpdatedDto.setAddress("hanoi");
+		userUpdatedDto.setJob("developer");
+		
+		when(userService.updateInfo(any(), any(), anyInt(), anyInt())).thenReturn(userUpdatedDto);
 		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
 		
 		Map<String, Object> requestBody = new HashMap<>();
@@ -242,21 +254,49 @@ public class UserControllerTest {
 		requestBody.putIfAbsent("avatar", avatar);
 		requestBody.putIfAbsent("userId", userId);
 		
-		String request2 = JSonHelper.toJson(requestBody).orElse("");
+		String request = JSonHelper.toJson(requestBody).orElse("");
 		mockMvc.perform(patch("/user/update/{userId}", userId)
 				.header("AUTHORIZATION", "Bearer " + token)
 				.contentType(MediaType.MULTIPART_FORM_DATA)
-				.content(request2))
-				.andExpect(status().isOk()).andReturn();
+				.content(request))
+				.andExpect(status().isOk())
+				.andDo(print())
+				.andExpect(jsonPath("$.address").value(userUpdatedDto.getAddress()))
+				.andExpect(jsonPath("$.job").value(userUpdatedDto.getJob()));
 	}
 	
 	@Test
-	public void searchUserTest() throws Exception {
-		int loggedInUserId = jwtUtils.getUserIdFromJwt(token);
+	public void updateUserFail() throws Exception {
+		int userId = 1;
+		
+		UserUpdateDto userUpdateDto = new UserUpdateDto();
+		userUpdateDto.setBirthDate(new Date());
+		userUpdateDto.setAddress("HCM");
+		
+		MultipartFile avatar = new MockMultipartFile("data2", "filename2.jpg", "multipart/form-data", "some xml".getBytes());
+		
+		when(userService.updateInfo(any(), any(), anyInt(), anyInt())).thenThrow(new Exception());
+		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
+		
+		Map<String, Object> requestBody = new HashMap<>();
+		requestBody.putIfAbsent("userUpdateDto", userUpdateDto);
+		requestBody.putIfAbsent("avatar", avatar);
+		requestBody.putIfAbsent("userId", userId);
+		
+		String request = JSonHelper.toJson(requestBody).orElse("");
+		mockMvc.perform(patch("/user/update/{userId}", userId)
+				.header("AUTHORIZATION", "Bearer " + token)
+				.contentType(MediaType.MULTIPART_FORM_DATA)
+				.content(request))
+				.andExpect(status().isInternalServerError());
+	}
+	
+	@Test
+	public void searchUserSuccess() throws Exception {
 		String keyword = "test";
 		
 		UserSearchDto userSearchDto1 = new UserSearchDto();
-		userSearchDto1.setUserId(3);
+		userSearchDto1.setUserId(4);
 		userSearchDto1.setUsername("test1");
 		userSearchDto1.setFriendStatus(2);
 		
@@ -275,23 +315,38 @@ public class UserControllerTest {
 		userSearchList.add(userSearchDto2);
 		userSearchList.add(userSearchDto3);
 		
-		when(userService.searchUser(loggedInUserId, keyword)).thenReturn(userSearchList);
+		when(userService.searchUser(anyInt(), any(), null)).thenReturn(userSearchList);
 		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
 		
 		mockMvc.perform(get("/user/search")
 				.header("AUTHORIZATION", "Bearer " + token)
 				.contentType(MediaType.APPLICATION_JSON)
 				.param("keyword", keyword))
-				.andExpect(status().isOk()).andReturn();
+				.andExpect(status().isOk())
+				.andDo(print())
+				.andExpect(jsonPath("$", hasSize(3)));
+	}
+	
+	@Test
+	public void searchUserFail() throws Exception {
+		String keyword = "test";
+		
+		when(userService.searchUser(anyInt(), any(), null)).thenThrow(new RuntimeException());
+		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
+		
+		mockMvc.perform(get("/user/search")
+				.header("AUTHORIZATION", "Bearer " + token)
+				.contentType(MediaType.APPLICATION_JSON)
+				.param("keyword", keyword))
+				.andExpect(status().isInternalServerError());
 	}
 	
 	@Test
 	public void forgotPasswordSuccess() throws Exception {
-		String email = "test@gmail.com";
 		UserForgotPasswordDto userForgotPasswordDto = new UserForgotPasswordDto();
-		userForgotPasswordDto.setEmail(email);
+		userForgotPasswordDto.setEmail("test@gmail.com");
 		
-		when(userService.forgotPassword(email)).thenReturn(anyString());
+		when(userService.forgotPassword(any())).thenReturn(anyString());
 		
 		String request = JSonHelper.toJson(userForgotPasswordDto).orElse("");
 		
@@ -302,13 +357,27 @@ public class UserControllerTest {
 	}
 	
 	@Test
-	public void resetPasswordSuccess() throws Exception {
-		String email = "test@gmail.com";
+	public void forgotPasswordFail() throws Exception {
 		UserForgotPasswordDto userForgotPasswordDto = new UserForgotPasswordDto();
-		userForgotPasswordDto.setEmail(email);
+		userForgotPasswordDto.setEmail("test@gmail.com");
+		
+		when(userService.forgotPassword(any())).thenThrow(new Exception());
+		
+		String request = JSonHelper.toJson(userForgotPasswordDto).orElse("");
+		
+		mockMvc.perform(post("/user/forgot-password")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(request))
+				.andExpect(status().isInternalServerError());
+	}
+	
+	@Test
+	public void resetPasswordSuccess() throws Exception {
+		UserForgotPasswordDto userForgotPasswordDto = new UserForgotPasswordDto();
+		userForgotPasswordDto.setEmail("test@gmail.com");
 		
 		String tokenForgotPassword = UUID.randomUUID().toString();
-		when(userService.forgotPassword(email)).thenReturn(tokenForgotPassword);
+		when(userService.forgotPassword(any())).thenReturn(tokenForgotPassword);
 		
 		String requestForgotPassword = JSonHelper.toJson(userForgotPasswordDto).orElse("");
 		
@@ -322,19 +391,33 @@ public class UserControllerTest {
 		userResetPasswordDto.setToken(tokenResetPassword);
 		userResetPasswordDto.setNewPassword("newpassword");
 		
-		when(userService.resetPassword(userResetPasswordDto.getToken(), userResetPasswordDto.getNewPassword())).thenReturn(Constant.RESET_PASSWORD_SUCCESSFULLY);
+		when(userService.resetPassword(any(), any())).thenReturn(Constant.RESET_PASSWORD_SUCCESSFULLY);
 		String requestResetPassword = JSonHelper.toJson(userResetPasswordDto).orElse("");
 		
 		mockMvc.perform(put("/user/reset-password")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(requestResetPassword))
-				.andExpect(status().isOk()).andReturn();
+				.andExpect(status().isOk())
+				.andExpect(content().string(Constant.RESET_PASSWORD_SUCCESSFULLY));
+	}
+	
+	@Test
+	public void resetPasswordFail() throws Exception {
+		UserResetPasswordDto userResetPasswordDto = new UserResetPasswordDto();
+		userResetPasswordDto.setToken("wrong token");
+		userResetPasswordDto.setNewPassword("newpassword");
+		
+		when(userService.resetPassword(any(), any())).thenThrow(new Exception(Constant.TOKEN_INVALID));
+		String requestResetPassword = JSonHelper.toJson(userResetPasswordDto).orElse("");
+		
+		mockMvc.perform(put("/user/reset-password")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(requestResetPassword))
+				.andExpect(status().isInternalServerError());
 	}
 	
 	@Test
 	public void getReportUserSuccess() throws Exception {
-		int loggedInUserId = jwtUtils.getUserIdFromJwt(token);
-		
 		UserReportDto userReportDto = new UserReportDto();
 		userReportDto.setCommentCount(1);
 		userReportDto.setFriendCount(2);
@@ -342,11 +425,11 @@ public class UserControllerTest {
 		userReportDto.setPostCount(4);
 		
 		
-		when(userService.getReportUser(loggedInUserId)).thenReturn(userReportDto);
+		when(userService.getReportUser(anyInt())).thenReturn(userReportDto);
 		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
 		
 		mockMvc.perform(get("/user/export-report")
 				.header("AUTHORIZATION", "Bearer " + token))
-				.andExpect(status().isOk()).andReturn();
+				.andExpect(status().isOk());
 	}
 }

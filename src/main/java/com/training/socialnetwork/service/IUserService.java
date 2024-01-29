@@ -2,6 +2,7 @@ package com.training.socialnetwork.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.training.socialnetwork.dto.request.user.UserRegisterDto;
@@ -22,7 +23,7 @@ public interface IUserService {
 	
 	UserDetailDto getInfo(int userId) throws Exception;
 	
-	List<UserSearchDto> searchUser(int userId, String keyword);
+	List<UserSearchDto> searchUser(int userId, String keyword, Pageable paging);
 	
 	UserReportDto getReportUser(int userId);
 	
