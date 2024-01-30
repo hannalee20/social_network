@@ -82,7 +82,7 @@ public class UserService implements IUserService {
 		if (userRepository.findByEmail(userRegisterDto.getEmail()) != null) {
 			throw new CustomException(HttpStatus.BAD_REQUEST, "Email already exists");
 		}
-		
+
 		if (userRepository.findByUsername(userRegisterDto.getUsername()) != null) {
 			throw new CustomException(HttpStatus.BAD_REQUEST, "Username already exists");
 		}
@@ -106,7 +106,12 @@ public class UserService implements IUserService {
 	@Override
 	public boolean loginUser(String username, String password) throws Exception {
 		User user = userRepository.findByUsername(username);
-		if (user != null && bCryptPasswordEncoder.matches(password, user.getPassword())) {
+		
+		if (user == null) {
+			throw new CustomException(HttpStatus.NOT_FOUND, "User does not exist");
+		}
+		
+		if (bCryptPasswordEncoder.matches(password, user.getPassword())) {
 			return true;
 		}
 
@@ -119,14 +124,14 @@ public class UserService implements IUserService {
 		User userToUpdate = userRepository.findById(userId).orElse(null);
 		User loggedInUser = userRepository.findById(loggedInUserId).orElse(null);
 
-		if (userToUpdate == null|| userToUpdate.getUserId() != loggedInUser.getUserId()) {
+		if (userToUpdate == null) {
 			throw new CustomException(HttpStatus.NOT_FOUND, "User does not exist");
 		}
-		
+
 		if (userToUpdate.getUserId() != loggedInUser.getUserId()) {
 			throw new CustomException(HttpStatus.FORBIDDEN, "You do not have permission to update");
 		}
-		
+
 		if (userUpdateDto.getSex() != null) {
 			if (userUpdateDto.getSex().toUpperCase().equals(Constant.MALE)) {
 				userToUpdate.setGender(Constant.NUMBER_0);
@@ -143,11 +148,7 @@ public class UserService implements IUserService {
 		userToUpdate.setUpdateDate(new Date());
 		User userUpdated = userRepository.save(userToUpdate);
 
-		if (userUpdated != null) {
-			return modelMapper.map(userUpdated, UserUpdatedDto.class);
-		}
-
-		throw new Exception(Constant.SERVER_ERROR);
+		return modelMapper.map(userUpdated, UserUpdatedDto.class);
 	}
 
 	@Override
@@ -175,8 +176,6 @@ public class UserService implements IUserService {
 		List<Friend> friendList = friendRepository.findAllByUserId(userId);
 
 		List<UserSearchDto> userSearchList = new ArrayList<>();
-//				userList.stream().map(user -> modelMapper.map(user, UserSearchDto.class))
-//				.collect(Collectors.toList());
 		for (User user : userList) {
 			UserSearchDto userSearchDto = modelMapper.map(user, UserSearchDto.class);
 			userSearchList.add(userSearchDto);

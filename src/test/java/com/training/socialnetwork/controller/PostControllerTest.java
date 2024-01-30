@@ -3,117 +3,59 @@ package com.training.socialnetwork.controller;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-
-import javax.transaction.Transactional;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
-import com.training.socialnetwork.dto.request.user.CustomUserDetail;
-import com.training.socialnetwork.dto.request.user.UserLoginDto;
-import com.training.socialnetwork.dto.request.user.UserTokenDto;
 import com.training.socialnetwork.dto.response.post.PostCreatedDto;
 import com.training.socialnetwork.dto.response.post.PostDetailDto;
 import com.training.socialnetwork.dto.response.post.PostListDto;
 import com.training.socialnetwork.dto.response.post.PostUpdatedDto;
+import com.training.socialnetwork.security.JwtUtils;
 import com.training.socialnetwork.service.IPostService;
-import com.training.socialnetwork.service.IUserService;
-import com.training.socialnetwork.service.impl.CustomUserDetailService;
-import com.training.socialnetwork.utils.JSonHelper;
+import com.training.socialnetwork.util.constant.Constant;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@AutoConfigureMockMvc
-@Transactional
+@WebMvcTest(PostController.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class PostControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;
 
-	@MockBean
-	private Authentication authentication;
-
-	@MockBean
-	private AuthenticationManager authenticationManager;
-
-	@MockBean
-	private UserDetails userDetails;
-
-	@MockBean
-	private IUserService userService;
-
-	@MockBean
-	private CustomUserDetailService customUserDetailService;
+	@Autowired
+	private WebApplicationContext webApplicationContext;
 
 	@MockBean
 	private IPostService postService;
 
-	private String token;
+	@MockBean
+	private JwtUtils jwtUtils;
 
 	@BeforeAll
 	void setUp() throws Exception {
-		UserLoginDto userLoginDto = new UserLoginDto();
-		userLoginDto.setUsername("test");
-		userLoginDto.setPassword("123456");
-
-		when(userService.loginUser(userLoginDto.getUsername(), userLoginDto.getPassword())).thenReturn(true);
-		String otpRequest = JSonHelper.toJson(userLoginDto).orElse("");
-
-		MvcResult result = mockMvc
-				.perform(post("/user/login").contentType(MediaType.APPLICATION_JSON).content(otpRequest))
-				.andExpect(status().isOk()).andReturn();
-
-		String otp = result.getResponse().getContentAsString();
-		UserTokenDto userTokenDto = new UserTokenDto();
-		userTokenDto.setUsername("test");
-		userTokenDto.setPassword("123456");
-
-		List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-		authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-
-		CustomUserDetail customUserDetail = new CustomUserDetail(1, "test", "123456", authorities);
-		userTokenDto.setOtp(Integer.valueOf(otp.substring(8, 14)));
-
-		String request = JSonHelper.toJson(userTokenDto).orElse("");
-
-		when(authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(userTokenDto.getUsername(), userTokenDto.getPassword())))
-				.thenReturn(authentication);
-		when(authentication.getPrincipal()).thenReturn(customUserDetail);
-
-		MvcResult tokenResult = mockMvc
-				.perform(post("/user/token").contentType(MediaType.APPLICATION_JSON).content(request))
-				.andExpect(status().isOk()).andReturn();
-		token = tokenResult.getResponse().getContentAsString().substring(8, 133);
+		mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 	}
 
 	@Test
@@ -135,17 +77,33 @@ public class PostControllerTest {
 		postCreatedDto.setUsername("test");
 
 		when(postService.createPost(anyInt(), any(), any())).thenReturn(postCreatedDto);
-		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
 
 		mockMvc.perform(MockMvcRequestBuilders.multipart("/post/create").file(photo1).file(photo2)
-				.header("AUTHORIZATION", "Bearer " + token).contentType(MediaType.MULTIPART_FORM_DATA)
+				.header("Authorization", "Bearer dummyToken").contentType(MediaType.MULTIPART_FORM_DATA)
 				.param("content", content)).andExpect(status().isCreated())
-				.andExpect(jsonPath("$postId").value(postCreatedDto.getPostId()))
-				.andExpect(jsonPath("$userId").value(postCreatedDto.getUserId()))
-				.andExpect(jsonPath("$content").value(postCreatedDto.getContent()))
-				.andExpect(jsonPath("$username").value(postCreatedDto.getUsername()));
+				.andExpect(jsonPath("$.postId").value(postCreatedDto.getPostId()))
+				.andExpect(jsonPath("$.userId").value(postCreatedDto.getUserId()))
+				.andExpect(jsonPath("$.content").value(postCreatedDto.getContent()))
+				.andExpect(jsonPath("$.username").value(postCreatedDto.getUsername()));
 	}
 
+	@Test
+    public void createPostFail() throws Exception {
+        int userId = 1;
+        String content = "Test post content";
+        MockMultipartFile photo1 = new MockMultipartFile("data1", "filename1.jpg", "multipart/form-data",
+				"some xml".getBytes());
+		MockMultipartFile photo2 = new MockMultipartFile("data2", "filename2.jpg", "multipart/form-data",
+				"some xml".getBytes());
+		
+        when(jwtUtils.getUserIdFromJwt(anyString())).thenReturn(userId);
+        when(postService.createPost(anyInt(), any(), any())).thenThrow(new Exception("Some error message"));
+
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/post/create").file(photo1).file(photo2)
+				.header("Authorization", "Bearer dummyToken").contentType(MediaType.MULTIPART_FORM_DATA)
+				.param("content", content)).andExpect(status().isInternalServerError());
+    }
+	
 	@Test
 	public void getTimelineSuccess() throws Exception {
 		List<PostListDto> postList = new ArrayList<>();
@@ -155,28 +113,58 @@ public class PostControllerTest {
 		postListDto.setUsername("test");
 		postListDto.setCommentCount(2);
 		postListDto.setLikeCount(3);
-		
-		when(postService.getTimeline(anyInt(), any())).thenReturn(postList);
-		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
+		postList.add(postListDto);
 
-		mockMvc.perform(get("/post/timeline").header("AUTHORIZATION", "Bearer " + token))
-				.andExpect(status().isOk())
+		when(postService.getTimeline(anyInt(), any())).thenReturn(postList);
+
+		mockMvc.perform(get("/post/timeline").header("Authorization", "Bearer dummyToken")).andExpect(status().isOk())
 				.andExpect(jsonPath("$", hasSize(1)));
 	}
 
+	@Test
+    public void getTimelineFail() throws Exception {
+        when(postService.getTimeline(anyInt(), any())).thenReturn(null);
+
+        mockMvc.perform(get("/post/timeline")
+        		.header("Authorization", "Bearer dummyToken")).andExpect(status().isNoContent())
+                .andExpect(content().string(Constant.NO_RESULT));
+    }
+
+    @Test
+    public void getTimelineFail2() throws Exception {
+    	int userId = 1;
+
+        when(jwtUtils.getUserIdFromJwt(anyString())).thenReturn(userId);
+        when(postService.getTimeline(anyInt(), any())).thenThrow(new RuntimeException("Some error message"));
+
+        mockMvc.perform(get("/post/timeline")
+        		.header("Authorization", "Bearer dummyToken")).andExpect(status().isInternalServerError())
+                .andExpect(content().string("Some error message"));
+    }
+    
 	@Test
 	public void getPostDetailSuccess() throws Exception {
 		PostDetailDto postDetailDto = new PostDetailDto();
 
 		when(postService.getPost(anyInt())).thenReturn(postDetailDto);
-		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
 
-//		String request = JSonHelper.toJson(postId).orElse("");
-
-		mockMvc.perform(get("/post/detail/{postId}", 1).header("AUTHORIZATION", "Bearer " + token)
+		mockMvc.perform(get("/post/detail/{postId}", 1).header("Authorization", "Bearer dummyToken")
 				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
 	}
 
+	@Test
+    public void getPostDetailFail() throws Exception {
+        int postId = 1;
+
+        when(postService.getPost(anyInt())).thenThrow(new Exception("Some error message"));
+
+        mockMvc.perform(get("/post/detail/{postId}", postId)
+        		.header("Authorization", "Bearer dummyToken")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError())
+                .andExpect(content().string("Some error message"));
+    }
+	
 	@Test
 	public void updatePostSuccess() throws Exception {
 		int postId = 1;
@@ -189,22 +177,53 @@ public class PostControllerTest {
 		PostUpdatedDto postUpdatedDto = new PostUpdatedDto();
 
 		when(postService.updatePost(any(), any(), anyInt(), anyInt())).thenReturn(postUpdatedDto);
-		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
 
 		mockMvc.perform(MockMvcRequestBuilders.multipart(HttpMethod.PUT, "/post/update/{postId}", postId).file(photo1)
-				.file(photo2).header("AUTHORIZATION", "Bearer " + token).contentType(MediaType.MULTIPART_FORM_DATA)
+				.file(photo2).header("Authorization", "Bearer dummyToken").contentType(MediaType.MULTIPART_FORM_DATA)
 				.param("content", content)).andExpect(status().isOk());
 	}
+	
+	@Test
+    public void updatePostFail() throws Exception {
+        int userId = 1;
+        int postId = 1;
+        MockMultipartFile photo1 = new MockMultipartFile("data1", "filename1.jpg", "multipart/form-data",
+				"some xml".getBytes());
+		MockMultipartFile photo2 = new MockMultipartFile("data2", "filename2.jpg", "multipart/form-data",
+				"some xml".getBytes());
+		
+        when(jwtUtils.getUserIdFromJwt(anyString())).thenReturn(userId);
+        when(postService.updatePost(any(), any(), anyInt(), anyInt())).thenThrow(new Exception("Some error message"));
+
+        mockMvc.perform(MockMvcRequestBuilders.multipart(HttpMethod.PUT, "/post/update/{postId}", postId).file(photo1)
+				.file(photo2).header("Authorization", "Bearer dummyToken").contentType(MediaType.MULTIPART_FORM_DATA))
+                .andExpect(status().isInternalServerError())
+                .andExpect(content().string("Some error message"));
+    }
 
 	@Test
 	public void deletePostSuccess() throws Exception {
 		int postId = 1;
 
 		when(postService.deletePost(anyInt(), anyInt())).thenReturn(true);
-		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
 
-		mockMvc.perform(delete("/post/delete/{postId}", postId).header("AUTHORIZATION", "Bearer " + token)
-				.contentType(MediaType.APPLICATION_JSON)
-				.param("postId", Integer.toString(postId))).andExpect(status().isOk());
+		mockMvc.perform(delete("/post/delete/{postId}", postId).header("Authorization", "Bearer dummyToken")
+				.contentType(MediaType.APPLICATION_JSON).param("postId", Integer.toString(postId)))
+				.andExpect(status().isOk());
 	}
+	
+	@Test
+    public void deletePostFail() throws Exception {
+        int userId = 1;
+        int postId = 1;
+
+        when(jwtUtils.getUserIdFromJwt(anyString())).thenReturn(userId);
+        when(postService.deletePost(anyInt(), anyInt())).thenThrow(new RuntimeException("Some error message"));
+
+        mockMvc.perform(delete("/post/delete/{postId}", postId).header("Authorization", "Bearer dummyToken")
+				.contentType(MediaType.APPLICATION_JSON)
+        		.param("postId", Integer.toString(postId)))
+                .andExpect(status().isInternalServerError())
+                .andExpect(content().string("Some error message"));
+    }
 }

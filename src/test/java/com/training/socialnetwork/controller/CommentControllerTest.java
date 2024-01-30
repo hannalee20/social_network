@@ -2,6 +2,7 @@ package com.training.socialnetwork.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -10,9 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -24,30 +23,17 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.training.socialnetwork.dto.request.comment.CommentCreateDto;
-import com.training.socialnetwork.dto.request.user.CustomUserDetail;
-import com.training.socialnetwork.dto.request.user.UserLoginDto;
-import com.training.socialnetwork.dto.request.user.UserTokenDto;
 import com.training.socialnetwork.dto.response.comment.CommentCreatedDto;
 import com.training.socialnetwork.dto.response.comment.CommentDetailDto;
 import com.training.socialnetwork.dto.response.comment.CommentUpdatedDto;
 import com.training.socialnetwork.security.JwtUtils;
-import com.training.socialnetwork.security.OtpUtils;
 import com.training.socialnetwork.service.ICommentService;
-import com.training.socialnetwork.service.IUserService;
-import com.training.socialnetwork.service.impl.CustomUserDetailService;
 import com.training.socialnetwork.util.constant.Constant;
 import com.training.socialnetwork.utils.JSonHelper;
 
@@ -60,78 +46,21 @@ public class CommentControllerTest {
 	
 	@Autowired
 	private WebApplicationContext webApplicationContext;
-	
-	@MockBean
-	private JwtUtils jwtUtils;
-	
-	@MockBean
-	private OtpUtils otpUtils;
 
 	@MockBean
-	private ICommentService commentService;
+    private ICommentService commentService;
 
 	@MockBean
-	private AuthenticationManager authenticationManager;
+    private JwtUtils jwtUtils;
 
-	@MockBean
-	private Authentication authentication;
-
-	@MockBean
-	private UserDetails userDetails;
-
-	@MockBean
-	private IUserService userService;
-
-	@MockBean
-	private CustomUserDetailService customUserDetailService;
-
-	private String token;
-
-	@BeforeAll
+    @BeforeAll
 	void setUp() throws Exception {
-		mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-
-		UserLoginDto userLoginDto = new UserLoginDto();
-		userLoginDto.setUsername("test");
-		userLoginDto.setPassword("123456");
-		
-		int otp1 = 643876;
-		when(userService.loginUser(any(), any())).thenReturn(true);
-		when(otpUtils.generateOtp(any())).thenReturn(otp1);
-		String otpRequest = JSonHelper.toJson(userLoginDto).orElse("");
-		
-		MvcResult result = mockMvc.perform(post("/user/login")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(otpRequest))
-				.andExpect(status().isOk()).andReturn();
-		
-		String otp = result.getResponse().getContentAsString();
-		UserTokenDto userTokenDto = new UserTokenDto();
-		userTokenDto.setUsername("test");
-		userTokenDto.setPassword("123456");
-		
-		List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>(); 
-		authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-		
-		CustomUserDetail customUserDetail = new CustomUserDetail(1, "test", "123456", authorities);
-		userTokenDto.setOtp(Integer.valueOf(otp.substring(8, 14)));
-		
-		String request = JSonHelper.toJson(userTokenDto).orElse("");
-		token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzA2MjU5NjgyLCJleHAiOjE3MDYzNDYwODF9.sVl5ksy4pXHHU9Bdx41AoDzAvs9gc5v3-NlAJG8p7DQ";
-		when(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userTokenDto.getUsername(), userTokenDto.getPassword())))
-				.thenReturn(authentication);
-		when(authentication.getPrincipal()).thenReturn(customUserDetail);
-		when(otpUtils.getOtp(any())).thenReturn(otp1);
-		when(jwtUtils.generateToken(any())).thenReturn(token);
-		MvcResult tokenResult = mockMvc.perform(post("/user/token")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(request))
-				.andExpect(status().isOk()).andReturn();
-		token = tokenResult.getResponse().getContentAsString().substring(8, 133);
-	}
-
+    	mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+    }
+    
 	@Test
 	public void createCommentSuccess() throws Exception {
+		int userId = 1;
 		CommentCreateDto commentCreateDto = new CommentCreateDto();
 		commentCreateDto.setPostId(1);
 		commentCreateDto.setContent("create content");
@@ -147,16 +76,16 @@ public class CommentControllerTest {
 		commentCreatedDto.setContent("create content");
 		commentCreatedDto.setPhotoUrl("photo.png");
 
+		when(jwtUtils.getUserIdFromJwt(anyString())).thenReturn(userId);
 		when(commentService.createComment(anyInt(), any(), any())).thenReturn(commentCreatedDto);
-		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
-
+		
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.putIfAbsent("commentCreateDto", commentCreateDto);
 		requestBody.putIfAbsent("photo", photo);
 
 		String request = JSonHelper.toJson(requestBody).orElse("");
 
-		mockMvc.perform(post("/comment/create").header("AUTHORIZATION", "Bearer " + token)
+		mockMvc.perform(post("/comment/create").header("Authorization", "Bearer dummyToken")
 				.contentType(MediaType.MULTIPART_FORM_DATA).content(request)).andExpect(status().isCreated())
 				.andExpect(jsonPath("$.username").value(commentCreatedDto.getUsername()))
 				.andExpect(jsonPath("$.commentId").value(commentCreatedDto.getCommentId()))
@@ -175,7 +104,6 @@ public class CommentControllerTest {
 				"some data".getBytes());
 
 		when(commentService.createComment(anyInt(), any(), any())).thenThrow(new Exception());
-		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
 
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.putIfAbsent("commentCreateDto", commentCreateDto);
@@ -183,7 +111,7 @@ public class CommentControllerTest {
 
 		String request = JSonHelper.toJson(requestBody).orElse("");
 
-		mockMvc.perform(post("/comment/create").header("AUTHORIZATION", "Bearer " + token)
+		mockMvc.perform(post("/comment/create").header("Authorization", "Bearer dummyToken")
 				.contentType(MediaType.MULTIPART_FORM_DATA).content(request))
 				.andExpect(status().isInternalServerError());
 	}
@@ -193,9 +121,8 @@ public class CommentControllerTest {
 		int commentId = 1;
 
 		when(commentService.deleteComment(anyInt(), anyInt())).thenReturn(true);
-		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
 
-		mockMvc.perform(delete("/comment/delete/{commentId}", commentId).header("AUTHORIZATION", "Bearer " + token)
+		mockMvc.perform(delete("/comment/delete/{commentId}", commentId).header("Authorization", "Bearer dummyToken")
 				.contentType(MediaType.APPLICATION_JSON).param("commentId", Integer.toString(commentId)))
 				.andExpect(status().isOk()).andExpect(content().string(Constant.DELETE_SUCCESSFULLY));
 	}
@@ -205,9 +132,8 @@ public class CommentControllerTest {
 		int commentId = 1;
 
 		when(commentService.deleteComment(anyInt(), anyInt())).thenThrow(new Exception());
-		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
 
-		mockMvc.perform(delete("/comment/delete/{commentId}", commentId).header("AUTHORIZATION", "Bearer " + token)
+		mockMvc.perform(delete("/comment/delete/{commentId}", commentId).header("Authorization", "Bearer dummyToken")
 				.contentType(MediaType.APPLICATION_JSON).param("commentId", Integer.toString(commentId)))
 				.andExpect(status().isInternalServerError());
 	}
@@ -223,10 +149,9 @@ public class CommentControllerTest {
 		commentUpdatedDto.setPhotoUrl(photo1.getOriginalFilename());
 
 		when(commentService.updateComment(any(), any(), anyInt(), anyInt())).thenReturn(commentUpdatedDto);
-		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
 
 		mockMvc.perform(MockMvcRequestBuilders.multipart(HttpMethod.PUT, "/comment/update/{commentId}", 1).file(photo1)
-				.header("AUTHORIZATION", "Bearer " + token).contentType(MediaType.MULTIPART_FORM_DATA)
+				.header("Authorization", "Bearer dummyToken").contentType(MediaType.MULTIPART_FORM_DATA)
 				.param("content", content)).andExpect(status().isOk())
 				.andExpect(jsonPath("$.content").value(commentUpdatedDto.getContent()))
 				.andExpect(jsonPath("$.photoUrl").value(commentUpdatedDto.getPhotoUrl()));
@@ -239,10 +164,9 @@ public class CommentControllerTest {
 				"some xml".getBytes());
 
 		when(commentService.updateComment(any(), any(), anyInt(), anyInt())).thenThrow(new Exception());
-		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
 
 		mockMvc.perform(MockMvcRequestBuilders.multipart(HttpMethod.PUT, "/comment/update/{commentId}", 1).file(photo1)
-				.header("AUTHORIZATION", "Bearer " + token).contentType(MediaType.MULTIPART_FORM_DATA)
+				.header("Authorization", "Bearer dummyToken").contentType(MediaType.MULTIPART_FORM_DATA)
 				.param("content", content)).andExpect(status().isInternalServerError());
 	}
 
@@ -255,9 +179,8 @@ public class CommentControllerTest {
 		commentDetailDto.setPostId(1);
 
 		when(commentService.getCommentDetail(anyInt())).thenReturn(commentDetailDto);
-		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
 
-		mockMvc.perform(get("/comment/detail/{commentId}", 1).header("AUTHORIZATION", "Bearer " + token)
+		mockMvc.perform(get("/comment/detail/{commentId}", 1).header("Authorization", "Bearer dummyToken")
 				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
 				.andExpect(jsonPath("$.content").value(commentDetailDto.getContent()));
 	}

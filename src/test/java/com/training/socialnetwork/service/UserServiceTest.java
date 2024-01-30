@@ -1,5 +1,6 @@
 package com.training.socialnetwork.service;
 
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -41,6 +42,7 @@ import com.training.socialnetwork.repository.PostRepository;
 import com.training.socialnetwork.repository.RoleRepository;
 import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.impl.UserService;
+import com.training.socialnetwork.util.CustomException;
 import com.training.socialnetwork.util.constant.Constant;
 import com.training.socialnetwork.util.image.ImageUtils;
 import com.training.socialnetwork.util.mapper.ObjectMapper;
@@ -115,19 +117,45 @@ public class UserServiceTest {
 	}
 	
 	@Test
-	public void loginUserFail() throws Exception {
+	public void loginUserSuccess() throws Exception {
 		String username = "test";
 		String password = "123456";
 		
 		User user = new User();
 		user.setUserId(1);
 		user.setUsername("test");
-		user.setPassword("123456");
+		user.setPassword(bCryptPasswordEncoder.encode("123456"));
 		user.setEmail("test@gmail.com");
 		
 		when(userRepository.findByUsername(username)).thenReturn(user);
+		when(bCryptPasswordEncoder.matches(password, user.getPassword())).thenReturn(true);
+		
 		userService.loginUser(username, password);
 	}
+	
+	@Test
+    public void loginUserFail() throws Exception {
+        String username = "test";
+        String password = "654321";
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(bCryptPasswordEncoder.encode("123456"));
+
+        when(userRepository.findByUsername(username)).thenReturn(user);
+        when(bCryptPasswordEncoder.matches(password, user.getPassword())).thenReturn(false);
+
+        userService.loginUser(username, password);
+    }
+	
+	@Test
+    public void loginUserFail2() throws Exception {
+        String username = "nonexistentUser";
+        String password = "testPassword";
+
+        when(userRepository.findByUsername(username)).thenReturn(null);
+
+        assertThrows(CustomException.class, () -> userService.loginUser(username, password));
+    }
 	
 	@Test
 	public void updateInfoSuccess() throws Exception {
@@ -151,6 +179,41 @@ public class UserServiceTest {
 		
 		userService.updateInfo(userUpdateDto, avatar, 1, 1);
 	}
+	
+	@Test
+    public void updateInfoUserFail() throws Exception {
+        int userId = 1;
+        MockMultipartFile avatar =
+                new MockMultipartFile("data2", "filename2.jpg", "multipart/form-data", "some xml".getBytes());
+		UserUpdateDto userUpdateDto = new UserUpdateDto();
+		userUpdateDto.setRealName("Test");
+		userUpdateDto.setSex("female");
+		userUpdateDto.setAddress("Hanoi");
+
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        assertThrows(CustomException.class, () -> userService.updateInfo(userUpdateDto, avatar, 1, 1));
+    }
+	
+	@Test
+    public void testUpdateInfoForbidden() throws Exception {
+        int userId = 1;
+        int loggedInUserId = 2;
+        MockMultipartFile avatar =
+                new MockMultipartFile("data2", "filename2.jpg", "multipart/form-data", "some xml".getBytes());
+		UserUpdateDto userUpdateDto = new UserUpdateDto();
+		userUpdateDto.setRealName("Test");
+		userUpdateDto.setSex("female");
+		userUpdateDto.setAddress("Hanoi");
+        User userToUpdate = new User();
+        userToUpdate.setUserId(userId);
+        User loggedInUser = new User();
+        loggedInUser.setUserId(loggedInUserId);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(userToUpdate));
+        when(userRepository.findById(loggedInUserId)).thenReturn(Optional.of(loggedInUser));
+
+        assertThrows(CustomException.class, () -> userService.updateInfo(userUpdateDto, avatar, 1, 2));
+    }
 	
 	@Test
 	public void getInfoSuccess() throws Exception {
@@ -244,6 +307,15 @@ public class UserServiceTest {
 		userService.forgotPassword(email);
 	}
 	
+	 @Test
+	    public void getForgotPasswordFail() throws Exception {
+	        String email = "test1@gmail.com";
+
+	        when(userRepository.findByEmail(email)).thenReturn(null);
+
+	        assertThrows(CustomException.class, () -> userService.forgotPassword(email));
+	    }
+	
 	@Test
 	public void getReportUserSuccess() {
 		LocalDate date = LocalDate.now();
@@ -293,4 +365,15 @@ public class UserServiceTest {
 		
 		userService.resetPassword(token, newPassword);
 	}
+	
+	@Test
+    public void resetPasswordFail() {
+        String token = "invalidToken";
+        String newPassword = "newPassword";
+
+        when(userRepository.findByToken(token)).thenReturn(null);
+
+        assertThrows(CustomException.class, () -> userService.resetPassword(token, newPassword));
+    }
+	
 }
