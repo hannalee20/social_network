@@ -3,11 +3,11 @@ package com.training.socialnetwork.service.impl;
 import java.time.LocalDate;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -174,9 +174,13 @@ public class UserService implements IUserService {
 
 		List<Friend> friendList = friendRepository.findAllByUserId(userId);
 
-		List<UserSearchDto> userSearchList = userList.stream().map(user -> modelMapper.map(user, UserSearchDto.class))
-				.collect(Collectors.toList());
-
+		List<UserSearchDto> userSearchList = new ArrayList<>();
+//				userList.stream().map(user -> modelMapper.map(user, UserSearchDto.class))
+//				.collect(Collectors.toList());
+		for (User user : userList) {
+			UserSearchDto userSearchDto = modelMapper.map(user, UserSearchDto.class);
+			userSearchList.add(userSearchDto);
+		}
 		for (UserSearchDto user : userSearchList) {
 			user.setFriendStatus(Constant.NOT_FRIEND);
 			for (Friend friend : friendList) {

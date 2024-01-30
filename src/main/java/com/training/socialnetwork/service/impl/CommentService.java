@@ -54,9 +54,10 @@ public class CommentService implements ICommentService {
 			throw new CustomException(HttpStatus.NOT_FOUND, "Post does not exist");
 		}
 
-		Comment comment = modelMapper.map(commentCreateDto, Comment.class);
+		Comment comment = new Comment();
 		comment.setPost(post);
 		comment.setUser(user);
+		comment.setContent(commentCreateDto.getContent());
 		if (photo != null) {
 			String photoUrl = imageUtils.saveImage(photo);
 			comment.setPhotoUrl(photoUrl);

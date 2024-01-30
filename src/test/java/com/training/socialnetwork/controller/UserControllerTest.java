@@ -21,14 +21,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.transaction.Transactional;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -40,9 +36,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.training.socialnetwork.dto.request.user.CustomUserDetail;
@@ -58,23 +55,24 @@ import com.training.socialnetwork.dto.response.user.UserReportDto;
 import com.training.socialnetwork.dto.response.user.UserSearchDto;
 import com.training.socialnetwork.dto.response.user.UserUpdatedDto;
 import com.training.socialnetwork.entity.User;
+import com.training.socialnetwork.security.JwtUtils;
+import com.training.socialnetwork.security.OtpUtils;
 import com.training.socialnetwork.service.impl.CustomUserDetailService;
 import com.training.socialnetwork.service.impl.UserService;
 import com.training.socialnetwork.util.constant.Constant;
 import com.training.socialnetwork.utils.JSonHelper;
 
-@RunWith(SpringRunner.class)
 @WebMvcTest(UserController.class)
-//@SpringBootTest
-@AutoConfigureMockMvc
-@Transactional
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class UserControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;
-
+	
 	@Autowired
+	private WebApplicationContext webApplicationContext;
+
+	@MockBean
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 	
 	@MockBean
@@ -85,6 +83,12 @@ public class UserControllerTest {
 
 	@MockBean
 	private UserDetails userDetails;
+	
+	@MockBean
+	private JwtUtils jwtUtils;
+	
+	@MockBean
+	private OtpUtils otpUtils;
 
 	@MockBean
 	private UserService userService;
@@ -97,11 +101,15 @@ public class UserControllerTest {
 	@BeforeAll
 	void setUp() throws Exception {
 		this.bCryptPasswordEncoder = new BCryptPasswordEncoder();
+		mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+
 		UserLoginDto userLoginDto = new UserLoginDto();
 		userLoginDto.setUsername("test");
 		userLoginDto.setPassword("123456");
 		
-		when(userService.loginUser(userLoginDto.getUsername(), userLoginDto.getPassword())).thenReturn(true);
+		int otp1 = 643876;
+		when(userService.loginUser(any(), any())).thenReturn(true);
+		when(otpUtils.generateOtp(any())).thenReturn(otp1);
 		String otpRequest = JSonHelper.toJson(userLoginDto).orElse("");
 		
 		MvcResult result = mockMvc.perform(post("/user/login")
@@ -121,11 +129,12 @@ public class UserControllerTest {
 		userTokenDto.setOtp(Integer.valueOf(otp.substring(8, 14)));
 		
 		String request = JSonHelper.toJson(userTokenDto).orElse("");
-		
+		token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzA2MjU5NjgyLCJleHAiOjE3MDYzNDYwODF9.sVl5ksy4pXHHU9Bdx41AoDzAvs9gc5v3-NlAJG8p7DQ";
 		when(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userTokenDto.getUsername(), userTokenDto.getPassword())))
 				.thenReturn(authentication);
 		when(authentication.getPrincipal()).thenReturn(customUserDetail);
-		
+		when(otpUtils.getOtp(any())).thenReturn(otp1);
+		when(jwtUtils.generateToken(any())).thenReturn(token);
 		MvcResult tokenResult = mockMvc.perform(post("/user/token")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(request))
@@ -316,7 +325,7 @@ public class UserControllerTest {
 		userSearchList.add(userSearchDto2);
 		userSearchList.add(userSearchDto3);
 		
-		when(userService.searchUser(anyInt(), any(), null)).thenReturn(userSearchList);
+		when(userService.searchUser(anyInt(), any(), any())).thenReturn(userSearchList);
 		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
 		
 		mockMvc.perform(get("/user/search")
@@ -332,7 +341,7 @@ public class UserControllerTest {
 	public void searchUserFail() throws Exception {
 		String keyword = "test";
 		
-		when(userService.searchUser(anyInt(), any(), null)).thenThrow(new RuntimeException());
+		when(userService.searchUser(anyInt(), any(), any())).thenThrow(new RuntimeException());
 		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
 		
 		mockMvc.perform(get("/user/search")

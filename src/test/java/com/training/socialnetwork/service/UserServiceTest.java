@@ -16,18 +16,21 @@ import java.util.UUID;
 import javax.transaction.Transactional;
 
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.training.socialnetwork.dto.request.user.UserRegisterDto;
 import com.training.socialnetwork.dto.request.user.UserUpdateDto;
 import com.training.socialnetwork.dto.response.user.UserDetailDto;
+import com.training.socialnetwork.dto.response.user.UserRegistedDto;
 import com.training.socialnetwork.dto.response.user.UserReportDto;
+import com.training.socialnetwork.dto.response.user.UserSearchDto;
 import com.training.socialnetwork.entity.Friend;
 import com.training.socialnetwork.entity.Role;
 import com.training.socialnetwork.entity.User;
@@ -39,40 +42,45 @@ import com.training.socialnetwork.repository.RoleRepository;
 import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.impl.UserService;
 import com.training.socialnetwork.util.constant.Constant;
+import com.training.socialnetwork.util.image.ImageUtils;
 import com.training.socialnetwork.util.mapper.ObjectMapper;
 
-//@ExtendWith(MockitoExtension.class)
-@RunWith(SpringRunner.class)
-@SpringBootTest
-//@AutoConfigureMockMvc
+@ExtendWith(MockitoExtension.class)
+@DataJpaTest
 @Transactional
 public class UserServiceTest {
 
-	@Autowired
+	@InjectMocks
 	private UserService userService;
 	
-	@Autowired
+	@Mock
 	private ObjectMapper objectMapper;
 	
-	@Autowired
+	@Mock
 	private ModelMapper modelMapper;
 	
-	@MockBean
+	@Mock
+	private BCryptPasswordEncoder bCryptPasswordEncoder;
+	
+	@Mock
+	private ImageUtils imageUtils;
+	
+	@Mock
 	private UserRepository userRepository;
 	
-	@MockBean
+	@Mock
 	private RoleRepository roleRepository;
 	
-	@MockBean
+	@Mock
 	private FriendRepository friendRepository;
 	
-	@MockBean
+	@Mock
 	private PostRepository postRepository;
 	
-	@MockBean
+	@Mock
 	private LikeRepository likeRepository;
 	
-	@MockBean
+	@Mock
 	private CommentRepository commentRepository;
 	
 	@Test
@@ -95,11 +103,15 @@ public class UserServiceTest {
 		user.setCreateDate(new Date());
 		user.setUpdateDate(new Date());
 		
-		when(userRepository.findByUsernameOrEmail(userRegisterDto.getUsername(), userRegisterDto.getEmail())).thenReturn(null);
-		when(roleRepository.findByName(Constant.ROLE_USER)).thenReturn(role);
-		when(userRepository.save(any())).thenReturn(user);
+		UserRegistedDto userRegistedDto = new UserRegistedDto();
 		
-		userService.createUser(userRegisterDto);
+		when(userRepository.findByEmail(any())).thenReturn(null);
+		when(userRepository.findByUsername(any())).thenReturn(null);
+		when(roleRepository.findByName(any())).thenReturn(role);
+		when(userRepository.save(any())).thenReturn(user);
+		when(modelMapper.map(any(), any())).thenReturn(userRegistedDto);
+		
+		userRegistedDto = userService.createUser(userRegisterDto);
 	}
 	
 	@Test
@@ -152,10 +164,9 @@ public class UserServiceTest {
 		user.setAddress("Hanoi");
 		
 		UserDetailDto userDetailDto = new UserDetailDto();
-		modelMapper.map(user, userDetailDto);
-		userDetailDto.setGender(Constant.MALE);
 		
 		when(userRepository.findById(1)).thenReturn(Optional.of(user));
+		when(modelMapper.map(any(), any())).thenReturn(userDetailDto);
 		
 		userService.getInfo(1);
 	}
@@ -203,9 +214,10 @@ public class UserServiceTest {
 		friendList.add(friend);
 		
 		String keyword = "test";
-		
+		UserSearchDto userSearchDto = new UserSearchDto();
 		when(userRepository.findAllUserByKeyword(3, keyword)).thenReturn(userList);
 		when(friendRepository.findAllByUserId(3)).thenReturn(friendList);
+		when(modelMapper.map(any(), any())).thenReturn(userSearchDto);
 		
 		userService.searchUser(3, keyword, null);
 	}

@@ -5,15 +5,23 @@ import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 
+import javax.transaction.Transactional;
+
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+import org.modelmapper.ModelMapper;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import com.training.socialnetwork.dto.request.comment.CommentCreateDto;
+import com.training.socialnetwork.dto.response.comment.CommentCreatedDto;
+import com.training.socialnetwork.dto.response.comment.CommentDetailDto;
+import com.training.socialnetwork.dto.response.comment.CommentUpdatedDto;
 import com.training.socialnetwork.entity.Comment;
 import com.training.socialnetwork.entity.Post;
 import com.training.socialnetwork.entity.User;
@@ -24,23 +32,28 @@ import com.training.socialnetwork.service.impl.CommentService;
 import com.training.socialnetwork.util.constant.Constant;
 import com.training.socialnetwork.util.image.ImageUtils;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
+@DataJpaTest
+@Transactional
 public class CommentServiceTest {
 
-	@Autowired
+	@InjectMocks
 	private CommentService commentService;
 	
-	@Autowired
+	@Mock
 	private ImageUtils imageUtils;
 	
-	@MockBean
+	@Mock
+	private ModelMapper modelMapper;
+	
+	@Mock
 	private CommentRepository commentRepository;
 	
-	@MockBean
+	@Mock
 	private UserRepository userRepository;
 
-	@MockBean
+	@Mock
 	private PostRepository postRepository;
 	
 	@Test
@@ -62,20 +75,21 @@ public class CommentServiceTest {
 		
 		MockMultipartFile photo1 =
                 new MockMultipartFile("data1", "filename1.jpg", "multipart/form-data", "some xml".getBytes());
-		
-		when(postRepository.findById(any())).thenReturn(Optional.of(post));
-		when(userRepository.findById(any())).thenReturn(Optional.of(user));
-		
 		Comment comment = new Comment();
 		comment.setPost(post);
 		comment.setUser(user);
 		comment.setContent("comment content");
 		comment.setPhotoUrl(imageUtils.saveImage(photo1));
 		
-		when(commentRepository.save(any())).thenReturn(comment);
-		commentService.createComment(userId, commentCreateDto, photo1);
+		when(postRepository.findById(any())).thenReturn(Optional.of(post));
+		when(userRepository.findById(any())).thenReturn(Optional.of(user));
 		
-//		verify(commentRepository).save(any());
+		CommentCreatedDto commentCreatedDto = new CommentCreatedDto();
+		
+		when(commentRepository.save(any())).thenReturn(comment);
+		when(modelMapper.map(any(), any())).thenReturn(commentCreatedDto);
+		
+		commentService.createComment(userId, commentCreateDto, photo1);
 	}
 	
 	@Test
@@ -102,10 +116,13 @@ public class CommentServiceTest {
 		comment.setContent("comment update content");
 		comment.setPhotoUrl(imageUtils.saveImage(photo1));
 		
+		CommentUpdatedDto commentUpdatedDto = new CommentUpdatedDto();
+		
 		when(commentRepository.findById(any())).thenReturn(Optional.of(comment));
 		when(postRepository.findById(any())).thenReturn(Optional.of(post));
 		when(userRepository.findById(any())).thenReturn(Optional.of(user));
 		when(commentRepository.save(any())).thenReturn(comment);
+		when(modelMapper.map(any(), any())).thenReturn(commentUpdatedDto);
 		
 		commentService.updateComment(content, photo1, commentId, userId);
 	}
@@ -147,7 +164,9 @@ public class CommentServiceTest {
 		comment.setCommentId(1);
 		comment.setContent("comment content");
 		
+		CommentDetailDto commentDetailDto = new CommentDetailDto();
 		when(commentRepository.findById(any())).thenReturn(Optional.of(comment));
+		when(modelMapper.map(any(), any())).thenReturn(commentDetailDto);
 		
 		commentService.getCommentDetail(commentId);
 	}

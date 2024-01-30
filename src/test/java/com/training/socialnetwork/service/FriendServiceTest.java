@@ -8,12 +8,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import javax.transaction.Transactional;
+
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import com.training.socialnetwork.entity.Friend;
 import com.training.socialnetwork.entity.User;
@@ -22,17 +24,18 @@ import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.impl.FriendService;
 import com.training.socialnetwork.util.constant.Constant;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
+@DataJpaTest
+@Transactional
 public class FriendServiceTest {
 
-	@Autowired
+	@InjectMocks
 	private FriendService friendService;
 
-	@MockBean
+	@Mock
 	private FriendRepository friendRepository;
 
-	@MockBean
+	@Mock
 	private UserRepository userRepository;
 
 	@Test

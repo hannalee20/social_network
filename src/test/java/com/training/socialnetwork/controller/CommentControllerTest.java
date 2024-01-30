@@ -15,15 +15,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.transaction.Transactional;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -34,10 +30,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import com.training.socialnetwork.dto.request.comment.CommentCreateDto;
 import com.training.socialnetwork.dto.request.user.CustomUserDetail;
@@ -46,21 +43,29 @@ import com.training.socialnetwork.dto.request.user.UserTokenDto;
 import com.training.socialnetwork.dto.response.comment.CommentCreatedDto;
 import com.training.socialnetwork.dto.response.comment.CommentDetailDto;
 import com.training.socialnetwork.dto.response.comment.CommentUpdatedDto;
+import com.training.socialnetwork.security.JwtUtils;
+import com.training.socialnetwork.security.OtpUtils;
 import com.training.socialnetwork.service.ICommentService;
 import com.training.socialnetwork.service.IUserService;
 import com.training.socialnetwork.service.impl.CustomUserDetailService;
 import com.training.socialnetwork.util.constant.Constant;
 import com.training.socialnetwork.utils.JSonHelper;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@AutoConfigureMockMvc
-@Transactional
+@WebMvcTest(CommentController.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CommentControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;
+	
+	@Autowired
+	private WebApplicationContext webApplicationContext;
+	
+	@MockBean
+	private JwtUtils jwtUtils;
+	
+	@MockBean
+	private OtpUtils otpUtils;
 
 	@MockBean
 	private ICommentService commentService;
@@ -84,37 +89,43 @@ public class CommentControllerTest {
 
 	@BeforeAll
 	void setUp() throws Exception {
+		mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+
 		UserLoginDto userLoginDto = new UserLoginDto();
 		userLoginDto.setUsername("test");
 		userLoginDto.setPassword("123456");
-
-		when(userService.loginUser(userLoginDto.getUsername(), userLoginDto.getPassword())).thenReturn(true);
+		
+		int otp1 = 643876;
+		when(userService.loginUser(any(), any())).thenReturn(true);
+		when(otpUtils.generateOtp(any())).thenReturn(otp1);
 		String otpRequest = JSonHelper.toJson(userLoginDto).orElse("");
-
-		MvcResult result = mockMvc
-				.perform(post("/user/login").contentType(MediaType.APPLICATION_JSON).content(otpRequest))
+		
+		MvcResult result = mockMvc.perform(post("/user/login")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(otpRequest))
 				.andExpect(status().isOk()).andReturn();
-
+		
 		String otp = result.getResponse().getContentAsString();
 		UserTokenDto userTokenDto = new UserTokenDto();
 		userTokenDto.setUsername("test");
 		userTokenDto.setPassword("123456");
-
-		List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+		
+		List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>(); 
 		authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-
+		
 		CustomUserDetail customUserDetail = new CustomUserDetail(1, "test", "123456", authorities);
 		userTokenDto.setOtp(Integer.valueOf(otp.substring(8, 14)));
-
+		
 		String request = JSonHelper.toJson(userTokenDto).orElse("");
-
-		when(authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(userTokenDto.getUsername(), userTokenDto.getPassword())))
+		token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzA2MjU5NjgyLCJleHAiOjE3MDYzNDYwODF9.sVl5ksy4pXHHU9Bdx41AoDzAvs9gc5v3-NlAJG8p7DQ";
+		when(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userTokenDto.getUsername(), userTokenDto.getPassword())))
 				.thenReturn(authentication);
 		when(authentication.getPrincipal()).thenReturn(customUserDetail);
-
-		MvcResult tokenResult = mockMvc
-				.perform(post("/user/token").contentType(MediaType.APPLICATION_JSON).content(request))
+		when(otpUtils.getOtp(any())).thenReturn(otp1);
+		when(jwtUtils.generateToken(any())).thenReturn(token);
+		MvcResult tokenResult = mockMvc.perform(post("/user/token")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(request))
 				.andExpect(status().isOk()).andReturn();
 		token = tokenResult.getResponse().getContentAsString().substring(8, 133);
 	}

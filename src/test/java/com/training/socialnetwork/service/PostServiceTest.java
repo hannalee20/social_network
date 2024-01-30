@@ -8,14 +8,21 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.junit4.SpringRunner;
+import javax.transaction.Transactional;
 
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.mock.web.MockMultipartFile;
+
+import com.training.socialnetwork.dto.response.post.PostCreatedDto;
+import com.training.socialnetwork.dto.response.post.PostDetailDto;
+import com.training.socialnetwork.dto.response.post.PostListDto;
+import com.training.socialnetwork.dto.response.post.PostUpdatedDto;
 import com.training.socialnetwork.entity.Comment;
 import com.training.socialnetwork.entity.Like;
 import com.training.socialnetwork.entity.Photo;
@@ -26,21 +33,29 @@ import com.training.socialnetwork.repository.PostRepository;
 import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.impl.PostService;
 import com.training.socialnetwork.util.constant.Constant;
+import com.training.socialnetwork.util.image.ImageUtils;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
+@DataJpaTest
+@Transactional
 public class PostServiceTest {
 
-	@Autowired
+	@InjectMocks
 	private PostService postService;
 	
-	@MockBean
+	@Mock
+	private ModelMapper modelMapper;
+	
+	@Mock
+	private ImageUtils imageUtils;
+	
+	@Mock
 	private PostRepository postRepository;
 	
-	@MockBean
+	@Mock
 	private UserRepository userRepository;
 	
-	@MockBean
+	@Mock
 	private PhotoRepository photoRepository;
 	
 	@Test
@@ -74,8 +89,11 @@ public class PostServiceTest {
 		photo.setName("data1");
 		photo.setCreateDate(new Date());
 		
+		PostCreatedDto postCreatedDto = new PostCreatedDto();
+		
 		when(photoRepository.save(any())).thenReturn(photo);
 		when(postRepository.save(any())).thenReturn(post);
+		when(modelMapper.map(any(), any())).thenReturn(postCreatedDto);
 		
 		postService.createPost(userId, content, photos);
 	}
@@ -148,8 +166,10 @@ public class PostServiceTest {
 		postList.add(post1);
 		postList.add(post2);
 		
-		when(postRepository.findAllByUserId(1, null)).thenReturn(postList);
+		PostListDto postListDto = new PostListDto();
 		
+		when(postRepository.findAllByUserId(1, null)).thenReturn(postList);
+		when(modelMapper.map(any(), any())).thenReturn(postListDto);
 		postService.getTimeline(userId, null);
 	}
 	
@@ -197,8 +217,10 @@ public class PostServiceTest {
 		post1.setLikeList(likeList1);
 		post1.setCommentList(commentList1);
 		
-		when(postRepository.findById(postId)).thenReturn(Optional.of(post1));
+		PostDetailDto postDetailDto = new PostDetailDto();
 		
+		when(postRepository.findById(postId)).thenReturn(Optional.of(post1));
+		when(modelMapper.map(any(), any())).thenReturn(postDetailDto);
 		postService.getPost(postId);
 	}
 	
@@ -234,8 +256,11 @@ public class PostServiceTest {
 		photo.setName("data1");
 		photo.setCreateDate(new Date());
 		
+		PostUpdatedDto postUpdatedDto = new PostUpdatedDto();
+		
 		when(photoRepository.save(any())).thenReturn(photo);
 		when(postRepository.save(any())).thenReturn(post1);
+		when(modelMapper.map(any(), any())).thenReturn(postUpdatedDto);
 		
 		postService.updatePost(content, photos, postId, userId);
 	}
