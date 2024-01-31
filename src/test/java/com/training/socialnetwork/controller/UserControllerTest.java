@@ -206,12 +206,40 @@ public class UserControllerTest {
 	}
 	
 	@Test
+    public void testGetToken_Failure() throws Exception {
+		UserTokenDto userTokenDto = new UserTokenDto();
+		userTokenDto.setUsername("test");
+		userTokenDto.setPassword("123456");
+		userTokenDto.setOtp(123456);
+		
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(null);
+        when(otpUtils.getOtp(anyString())).thenReturn(123456);
+
+        String request = JSonHelper.toJson(userTokenDto).orElse("");
+        
+        mockMvc.perform(post("/user/token")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(request))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(Constant.INVALID));
+    }
+	
+	@Test
 	public void getUserInfoSuccess() throws Exception {
 		int userId = 1;
 		UserDetailDto userDetailDto = new UserDetailDto();
 		userDetailDto.setUserId(1);
+		userDetailDto.setUsername("test");
 		userDetailDto.setRealName("Test");
 		userDetailDto.setGender("female");
+		userDetailDto.setBirthDate(new Date());
+		userDetailDto.setEmail("test");
+		userDetailDto.setAddress("hanoi");
+		userDetailDto.setJob("developer");
+		userDetailDto.setUniversity("test");
+		userDetailDto.setAvatarUrl("test");
+		userDetailDto.setStatus("test");
+		userDetailDto.setAbout("");
 		
 		when(userService.getInfo(anyInt())).thenReturn(userDetailDto);
 		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
@@ -249,12 +277,25 @@ public class UserControllerTest {
 		UserUpdateDto userUpdateDto = new UserUpdateDto();
 		userUpdateDto.setBirthDate(new Date());
 		userUpdateDto.setAddress("HCM");
+		userUpdateDto.setUniversity("test");
+		userUpdateDto.setJob("test");
+		userUpdateDto.setStatus("test");
+		userUpdateDto.setAbout("");
 		
 		MultipartFile avatar = new MockMultipartFile("data2", "filename2.jpg", "multipart/form-data", "some xml".getBytes());
 		
 		UserUpdatedDto userUpdatedDto = new UserUpdatedDto();
+		userUpdatedDto.setUserId(1);
+		userUpdatedDto.setBirthDate(new Date());
+		userUpdatedDto.setGender(1);
+		userUpdatedDto.setEmail("test");
+		userUpdatedDto.setRealName("test");
 		userUpdatedDto.setAddress("hanoi");
 		userUpdatedDto.setJob("developer");
+		userUpdatedDto.setUniversity("test");
+		userUpdatedDto.setAvatarUrl("test");
+		userUpdatedDto.setStatus("test");
+		userUpdatedDto.setAbout("");
 		
 		when(userService.updateInfo(any(), any(), anyInt(), anyInt())).thenReturn(userUpdatedDto);
 		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);

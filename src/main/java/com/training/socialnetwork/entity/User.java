@@ -57,9 +57,6 @@ public class User {
 	@Column
 	private String avatarUrl;
 
-//	@ManyToMany
-//	@JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-//	private Set<Role> roles = new HashSet<>();
 	@ManyToOne
 	@JoinColumn(name = "roleId")
 	private Role role;

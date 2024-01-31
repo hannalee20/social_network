@@ -1,6 +1,8 @@
 package com.training.socialnetwork.service;
 
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -32,6 +34,7 @@ import com.training.socialnetwork.repository.PhotoRepository;
 import com.training.socialnetwork.repository.PostRepository;
 import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.impl.PostService;
+import com.training.socialnetwork.util.CustomException;
 import com.training.socialnetwork.util.constant.Constant;
 import com.training.socialnetwork.util.image.ImageUtils;
 
@@ -97,6 +100,17 @@ public class PostServiceTest {
 		
 		postService.createPost(userId, content, photos);
 	}
+	
+	@Test
+    void createPostFail() {
+        int userId = 1;
+        String content = "Test Content";
+
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        assertThrows(CustomException.class, () -> postService.createPost(userId, content, null));
+    }
+
 	
 	@Test
 	public void getTimelineSuccess() {
@@ -225,6 +239,15 @@ public class PostServiceTest {
 	}
 	
 	@Test
+    void getPostFail() {
+        int postId = 1;
+
+        when(postRepository.findById(postId)).thenReturn(Optional.empty());
+
+        assertThrows(CustomException.class, () -> postService.getPost(postId));
+    }
+	
+	@Test
 	public void updatePostSuccess() throws Exception {
 		String content = "content update post";
 		int userId = 1;
@@ -266,6 +289,37 @@ public class PostServiceTest {
 	}
 	
 	@Test
+    void updatePostFail() {
+        int userId = 1;
+        int postId = 2;
+        String content = "Updated Content";
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(new User()));
+        when(postRepository.findById(postId)).thenReturn(Optional.empty());
+
+        assertThrows(CustomException.class, () -> postService.updatePost(content, null, postId, userId));
+    }
+	
+	@Test
+    void updatePostFail2() {
+        int userId = 1;
+        int postId = 2;
+        String content = "Updated Content";
+
+        User user = new User();
+        user.setUserId(userId);
+
+        Post postToUpdate = new Post();
+        postToUpdate.setPostId(postId);
+        postToUpdate.setUser(new User());
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(postRepository.findById(postId)).thenReturn(Optional.of(postToUpdate));
+
+        assertThrows(CustomException.class, () -> postService.updatePost(content, null, postId, userId));
+    }
+	
+	@Test
 	public void deletePostSuccess() throws Exception {
 		int userId = 1;
 		int postId = 1;
@@ -285,4 +339,31 @@ public class PostServiceTest {
 		
 		postService.deletePost(postId, userId);
 	}
+	
+	@Test
+    void deletePostFail() {
+        int userId = 1;
+        int postId = 2;
+
+        User user = new User();
+        user.setUserId(2);
+
+        Post postToUpdate = new Post();
+        postToUpdate.setPostId(postId);
+        postToUpdate.setUser(user);
+
+        when(postRepository.findById(anyInt())).thenReturn(Optional.of(postToUpdate));
+
+        assertThrows(CustomException.class, () -> postService.deletePost(postId, userId));
+    }
+	
+	@Test
+    void deletePostFail2() {
+        int userId = 1;
+        int postId = 2;
+
+        when(postRepository.findById(postId)).thenReturn(Optional.empty());
+
+        assertThrows(CustomException.class, () -> postService.deletePost(postId, userId));
+    }
 }

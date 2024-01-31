@@ -12,7 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -145,6 +145,12 @@ public class PostControllerTest {
 	@Test
 	public void getPostDetailSuccess() throws Exception {
 		PostDetailDto postDetailDto = new PostDetailDto();
+		postDetailDto.setPostId(1);
+		postDetailDto.setUserId(1);
+		postDetailDto.setUsername("test");
+		postDetailDto.setContent("content");
+		postDetailDto.setPhotoUrl("test");
+		postDetailDto.setCreateDate(new Date());
 
 		when(postService.getPost(anyInt())).thenReturn(postDetailDto);
 
@@ -175,6 +181,11 @@ public class PostControllerTest {
 				"some xml".getBytes());
 
 		PostUpdatedDto postUpdatedDto = new PostUpdatedDto();
+		postUpdatedDto.setPostId(1);
+		postUpdatedDto.setUserId(1);
+		postUpdatedDto.setUsername("test");
+		postUpdatedDto.setContent(content);
+		postUpdatedDto.setUpdateDate(new Date());
 
 		when(postService.updatePost(any(), any(), anyInt(), anyInt())).thenReturn(postUpdatedDto);
 

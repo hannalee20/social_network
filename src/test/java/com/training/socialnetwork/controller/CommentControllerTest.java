@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -145,8 +146,12 @@ public class CommentControllerTest {
 				"some xml".getBytes());
 
 		CommentUpdatedDto commentUpdatedDto = new CommentUpdatedDto();
+		commentUpdatedDto.setCommentId(1);
+		commentUpdatedDto.setPostId(1);
+		commentUpdatedDto.setUserId(1);
 		commentUpdatedDto.setContent(content);
 		commentUpdatedDto.setPhotoUrl(photo1.getOriginalFilename());
+		commentUpdatedDto.setUpdateDate(new Date());
 
 		when(commentService.updateComment(any(), any(), anyInt(), anyInt())).thenReturn(commentUpdatedDto);
 
@@ -177,11 +182,26 @@ public class CommentControllerTest {
 		commentDetailDto.setCommentId(1);
 		commentDetailDto.setUserId(1);
 		commentDetailDto.setPostId(1);
+		commentDetailDto.setPhotoUrl("test");
 
 		when(commentService.getCommentDetail(anyInt())).thenReturn(commentDetailDto);
 
 		mockMvc.perform(get("/comment/detail/{commentId}", 1).header("Authorization", "Bearer dummyToken")
 				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
 				.andExpect(jsonPath("$.content").value(commentDetailDto.getContent()));
+	}
+	
+	@Test
+	public void getCommentDetailFail() throws Exception {
+		CommentDetailDto commentDetailDto = new CommentDetailDto();
+		commentDetailDto.setContent("comment content");
+		commentDetailDto.setCommentId(1);
+		commentDetailDto.setUserId(1);
+		commentDetailDto.setPostId(1);
+
+		when(commentService.getCommentDetail(anyInt())).thenThrow(new Exception());
+
+		mockMvc.perform(get("/comment/detail/{commentId}", 1).header("Authorization", "Bearer dummyToken")
+				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isInternalServerError());
 	}
 }

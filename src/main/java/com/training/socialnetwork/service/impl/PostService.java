@@ -153,7 +153,7 @@ public class PostService implements IPostService {
 		User user = userRepository.findById(userId).orElse(null);
 		Post postToUpdate = postRepository.findById(postId).orElse(null);
 
-		if (postToUpdate == null || user.getUserId() != postToUpdate.getUser().getUserId()) {
+		if (postToUpdate == null) {
 			throw new CustomException(HttpStatus.NOT_FOUND, "Post does not exist");
 		}
 		
@@ -193,6 +193,10 @@ public class PostService implements IPostService {
 	@Override
 	public boolean deletePost(int postId, int userId) throws Exception {
 		Post post = postRepository.findById(postId).orElse(null);
+		
+		if(post == null) {
+			throw new CustomException(HttpStatus.NOT_FOUND, "Post does not exist");
+		}
 		
 		if (post.getUser().getUserId() != userId) {
 			throw new CustomException(HttpStatus.FORBIDDEN, "You do not have permission to update");

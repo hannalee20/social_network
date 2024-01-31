@@ -2,6 +2,7 @@ package com.training.socialnetwork.service;
 
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
@@ -115,6 +116,46 @@ public class UserServiceTest {
 		
 		userRegistedDto = userService.createUser(userRegisterDto);
 	}
+	
+	@Test
+    public void createUserFalse() throws Exception {
+		UserRegisterDto userRegisterDto = new UserRegisterDto();
+		userRegisterDto.setUsername("test");
+		userRegisterDto.setPassword("123456");
+		userRegisterDto.setEmail("test@gmail.com");
+		
+		User user = new User();
+		user.setUserId(1);
+		user.setUsername("test");
+		user.setPassword("123456");
+		user.setEmail("test@gmail.com");
+		user.setCreateDate(new Date());
+		user.setUpdateDate(new Date());
+		
+        when(userRepository.findByEmail(anyString())).thenReturn(user);
+
+        assertThrows(CustomException.class, () -> userService.createUser(userRegisterDto));
+    }
+	
+	@Test
+    public void createUserFalse2() throws Exception {
+		UserRegisterDto userRegisterDto = new UserRegisterDto();
+		userRegisterDto.setUsername("test");
+		userRegisterDto.setPassword("123456");
+		userRegisterDto.setEmail("test@gmail.com");
+		
+		User user = new User();
+		user.setUserId(1);
+		user.setUsername("test");
+		user.setPassword("123456");
+		user.setEmail("test@gmail.com");
+		user.setCreateDate(new Date());
+		user.setUpdateDate(new Date());
+		
+        when(userRepository.findByUsername(anyString())).thenReturn(user);
+
+        assertThrows(CustomException.class, () -> userService.createUser(userRegisterDto));
+    }
 	
 	@Test
 	public void loginUserSuccess() throws Exception {
@@ -232,6 +273,41 @@ public class UserServiceTest {
 		when(modelMapper.map(any(), any())).thenReturn(userDetailDto);
 		
 		userService.getInfo(1);
+	}
+	
+	@Test
+	public void getInfoSuccess2() throws Exception {
+		User user = new User();
+		user.setUserId(1);
+		user.setUsername("test");
+		user.setPassword("123456");
+		user.setEmail("test@gmail.com");
+		user.setGender(1);
+		user.setBirthDate(new Date());
+		user.setAddress("Hanoi");
+		
+		UserDetailDto userDetailDto = new UserDetailDto();
+		
+		when(userRepository.findById(1)).thenReturn(Optional.of(user));
+		when(modelMapper.map(any(), any())).thenReturn(userDetailDto);
+		
+		userService.getInfo(1);
+	}
+	
+	@Test
+	public void getInfoFail() throws Exception {
+		User user = new User();
+		user.setUserId(1);
+		user.setUsername("test");
+		user.setPassword("123456");
+		user.setEmail("test@gmail.com");
+		user.setGender(1);
+		user.setBirthDate(new Date());
+		user.setAddress("Hanoi");
+		
+		when(userRepository.findById(1)).thenReturn(Optional.empty());
+		
+		assertThrows(CustomException.class, () -> userService.getInfo(1));
 	}
 	
 	@Test

@@ -12,16 +12,6 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 @Configuration
 public class SwaggerConfig {
 
-//	@Bean
-//	public Docket booksApi() {
-//		return new Docket(DocumentationType.SWAGGER_2).apiInfo(apiInfo()).select().apis(RequestHandlerSelectors.any())
-//				.paths(PathSelectors.regex("/.*")).build();
-//	}
-//
-//	private ApiInfo apiInfo() {
-//		return new ApiInfoBuilder().title("blah").description("blah.").termsOfServiceUrl("http://www.blah.com.au")
-//				.build();
-//	}
     private SecurityScheme createAPIKeyScheme() {
         return new SecurityScheme().type(SecurityScheme.Type.HTTP)
                 .bearerFormat("JWT")
