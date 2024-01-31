@@ -2,6 +2,8 @@ package com.training.socialnetwork.dto.request.user;
 
 import java.io.Serializable;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
@@ -10,12 +12,20 @@ import com.training.socialnetwork.util.constant.Constant;
 public class UserRegisterDto implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	private String username;
-	private String password;
-	private String email;
-
 	@Pattern(regexp = "^([a-zA-Z0-9]+)$")
 	@Size(min = 4, max = 16, message = Constant.INVALID_USERNAME_OR_PASSWORD)
+	@NotBlank
+	private String username;
+
+	@Pattern(regexp = "^([a-zA-Z0-9]+)$")
+	@Size(min = 6, max = 16, message = Constant.INVALID)
+	@NotBlank
+	private String password;
+
+	@Email
+	@NotBlank
+	private String email;
+
 	public String getUsername() {
 		return username;
 	}
@@ -24,7 +34,6 @@ public class UserRegisterDto implements Serializable {
 		this.username = username;
 	}
 
-	@Size(min = 4, max = 16, message = Constant.INVALID_USERNAME_OR_PASSWORD)
 	public String getPassword() {
 		return password;
 	}
@@ -33,7 +42,6 @@ public class UserRegisterDto implements Serializable {
 		this.password = password;
 	}
 
-	@Pattern(regexp = "^[A-Za-z0-9+_.-]+@(.+)$", message = Constant.INVALID_EMAIL)
 	public String getEmail() {
 		return email;
 	}

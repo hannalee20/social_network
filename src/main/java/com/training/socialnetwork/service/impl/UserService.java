@@ -36,8 +36,8 @@ import com.training.socialnetwork.repository.PostRepository;
 import com.training.socialnetwork.repository.RoleRepository;
 import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.IUserService;
-import com.training.socialnetwork.util.CustomException;
 import com.training.socialnetwork.util.constant.Constant;
+import com.training.socialnetwork.util.exception.CustomException;
 import com.training.socialnetwork.util.image.ImageUtils;
 import com.training.socialnetwork.util.mapper.ObjectMapper;
 
@@ -132,8 +132,8 @@ public class UserService implements IUserService {
 			throw new CustomException(HttpStatus.FORBIDDEN, "You do not have permission to update");
 		}
 
-		if (userUpdateDto.getSex() != null) {
-			if (userUpdateDto.getSex().toUpperCase().equals(Constant.MALE)) {
+		if (userUpdateDto.getGender() != null) {
+			if (userUpdateDto.getGender().toUpperCase().equals(Constant.MALE)) {
 				userToUpdate.setGender(Constant.NUMBER_0);
 			} else {
 				userToUpdate.setGender(Constant.NUMBER_1);
@@ -146,9 +146,12 @@ public class UserService implements IUserService {
 			userToUpdate.setAvatarUrl(avatarUrl);
 		}
 		userToUpdate.setUpdateDate(new Date());
-		User userUpdated = userRepository.save(userToUpdate);
+		userToUpdate = userRepository.save(userToUpdate);
 
-		return modelMapper.map(userUpdated, UserUpdatedDto.class);
+		UserUpdatedDto userUpdatedDto = modelMapper.map(userToUpdate, UserUpdatedDto.class);
+		userUpdatedDto.setGender(userUpdateDto.getGender().toLowerCase());
+		
+		return userUpdatedDto;
 	}
 
 	@Override

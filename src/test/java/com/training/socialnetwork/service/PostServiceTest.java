@@ -34,8 +34,8 @@ import com.training.socialnetwork.repository.PhotoRepository;
 import com.training.socialnetwork.repository.PostRepository;
 import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.impl.PostService;
-import com.training.socialnetwork.util.CustomException;
 import com.training.socialnetwork.util.constant.Constant;
+import com.training.socialnetwork.util.exception.CustomException;
 import com.training.socialnetwork.util.image.ImageUtils;
 
 @ExtendWith(MockitoExtension.class)

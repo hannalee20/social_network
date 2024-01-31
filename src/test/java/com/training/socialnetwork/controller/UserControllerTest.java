@@ -287,7 +287,7 @@ public class UserControllerTest {
 		UserUpdatedDto userUpdatedDto = new UserUpdatedDto();
 		userUpdatedDto.setUserId(1);
 		userUpdatedDto.setBirthDate(new Date());
-		userUpdatedDto.setGender(1);
+		userUpdatedDto.setGender("female");
 		userUpdatedDto.setEmail("test");
 		userUpdatedDto.setRealName("test");
 		userUpdatedDto.setAddress("hanoi");

@@ -1,4 +1,4 @@
-package com.training.socialnetwork.util;
+package com.training.socialnetwork.util.exception;
 
 import org.springframework.http.HttpStatus;
 

@@ -82,8 +82,7 @@ public class PostController {
 	}
 
 	@PutMapping(value = "/update/{postId}", consumes = "multipart/form-data")
-	public ResponseEntity<Object> updatePost(HttpServletRequest request, @RequestParam(required = false) String content, @RequestPart(value = "files", required = false) MultipartFile[] photos,
-			@PathVariable(value = "postId") int postId) {
+	public ResponseEntity<Object> updatePost(HttpServletRequest request, @PathVariable(value = "postId") int postId, @RequestParam(required = false) String content, @RequestPart(value = "files", required = false) MultipartFile[] photos) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		try {
 			PostUpdatedDto result = postService.updatePost(content, photos, postId, userId);

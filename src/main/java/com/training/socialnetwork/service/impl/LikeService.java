@@ -13,8 +13,8 @@ import com.training.socialnetwork.repository.LikeRepository;
 import com.training.socialnetwork.repository.PostRepository;
 import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.ILikeService;
-import com.training.socialnetwork.util.CustomException;
 import com.training.socialnetwork.util.constant.Constant;
+import com.training.socialnetwork.util.exception.CustomException;
 
 @Service
 @Transactional

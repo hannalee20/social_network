@@ -3,7 +3,7 @@ package com.training.socialnetwork.dto.response.post;
 import java.util.Date;
 import java.util.List;
 
-import com.training.socialnetwork.entity.Comment;
+import com.training.socialnetwork.dto.response.comment.CommentDetailDto;
 
 public class PostDetailDto {
 
@@ -14,7 +14,7 @@ public class PostDetailDto {
 	private String photoUrl;
 	private Date createDate;
 	private int likeCount;
-	private List<Comment> commentList;
+	private List<CommentDetailDto> commentList;
 
 	public int getPostId() {
 		return postId;
@@ -72,11 +72,11 @@ public class PostDetailDto {
 		this.likeCount = likeCount;
 	}
 
-	public List<Comment> getCommentList() {
+	public List<CommentDetailDto> getCommentList() {
 		return commentList;
 	}
 
-	public void setCommentList(List<Comment> commentList) {
+	public void setCommentList(List<CommentDetailDto> commentList) {
 		this.commentList = commentList;
 	}
 

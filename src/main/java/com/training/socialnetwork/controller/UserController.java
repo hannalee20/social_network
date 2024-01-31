@@ -19,13 +19,13 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -52,6 +52,7 @@ import com.training.socialnetwork.util.constant.Constant;
 import com.training.socialnetwork.util.generator.ReportGenerator;
 
 @RestController
+@Validated
 @RequestMapping(value = "/user")
 public class UserController {
 
@@ -71,7 +72,7 @@ public class UserController {
 	private ObjectMapper objectMapper;
 
 	@PostMapping(value = "/register")
-	public ResponseEntity<Object> registerUser(@RequestBody UserRegisterDto userRegisterDto) {
+	public ResponseEntity<Object> registerUser(@ParameterObject @ModelAttribute UserRegisterDto userRegisterDto) {
 		try {
 			UserRegistedDto result = userService.createUser(userRegisterDto);
 			
@@ -83,7 +84,7 @@ public class UserController {
 	}
 
 	@PostMapping(value = "/login")
-	public ResponseEntity<Object> loginUser(@RequestBody UserLoginDto userLoginDto) throws Exception {
+	public ResponseEntity<Object> loginUser(@ParameterObject @ModelAttribute UserLoginDto userLoginDto) throws Exception {
 		try {
 			boolean checkLogin = userService.loginUser(userLoginDto.getUsername(), userLoginDto.getPassword());
 
@@ -100,7 +101,7 @@ public class UserController {
 	}
 
 	@PostMapping(value = "/token")
-	public ResponseEntity<Object> getToken(@RequestBody UserTokenDto userTokenDto) {
+	public ResponseEntity<Object> getToken(@ParameterObject @ModelAttribute UserTokenDto userTokenDto) {
 		Authentication authentication = authenticationManager
 				.authenticate(new UsernamePasswordAuthenticationToken(userTokenDto.getUsername(), userTokenDto.getPassword()));
 		SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -121,7 +122,7 @@ public class UserController {
 	}
 
 	@PatchMapping(value = "/update/{userId}", consumes = {"multipart/form-data"})
-	public ResponseEntity<Object> updateUser(HttpServletRequest request, @ParameterObject @ModelAttribute UserUpdateDto userUpdateDto, @RequestParam(value = "file", required = false) MultipartFile avatar, @PathVariable(value = "userId") int userId) {
+	public ResponseEntity<Object> updateUser(HttpServletRequest request, @PathVariable(value = "userId") int userId, @ParameterObject @ModelAttribute UserUpdateDto userUpdateDto, @RequestParam(value = "file", required = false) MultipartFile avatar) {
 		int loggedInUserId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		try {
 			UserUpdatedDto result = userService.updateInfo(userUpdateDto, avatar, userId, loggedInUserId);
@@ -192,7 +193,7 @@ public class UserController {
 	}
 
 	@PostMapping(value = "/forgot-password")
-	public ResponseEntity<Object> forgotPassword(@RequestBody UserForgotPasswordDto userForgotPasswordDto) {
+	public ResponseEntity<Object> forgotPassword(@ParameterObject @ModelAttribute UserForgotPasswordDto userForgotPasswordDto) {
 		try {
 			String result = userService.forgotPassword(userForgotPasswordDto.getEmail());
 			if (result != null) {
@@ -207,7 +208,7 @@ public class UserController {
 	}
 
 	@PutMapping(value = "/reset-password")
-	public ResponseEntity<Object> resetPassword(@RequestBody UserResetPasswordDto userResetPasswordDto) {
+	public ResponseEntity<Object> resetPassword(@ParameterObject @ModelAttribute UserResetPasswordDto userResetPasswordDto) {
 		try {
 			String result = userService.resetPassword(userResetPasswordDto.getToken(), userResetPasswordDto.getNewPassword());
 			

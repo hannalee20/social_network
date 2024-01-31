@@ -5,6 +5,8 @@ import java.io.Serializable;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
+import com.training.socialnetwork.util.constant.Constant;
+
 public class CommentCreateDto implements Serializable{
 
 	private static final long serialVersionUID = 1L;
@@ -12,8 +14,8 @@ public class CommentCreateDto implements Serializable{
 	private int postId;
 	private String content;
 
-	@NotBlank(message = "The postId is required")
-	@Pattern(regexp = "^[0-9]*$", message = "The postId is invalid..")
+	@NotBlank
+	@Pattern(regexp = "^[0-9]*$", message = Constant.INVALID)
 	public int getPostId() {
 		return postId;
 	}
@@ -22,7 +24,7 @@ public class CommentCreateDto implements Serializable{
 		this.postId = postId;
 	}
 
-	@NotBlank
+	@NotBlank(message = Constant.INVALID)
 	public String getContent() {
 		return content;
 	}

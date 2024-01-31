@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.training.socialnetwork.dto.response.comment.CommentDetailDto;
 import com.training.socialnetwork.dto.response.post.PostCreatedDto;
 import com.training.socialnetwork.dto.response.post.PostDetailDto;
 import com.training.socialnetwork.dto.response.post.PostListDto;
@@ -27,8 +28,8 @@ import com.training.socialnetwork.repository.PhotoRepository;
 import com.training.socialnetwork.repository.PostRepository;
 import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.IPostService;
-import com.training.socialnetwork.util.CustomException;
 import com.training.socialnetwork.util.constant.Constant;
+import com.training.socialnetwork.util.exception.CustomException;
 import com.training.socialnetwork.util.image.ImageUtils;
 
 @Service
@@ -40,13 +41,13 @@ public class PostService implements IPostService {
 
 	@Autowired
 	private UserRepository userRepository;
-	
+
 	@Autowired
 	private PhotoRepository photoRepository;
 
 	@Autowired
 	private ModelMapper modelMapper;
-	
+
 	@Autowired
 	private ImageUtils imageUtils;
 
@@ -67,7 +68,7 @@ public class PostService implements IPostService {
 		if (postCreated == null) {
 			throw new Exception(Constant.SERVER_ERROR);
 		}
-		
+
 		List<Photo> photoList = new ArrayList<>();
 		List<String> photoUrls = new ArrayList<>();
 		if (photos != null) {
@@ -77,7 +78,7 @@ public class PostService implements IPostService {
 				photo.setPost(postCreated);
 				photo.setName(photoUrl);
 				photo.setCreateDate(new Date());
-				
+
 				photo = photoRepository.save(photo);
 				if (photo == null) {
 					throw new Exception(Constant.SERVER_ERROR);
@@ -87,7 +88,7 @@ public class PostService implements IPostService {
 			}
 			postCreated.setListPhoto(photoList);
 		}
-		
+
 		PostCreatedDto postCreatedDto = modelMapper.map(postCreated, PostCreatedDto.class);
 		postCreatedDto.setPhotoUrl(photoUrls);
 		postCreatedDto.setUsername(user.getUsername());
@@ -106,14 +107,14 @@ public class PostService implements IPostService {
 			postListDto.setPhotoUrl(photoUrlList);
 			List<Like> likeList = new ArrayList<>();
 			for (Like like : post.getLikeList()) {
-				if(like.getDeleteFlg() != Constant.DELETED_FlG) {
+				if (like.getDeleteFlg() != Constant.DELETED_FlG) {
 					likeList.add(like);
 				}
 			}
 			postListDto.setLikeCount(likeList.size());
 			List<Comment> commentList = new ArrayList<>();
 			for (Comment comment : post.getCommentList()) {
-				if(comment.getDeleteFlg() != Constant.DELETED_FlG) {
+				if (comment.getDeleteFlg() != Constant.DELETED_FlG) {
 					commentList.add(comment);
 				}
 			}
@@ -133,17 +134,20 @@ public class PostService implements IPostService {
 		}
 
 		PostDetailDto postDetailDto = modelMapper.map(post, PostDetailDto.class);
-		List<Comment> commentList = post.getCommentList().stream().sorted((comment1, comment2) -> {
-			if (comment1.getUpdateDate().after(comment2.getUpdateDate())) {
-				return 1;
-			} else if (comment1.getUpdateDate().before(comment2.getUpdateDate())) {
-				return -1;
+		if (!post.getCommentList().isEmpty()) {
+			List<Comment> commentList = post.getCommentList();
+			List<CommentDetailDto> comDetailDtoList = new ArrayList<>();
+			for (Comment comment : commentList) {
+				CommentDetailDto commentDetailDto = modelMapper.map(comment, CommentDetailDto.class);
+				commentDetailDto.setUsername(comment.getUser().getUsername());
+				comDetailDtoList.add(commentDetailDto);
 			}
-			return 0;
-		}).collect(Collectors.toList());
 
+			postDetailDto.setCommentList(comDetailDtoList);
+		}
+
+		postDetailDto.setUsername(post.getUser().getUsername());
 		postDetailDto.setLikeCount(post.getLikeList().size());
-		postDetailDto.setCommentList(commentList);
 
 		return postDetailDto;
 	}
@@ -156,7 +160,7 @@ public class PostService implements IPostService {
 		if (postToUpdate == null) {
 			throw new CustomException(HttpStatus.NOT_FOUND, "Post does not exist");
 		}
-		
+
 		if (user.getUserId() != postToUpdate.getUser().getUserId()) {
 			throw new CustomException(HttpStatus.FORBIDDEN, "You do not have permission to update");
 		}
@@ -171,7 +175,7 @@ public class PostService implements IPostService {
 				photo.setPost(postToUpdate);
 				photo.setName(photoUrl);
 				photo.setCreateDate(new Date());
-				
+
 				photo = photoRepository.save(photo);
 				if (photo == null) {
 					throw new Exception(Constant.SERVER_ERROR);
@@ -186,23 +190,23 @@ public class PostService implements IPostService {
 
 		PostUpdatedDto postUpdatedDto = modelMapper.map(postToUpdate, PostUpdatedDto.class);
 		postUpdatedDto.setPhotoUrls(photoUrls);
-		
+
 		return postUpdatedDto;
 	}
 
 	@Override
 	public boolean deletePost(int postId, int userId) throws Exception {
 		Post post = postRepository.findById(postId).orElse(null);
-		
-		if(post == null) {
+
+		if (post == null) {
 			throw new CustomException(HttpStatus.NOT_FOUND, "Post does not exist");
 		}
-		
+
 		if (post.getUser().getUserId() != userId) {
 			throw new CustomException(HttpStatus.FORBIDDEN, "You do not have permission to update");
 		}
 		post.setDeleteFlg(Constant.DELETED_FlG);
-		
+
 		return postRepository.save(post) != null;
 	}
 

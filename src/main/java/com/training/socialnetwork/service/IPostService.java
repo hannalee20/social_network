@@ -21,7 +21,5 @@ public interface IPostService {
 	PostUpdatedDto updatePost(String content, MultipartFile[] photos, int postId, int userId) throws Exception;
 	
 	boolean deletePost(int postId, int userId) throws Exception;
-	
-//	int countPost(int userId);
 
 }

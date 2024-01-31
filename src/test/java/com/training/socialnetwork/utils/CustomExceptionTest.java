@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-import com.training.socialnetwork.util.CustomException;
+import com.training.socialnetwork.util.exception.CustomException;
 
 public class CustomExceptionTest {
 

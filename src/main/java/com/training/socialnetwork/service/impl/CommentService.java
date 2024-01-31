@@ -21,8 +21,8 @@ import com.training.socialnetwork.repository.CommentRepository;
 import com.training.socialnetwork.repository.PostRepository;
 import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.ICommentService;
-import com.training.socialnetwork.util.CustomException;
 import com.training.socialnetwork.util.constant.Constant;
+import com.training.socialnetwork.util.exception.CustomException;
 import com.training.socialnetwork.util.image.ImageUtils;
 
 @Service

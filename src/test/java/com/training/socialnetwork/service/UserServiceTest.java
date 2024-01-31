@@ -43,8 +43,8 @@ import com.training.socialnetwork.repository.PostRepository;
 import com.training.socialnetwork.repository.RoleRepository;
 import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.impl.UserService;
-import com.training.socialnetwork.util.CustomException;
 import com.training.socialnetwork.util.constant.Constant;
+import com.training.socialnetwork.util.exception.CustomException;
 import com.training.socialnetwork.util.image.ImageUtils;
 import com.training.socialnetwork.util.mapper.ObjectMapper;
 
@@ -204,7 +204,7 @@ public class UserServiceTest {
                 new MockMultipartFile("data2", "filename2.jpg", "multipart/form-data", "some xml".getBytes());
 		UserUpdateDto userUpdateDto = new UserUpdateDto();
 		userUpdateDto.setRealName("Test");
-		userUpdateDto.setSex("female");
+		userUpdateDto.setGender("female");
 		userUpdateDto.setAddress("Hanoi");
 		
 		User userToUpdate = new User();
@@ -228,7 +228,7 @@ public class UserServiceTest {
                 new MockMultipartFile("data2", "filename2.jpg", "multipart/form-data", "some xml".getBytes());
 		UserUpdateDto userUpdateDto = new UserUpdateDto();
 		userUpdateDto.setRealName("Test");
-		userUpdateDto.setSex("female");
+		userUpdateDto.setGender("female");
 		userUpdateDto.setAddress("Hanoi");
 
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
@@ -244,7 +244,7 @@ public class UserServiceTest {
                 new MockMultipartFile("data2", "filename2.jpg", "multipart/form-data", "some xml".getBytes());
 		UserUpdateDto userUpdateDto = new UserUpdateDto();
 		userUpdateDto.setRealName("Test");
-		userUpdateDto.setSex("female");
+		userUpdateDto.setGender("female");
 		userUpdateDto.setAddress("Hanoi");
         User userToUpdate = new User();
         userToUpdate.setUserId(userId);
