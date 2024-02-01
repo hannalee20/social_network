@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.training.socialnetwork.security.JwtUtils;
 import com.training.socialnetwork.service.ILikeService;
+import com.training.socialnetwork.util.exception.CustomException;
 
 @RestController
 @RequestMapping(value = "/like")
@@ -31,6 +32,8 @@ public class LikeController {
 			boolean result = likeService.addLikePost(postId, userId);
 
 			return new ResponseEntity<Object>(result, HttpStatus.OK);
+		} catch (CustomException e) {
+			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -45,6 +48,8 @@ public class LikeController {
 			boolean result = likeService.unlikePost(postId, userId);
 
 			return new ResponseEntity<Object>(result, HttpStatus.OK);
+		} catch (CustomException e) {
+			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}

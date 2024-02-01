@@ -5,14 +5,11 @@ import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 
-import javax.transaction.Transactional;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import com.training.socialnetwork.entity.Like;
 import com.training.socialnetwork.entity.Post;
@@ -24,8 +21,6 @@ import com.training.socialnetwork.service.impl.LikeService;
 import com.training.socialnetwork.util.constant.Constant;
 
 @ExtendWith(MockitoExtension.class)
-@DataJpaTest
-@Transactional
 public class LikeServiceTest {
 
 	@InjectMocks

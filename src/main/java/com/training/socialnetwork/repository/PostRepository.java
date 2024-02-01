@@ -16,11 +16,11 @@ public interface PostRepository extends JpaRepository<Post, Integer>{
 
 	@Query(value = "" + 
 				"select * from posts as p " + 
-				"left join friends f1 on p.user_id = f1.user_id1 " + 
-				"and f1.status = 1 " + 
-				"left join friends f2 on p.user_id = f2.user_id2 " + 
-				"and f2.status = 1 " + 
-				"where p.user_id in (:userId , f1.user_id1 , f2.user_id2) " + 
+				"where p.user_id in (:userId, " + 
+				"(select f.user_id1 from friends as f " + 
+				"where f.user_id2 = :userId and f.status = 1), " + 
+				"(select f.user_id2 from friends as f " + 
+				"where f.user_id1 = :userId and f.status = 1)) " + 
 				"and p.delete_flg = 0 " + 
 				"order by p.update_date ", nativeQuery = true)
 	List<Post> findAllByUserId(@Param(value = "userId") int userId, Pageable paging);

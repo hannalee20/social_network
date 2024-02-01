@@ -11,7 +11,7 @@ public class PostDetailDto {
 	private int userId;
 	private String username;
 	private String content;
-	private String photoUrl;
+	private List<String> photoUrl;
 	private Date createDate;
 	private int likeCount;
 	private List<CommentDetailDto> commentList;
@@ -48,11 +48,11 @@ public class PostDetailDto {
 		this.content = content;
 	}
 
-	public String getPhotoUrl() {
+	public List<String> getPhotoUrl() {
 		return photoUrl;
 	}
 
-	public void setPhotoUrl(String photoUrl) {
+	public void setPhotoUrl(List<String> photoUrl) {
 		this.photoUrl = photoUrl;
 	}
 

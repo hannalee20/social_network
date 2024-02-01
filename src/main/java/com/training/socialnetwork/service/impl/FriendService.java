@@ -87,7 +87,7 @@ public class FriendService implements IFriendService {
 			throw new CustomException(HttpStatus.NOT_FOUND, "User does not exist");
 		}
 
-		Friend friend = friendRepository.findFriendByUserIdAndStatus(userId1, userId2, Constant.FRIEND_REQUEST);
+		Friend friend = friendRepository.findFriendRequestByUserId(userId1, userId2);
 
 		if (friend == null) {
 			throw new CustomException(HttpStatus.NOT_FOUND, "Friend request does not exist");
@@ -107,7 +107,7 @@ public class FriendService implements IFriendService {
 			throw new CustomException(HttpStatus.NOT_FOUND, "User does not exist");
 		}
 
-		Friend friend = friendRepository.findFriendByUserIdAndStatus(userId1, userId2, Constant.FRIEND_REQUEST);
+		Friend friend = friendRepository.findFriendRequestByUserId(userId1, userId2);
 
 		if (friend == null) {
 			throw new CustomException(HttpStatus.NOT_FOUND, "Friend request does not exist");
@@ -131,7 +131,7 @@ public class FriendService implements IFriendService {
 		Friend friend = friendRepository.findFriendByUserIdAndStatus(userId1, userId2, Constant.FRIENDED_STATUS);
 
 		if (friend == null) {
-			throw new CustomException(HttpStatus.NOT_FOUND, "Friend request does not exist");
+			throw new CustomException(HttpStatus.NOT_FOUND, "Friend does not exist");
 		}
 
 		friend.setStatus(Constant.NOT_FRIEND);
@@ -164,7 +164,7 @@ public class FriendService implements IFriendService {
 			throw new CustomException(HttpStatus.NOT_FOUND, "User does not exist");
 		}
 
-		Friend friend = friendRepository.findFriendByUserIdAndStatus(userId1, userId2, Constant.FRIEND_REQUEST);
+		Friend friend = friendRepository.findFriendRequestByUserId(userId1, userId2);
 
 		if (friend == null) {
 			throw new CustomException(HttpStatus.NOT_FOUND, "Friend request does not exist");

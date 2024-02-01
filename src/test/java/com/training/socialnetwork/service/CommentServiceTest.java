@@ -5,17 +5,12 @@ import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 
-import javax.transaction.Transactional;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 import org.modelmapper.ModelMapper;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.mock.web.MockMultipartFile;
 
 import com.training.socialnetwork.dto.request.comment.CommentCreateDto;
@@ -33,9 +28,6 @@ import com.training.socialnetwork.util.constant.Constant;
 import com.training.socialnetwork.util.image.ImageUtils;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
-@DataJpaTest
-@Transactional
 public class CommentServiceTest {
 
 	@InjectMocks
@@ -120,7 +112,6 @@ public class CommentServiceTest {
 		
 		when(commentRepository.findById(any())).thenReturn(Optional.of(comment));
 		when(postRepository.findById(any())).thenReturn(Optional.of(post));
-		when(userRepository.findById(any())).thenReturn(Optional.of(user));
 		when(commentRepository.save(any())).thenReturn(comment);
 		when(modelMapper.map(any(), any())).thenReturn(commentUpdatedDto);
 		
@@ -143,7 +134,6 @@ public class CommentServiceTest {
 		comment.setContent("comment content");
 		comment.setDeleteFlg(Constant.DELETED_FlG);
 		
-		when(userRepository.findById(any())).thenReturn(Optional.of(user));
 		when(commentRepository.findById(any())).thenReturn(Optional.of(comment));
 		when(commentRepository.save(any())).thenReturn(comment);
 		

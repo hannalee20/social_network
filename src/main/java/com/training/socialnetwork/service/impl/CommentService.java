@@ -90,7 +90,10 @@ public class CommentService implements ICommentService {
 			throw new CustomException(HttpStatus.FORBIDDEN, "You do not have permission to update");
 		}
 		
-		commentToUpdate.setContent(content);
+		if(content != null) {
+			commentToUpdate.setContent(content);
+		}
+		
 		if(photo != null) {
 			String photoUrl = imageUtils.saveImage(photo);
 			commentToUpdate.setPhotoUrl(photoUrl);

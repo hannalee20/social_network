@@ -6,6 +6,7 @@ import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -24,8 +25,10 @@ import com.training.socialnetwork.dto.response.comment.CommentUpdatedDto;
 import com.training.socialnetwork.security.JwtUtils;
 import com.training.socialnetwork.service.ICommentService;
 import com.training.socialnetwork.util.constant.Constant;
+import com.training.socialnetwork.util.exception.CustomException;
 
 @RestController
+@Validated
 @RequestMapping(value = "/comment")
 public class CommentController {
 
@@ -41,18 +44,22 @@ public class CommentController {
 		try {
 			CommentCreatedDto result = commentService.createComment(userId, commentCreateDto, photo);
 			return new ResponseEntity<Object>(result, HttpStatus.CREATED);
+		} catch (CustomException e) {
+			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
 	@PutMapping(value = "/update/{commentId}", consumes = {"multipart/form-data"})
-	public ResponseEntity<Object> updateComment(HttpServletRequest request, @PathVariable(value = "commentId") int commentId, @RequestParam String content, @RequestParam(value = "file", required = false) MultipartFile photo) {
+	public ResponseEntity<Object> updateComment(HttpServletRequest request, @PathVariable(value = "commentId") int commentId, @RequestParam(required = false) String content, @RequestParam(value = "file", required = false) MultipartFile photo) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		try {
 			CommentUpdatedDto result = commentService.updateComment(content, photo, commentId, userId);
 
 			return new ResponseEntity<Object>(result, HttpStatus.OK);
+		} catch (CustomException e) {
+			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -67,6 +74,8 @@ public class CommentController {
 			commentService.deleteComment(commentId, userId);
 
 			return new ResponseEntity<Object>(Constant.DELETE_SUCCESSFULLY, HttpStatus.OK);
+		} catch (CustomException e) {
+			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -78,6 +87,8 @@ public class CommentController {
 			CommentDetailDto result = commentService.getCommentDetail(commentId);
 
 			return new ResponseEntity<Object>(result, HttpStatus.OK);
+		} catch (CustomException e) {
+			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}

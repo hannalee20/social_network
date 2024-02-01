@@ -128,7 +128,7 @@ public class User {
 		this.birthDate = birthDate;
 	}
 
-	public int getGender() {
+	public Integer getGender() {
 		return gender;
 	}
 

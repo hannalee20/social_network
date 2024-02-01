@@ -32,8 +32,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
@@ -42,7 +40,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.training.socialnetwork.dto.request.user.CustomUserDetail;
 import com.training.socialnetwork.dto.request.user.UserForgotPasswordDto;
 import com.training.socialnetwork.dto.request.user.UserLoginDto;
 import com.training.socialnetwork.dto.request.user.UserRegisterDto;
@@ -107,37 +104,30 @@ public class UserControllerTest {
 		userLoginDto.setUsername("test");
 		userLoginDto.setPassword("123456");
 		
-		int otp1 = 643876;
 		when(userService.loginUser(any(), any())).thenReturn(true);
-		when(otpUtils.generateOtp(any())).thenReturn(otp1);
+		when(otpUtils.generateOtp(any())).thenReturn(123456);
 		String otpRequest = JSonHelper.toJson(userLoginDto).orElse("");
 		
-		MvcResult result = mockMvc.perform(post("/user/login")
+		mockMvc.perform(post("/user/login")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(otpRequest))
 				.andExpect(status().isOk()).andReturn();
 		
-		String otp = result.getResponse().getContentAsString();
 		UserTokenDto userTokenDto = new UserTokenDto();
 		userTokenDto.setUsername("test");
 		userTokenDto.setPassword("123456");
+		userTokenDto.setOtp(123456);
 		
-		List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>(); 
-		authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-		
-		CustomUserDetail customUserDetail = new CustomUserDetail(1, "test", "123456", authorities);
-		userTokenDto.setOtp(Integer.valueOf(otp.substring(8, 14)));
-		
-		String request = JSonHelper.toJson(userTokenDto).orElse("");
 		token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzA2MjU5NjgyLCJleHAiOjE3MDYzNDYwODF9.sVl5ksy4pXHHU9Bdx41AoDzAvs9gc5v3-NlAJG8p7DQ";
-		when(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userTokenDto.getUsername(), userTokenDto.getPassword())))
-				.thenReturn(authentication);
-		when(authentication.getPrincipal()).thenReturn(customUserDetail);
-		when(otpUtils.getOtp(any())).thenReturn(otp1);
-		when(jwtUtils.generateToken(any())).thenReturn(token);
+		when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(new UsernamePasswordAuthenticationToken("test", "123456"));
+				
+		when(otpUtils.getOtp("test")).thenReturn(123456);
+		when(jwtUtils.generateToken(any(Authentication.class))).thenReturn(token);
 		MvcResult tokenResult = mockMvc.perform(post("/user/token")
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(request))
+				.param("username", "test")
+				.param("password", "123456")
+				.param("otp", Integer.toString(123456)))
 				.andExpect(status().isOk()).andReturn();
 		token = tokenResult.getResponse().getContentAsString().substring(8, 133);
 	}
@@ -183,11 +173,11 @@ public class UserControllerTest {
 		userLoginDto.setPassword("123456");
 		
 		when(userService.loginUser(userLoginDto.getUsername(), userLoginDto.getPassword())).thenReturn(true);
-		String request = JSonHelper.toJson(userLoginDto).orElse("");
 		
 		mockMvc.perform(post("/user/login")
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(request))
+				.param("username", "test")
+				.param("password", "123456"))
 				.andExpect(status().isOk());
 	}
 	
@@ -287,7 +277,7 @@ public class UserControllerTest {
 		UserUpdatedDto userUpdatedDto = new UserUpdatedDto();
 		userUpdatedDto.setUserId(1);
 		userUpdatedDto.setBirthDate(new Date());
-		userUpdatedDto.setGender("female");
+		userUpdatedDto.setSex("female");
 		userUpdatedDto.setEmail("test");
 		userUpdatedDto.setRealName("test");
 		userUpdatedDto.setAddress("hanoi");

@@ -27,6 +27,7 @@ import com.training.socialnetwork.dto.response.post.PostUpdatedDto;
 import com.training.socialnetwork.security.JwtUtils;
 import com.training.socialnetwork.service.IPostService;
 import com.training.socialnetwork.util.constant.Constant;
+import com.training.socialnetwork.util.exception.CustomException;
 
 @RestController
 @RequestMapping(value = "/post")
@@ -45,6 +46,8 @@ public class PostController {
 			PostCreatedDto result = postService.createPost(userId, content, photos);
 
 			return new ResponseEntity<Object>(result, HttpStatus.CREATED);
+		} catch (CustomException e) {
+			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -58,12 +61,14 @@ public class PostController {
 		Pageable paging = PageRequest.of(page, pageSize);
 		try {
 			List<PostListDto> postList = postService.getTimeline(userId, paging);
-			if(postList != null) {
+			if(!postList.isEmpty()) {
 				return new ResponseEntity<>(postList, HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(Constant.NO_RESULT, HttpStatus.NO_CONTENT);
 			}
 			
+		} catch (CustomException e) {
+			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -75,6 +80,8 @@ public class PostController {
 			PostDetailDto result = postService.getPost(postId);
 
 			return new ResponseEntity<Object>(result, HttpStatus.OK);
+		} catch (CustomException e) {
+			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -88,6 +95,8 @@ public class PostController {
 			PostUpdatedDto result = postService.updatePost(content, photos, postId, userId);
 
 			return new ResponseEntity<Object>(result, HttpStatus.OK);
+		} catch (CustomException e) {
+			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -101,6 +110,8 @@ public class PostController {
 			postService.deletePost(postId, userId);
 			
 			return new ResponseEntity<Object>(Constant.DELETE_SUCCESSFULLY, HttpStatus.OK);
+		} catch (CustomException e) {
+			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}

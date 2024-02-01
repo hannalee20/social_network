@@ -2,7 +2,6 @@ package com.training.socialnetwork.dto.request.user;
 
 import java.io.Serializable;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -22,7 +21,7 @@ public class UserRegisterDto implements Serializable {
 	@NotBlank
 	private String password;
 
-	@Email
+	@Pattern(regexp = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")
 	@NotBlank
 	private String email;
 

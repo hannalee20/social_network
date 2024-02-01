@@ -15,15 +15,12 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.transaction.Transactional;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -33,6 +30,7 @@ import com.training.socialnetwork.dto.response.user.UserDetailDto;
 import com.training.socialnetwork.dto.response.user.UserRegistedDto;
 import com.training.socialnetwork.dto.response.user.UserReportDto;
 import com.training.socialnetwork.dto.response.user.UserSearchDto;
+import com.training.socialnetwork.dto.response.user.UserUpdatedDto;
 import com.training.socialnetwork.entity.Friend;
 import com.training.socialnetwork.entity.Role;
 import com.training.socialnetwork.entity.User;
@@ -49,8 +47,6 @@ import com.training.socialnetwork.util.image.ImageUtils;
 import com.training.socialnetwork.util.mapper.ObjectMapper;
 
 @ExtendWith(MockitoExtension.class)
-@DataJpaTest
-@Transactional
 public class UserServiceTest {
 
 	@InjectMocks
@@ -212,11 +208,18 @@ public class UserServiceTest {
 		userToUpdate.setUsername("test");
 		userToUpdate.setEmail("test@gmail.com");
 		
+		UserUpdatedDto userUpdatedDto = new UserUpdatedDto();
+		userUpdatedDto.setUserId(1);
+		userUpdatedDto.setRealName("Test");
+		userUpdatedDto.setSex("female");
+		userUpdatedDto.setAddress("Hanoi");
+		userUpdatedDto.setUsername("test");
+		userUpdatedDto.setEmail("test@gmail.com");
+		
 		when(userRepository.findById(1)).thenReturn(Optional.of(userToUpdate));
-		
 		objectMapper.copyProperties(userUpdateDto, userToUpdate);
-		
 		when(userRepository.save(any())).thenReturn(userToUpdate);
+		when(modelMapper.map(any(), any())).thenReturn(userUpdatedDto);
 		
 		userService.updateInfo(userUpdateDto, avatar, 1, 1);
 	}

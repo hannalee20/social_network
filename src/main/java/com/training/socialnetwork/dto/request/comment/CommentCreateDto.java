@@ -7,15 +7,17 @@ import javax.validation.constraints.Pattern;
 
 import com.training.socialnetwork.util.constant.Constant;
 
-public class CommentCreateDto implements Serializable{
+public class CommentCreateDto implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
-	private int postId;
-	private String content;
 
 	@NotBlank
 	@Pattern(regexp = "^[0-9]*$", message = Constant.INVALID)
+	private int postId;
+
+	@NotBlank(message = Constant.INVALID)
+	private String content;
+
 	public int getPostId() {
 		return postId;
 	}
@@ -24,7 +26,6 @@ public class CommentCreateDto implements Serializable{
 		this.postId = postId;
 	}
 
-	@NotBlank(message = Constant.INVALID)
 	public String getContent() {
 		return content;
 	}

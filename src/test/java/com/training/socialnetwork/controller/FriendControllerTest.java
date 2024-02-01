@@ -195,23 +195,23 @@ public class FriendControllerTest {
 
 	@Test
 	public void removeFriendRequestSuccess() throws Exception {
-		int userId1 = 2;
+		int userId2 = 2;
 
 		when(friendService.removeFriendRequest(anyInt(), anyInt())).thenReturn(true);
 
 		mockMvc.perform(post("/friend/remove-friend-request").header("Authorization", "Bearer dummyToken")
-				.contentType(MediaType.APPLICATION_JSON).param("userId1", Integer.toString(userId1)))
+				.contentType(MediaType.APPLICATION_JSON).param("userId2", Integer.toString(userId2)))
 				.andExpect(status().isOk()).andExpect(content().string(Constant.REMOVE_FRIEND_REQUEST_SUCCESSFULLY));
 	}
 	
 	@Test
 	public void removeFriendRequestFail() throws Exception {
-		int userId1 = 2;
+		int userId2 = 2;
 
 		when(friendService.removeFriendRequest(anyInt(), anyInt())).thenThrow(new Exception());
 
 		mockMvc.perform(post("/friend/remove-friend-request").header("Authorization", "Bearer dummyToken")
-				.contentType(MediaType.APPLICATION_JSON).param("userId1", Integer.toString(userId1)))
+				.contentType(MediaType.APPLICATION_JSON).param("userId2", Integer.toString(userId2)))
 				.andExpect(status().isInternalServerError());
 	}
 }

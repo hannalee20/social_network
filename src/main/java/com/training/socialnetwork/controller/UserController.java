@@ -1,6 +1,5 @@
 package com.training.socialnetwork.controller;
 
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -49,6 +48,7 @@ import com.training.socialnetwork.security.JwtUtils;
 import com.training.socialnetwork.security.OtpUtils;
 import com.training.socialnetwork.service.IUserService;
 import com.training.socialnetwork.util.constant.Constant;
+import com.training.socialnetwork.util.exception.CustomException;
 import com.training.socialnetwork.util.generator.ReportGenerator;
 
 @RestController
@@ -67,7 +67,7 @@ public class UserController {
 
 	@Autowired
 	private OtpUtils otpUtils;
-	
+
 	@Autowired
 	private ObjectMapper objectMapper;
 
@@ -75,8 +75,10 @@ public class UserController {
 	public ResponseEntity<Object> registerUser(@ParameterObject @ModelAttribute UserRegisterDto userRegisterDto) {
 		try {
 			UserRegistedDto result = userService.createUser(userRegisterDto);
-			
+
 			return new ResponseEntity<Object>(result, HttpStatus.CREATED);
+		} catch (CustomException e) {
+			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -84,7 +86,8 @@ public class UserController {
 	}
 
 	@PostMapping(value = "/login")
-	public ResponseEntity<Object> loginUser(@ParameterObject @ModelAttribute UserLoginDto userLoginDto) throws Exception {
+	public ResponseEntity<Object> loginUser(@ParameterObject @ModelAttribute UserLoginDto userLoginDto)
+			throws Exception {
 		try {
 			boolean checkLogin = userService.loginUser(userLoginDto.getUsername(), userLoginDto.getPassword());
 
@@ -94,6 +97,8 @@ public class UserController {
 			} else {
 				return new ResponseEntity<Object>(Constant.INVALID_USERNAME_OR_PASSWORD, HttpStatus.BAD_REQUEST);
 			}
+		} catch (CustomException e) {
+			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -102,8 +107,8 @@ public class UserController {
 
 	@PostMapping(value = "/token")
 	public ResponseEntity<Object> getToken(@ParameterObject @ModelAttribute UserTokenDto userTokenDto) {
-		Authentication authentication = authenticationManager
-				.authenticate(new UsernamePasswordAuthenticationToken(userTokenDto.getUsername(), userTokenDto.getPassword()));
+		Authentication authentication = authenticationManager.authenticate(
+				new UsernamePasswordAuthenticationToken(userTokenDto.getUsername(), userTokenDto.getPassword()));
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 
 		int otpFromCache = 0;
@@ -121,13 +126,17 @@ public class UserController {
 		}
 	}
 
-	@PatchMapping(value = "/update/{userId}", consumes = {"multipart/form-data"})
-	public ResponseEntity<Object> updateUser(HttpServletRequest request, @PathVariable(value = "userId") int userId, @ParameterObject @ModelAttribute UserUpdateDto userUpdateDto, @RequestParam(value = "file", required = false) MultipartFile avatar) {
+	@PatchMapping(value = "/update/{userId}", consumes = { "multipart/form-data" })
+	public ResponseEntity<Object> updateUser(HttpServletRequest request, @PathVariable(value = "userId") int userId,
+			@ParameterObject @ModelAttribute UserUpdateDto userUpdateDto,
+			@RequestParam(value = "file", required = false) MultipartFile avatar) {
 		int loggedInUserId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		try {
 			UserUpdatedDto result = userService.updateInfo(userUpdateDto, avatar, userId, loggedInUserId);
 
 			return new ResponseEntity<Object>(objectMapper.writeValueAsString(result), HttpStatus.OK);
+		} catch (CustomException e) {
+			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -141,6 +150,8 @@ public class UserController {
 			UserDetailDto result = userService.getInfo(userId);
 
 			return new ResponseEntity<>(result, HttpStatus.OK);
+		} catch (CustomException e) {
+			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -148,21 +159,24 @@ public class UserController {
 	}
 
 	@GetMapping(value = "/search")
-	public ResponseEntity<Object> searchUser(HttpServletRequest request, @RequestParam(value = "keyword") String keyword,
+	public ResponseEntity<Object> searchUser(HttpServletRequest request,
+			@RequestParam(value = "keyword") String keyword,
 			@RequestParam(defaultValue = Constant.STRING_0, required = false) int page,
 			@RequestParam(defaultValue = Constant.STRING_5, required = false) int pageSize) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		Pageable paging = PageRequest.of(page, pageSize);
-		
+
 		try {
 			List<UserSearchDto> userSearchList = userService.searchUser(userId, keyword, paging);
-			
-			if(userSearchList.isEmpty()) {
+
+			if (userSearchList.isEmpty()) {
 				return new ResponseEntity<Object>(Constant.NO_RESULT, HttpStatus.NO_CONTENT);
 			} else {
 				return new ResponseEntity<Object>(userSearchList, HttpStatus.OK);
 			}
-			
+
+		} catch (CustomException e) {
+			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -187,20 +201,25 @@ public class UserController {
 			reportGenerator.export(response);
 
 			return new ResponseEntity<>(Constant.EXPORT_REPORT_SUCCESSFULLY, HttpStatus.OK);
-		} catch (IOException e) {
+		} catch (CustomException e) {
+			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
+		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
 	@PostMapping(value = "/forgot-password")
-	public ResponseEntity<Object> forgotPassword(@ParameterObject @ModelAttribute UserForgotPasswordDto userForgotPasswordDto) {
+	public ResponseEntity<Object> forgotPassword(
+			@ParameterObject @ModelAttribute UserForgotPasswordDto userForgotPasswordDto) {
 		try {
 			String result = userService.forgotPassword(userForgotPasswordDto.getEmail());
 			if (result != null) {
 				result = "http://localhost:8080/user/reset-password?token=" + result;
 			}
-			
+
 			return new ResponseEntity<Object>(result, HttpStatus.OK);
+		} catch (CustomException e) {
+			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -208,14 +227,19 @@ public class UserController {
 	}
 
 	@PutMapping(value = "/reset-password")
-	public ResponseEntity<Object> resetPassword(@ParameterObject @ModelAttribute UserResetPasswordDto userResetPasswordDto) {
+	public ResponseEntity<Object> resetPassword(
+			@ParameterObject @ModelAttribute UserResetPasswordDto userResetPasswordDto) {
 		try {
-			String result = userService.resetPassword(userResetPasswordDto.getToken(), userResetPasswordDto.getNewPassword());
-			
+			String result = userService.resetPassword(userResetPasswordDto.getToken(),
+					userResetPasswordDto.getNewPassword());
+
 			return new ResponseEntity<Object>(result, HttpStatus.OK);
+		} catch (CustomException e) {
+			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 	}
+	
 }

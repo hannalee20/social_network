@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -123,7 +124,7 @@ public class PostControllerTest {
 
 	@Test
     public void getTimelineFail() throws Exception {
-        when(postService.getTimeline(anyInt(), any())).thenReturn(null);
+        when(postService.getTimeline(anyInt(), any())).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/post/timeline")
         		.header("Authorization", "Bearer dummyToken")).andExpect(status().isNoContent())
@@ -149,7 +150,6 @@ public class PostControllerTest {
 		postDetailDto.setUserId(1);
 		postDetailDto.setUsername("test");
 		postDetailDto.setContent("content");
-		postDetailDto.setPhotoUrl("test");
 		postDetailDto.setCreateDate(new Date());
 
 		when(postService.getPost(anyInt())).thenReturn(postDetailDto);

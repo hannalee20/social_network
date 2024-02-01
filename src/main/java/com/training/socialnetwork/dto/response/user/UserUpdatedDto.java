@@ -5,9 +5,10 @@ import java.util.Date;
 public class UserUpdatedDto {
 
 	private int userId;
+	private String username;
 	private String realName;
 	private Date birthDate;
-	private String gender;
+	private String sex;
 	private String address;
 	private String email;
 	private String university;
@@ -22,6 +23,14 @@ public class UserUpdatedDto {
 
 	public void setUserId(int userId) {
 		this.userId = userId;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
 	public String getRealName() {
@@ -40,12 +49,12 @@ public class UserUpdatedDto {
 		this.birthDate = birthDate;
 	}
 
-	public String getGender() {
-		return gender;
+	public String getSex() {
+		return sex;
 	}
 
-	public void setGender(String gender) {
-		this.gender = gender;
+	public void setSex(String sex) {
+		this.sex = sex;
 	}
 
 	public String getAddress() {

@@ -23,7 +23,7 @@ public class UserTokenDto implements Serializable {
 	private String password;
 
 	@Pattern(regexp = "^[0-9]*$")
-	@Size(min = 6, max = 6, message = Constant.INVALID)
+	@Size(min = 100000, max = 999999, message = Constant.INVALID)
 	@NotBlank
 	private int otp;
 

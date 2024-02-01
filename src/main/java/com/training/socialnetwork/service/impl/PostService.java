@@ -142,12 +142,23 @@ public class PostService implements IPostService {
 				commentDetailDto.setUsername(comment.getUser().getUsername());
 				comDetailDtoList.add(commentDetailDto);
 			}
-
 			postDetailDto.setCommentList(comDetailDtoList);
 		}
+		
+		List<String> photoUrls = new ArrayList<>();
+		for (Photo photo : post.getListPhoto()) {
+			photoUrls.add(photo.getName());
+		}
 
+		List<Like> likeList = new ArrayList<>();
+		for (Like like : post.getLikeList()) {
+			if (like.getDeleteFlg() != Constant.DELETED_FlG) {
+				likeList.add(like);
+			}
+		}
 		postDetailDto.setUsername(post.getUser().getUsername());
-		postDetailDto.setLikeCount(post.getLikeList().size());
+		postDetailDto.setLikeCount(likeList.size());
+		postDetailDto.setPhotoUrl(photoUrls);
 
 		return postDetailDto;
 	}
@@ -164,8 +175,11 @@ public class PostService implements IPostService {
 		if (user.getUserId() != postToUpdate.getUser().getUserId()) {
 			throw new CustomException(HttpStatus.FORBIDDEN, "You do not have permission to update");
 		}
-
-		postToUpdate.setContent(content);
+		
+		if(content != null) {
+			postToUpdate.setContent(content);
+		}
+		
 		List<String> photoUrls = new ArrayList<>();
 		if (photos != null) {
 			List<Photo> photoList = new ArrayList<>();
@@ -181,7 +195,6 @@ public class PostService implements IPostService {
 					throw new Exception(Constant.SERVER_ERROR);
 				}
 				photoList.add(photo);
-				photoUrls.add(photoUrl);
 			}
 			postToUpdate.setListPhoto(photoList);
 		}
@@ -189,7 +202,11 @@ public class PostService implements IPostService {
 		postToUpdate = postRepository.save(postToUpdate);
 
 		PostUpdatedDto postUpdatedDto = modelMapper.map(postToUpdate, PostUpdatedDto.class);
+		for (Photo photo : postToUpdate.getListPhoto()) {
+			photoUrls.add(photo.getName());
+		}
 		postUpdatedDto.setPhotoUrls(photoUrls);
+		postUpdatedDto.setUsername(postToUpdate.getUser().getUsername());
 
 		return postUpdatedDto;
 	}

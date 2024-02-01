@@ -8,14 +8,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import javax.transaction.Transactional;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import com.training.socialnetwork.entity.Friend;
 import com.training.socialnetwork.entity.User;
@@ -25,8 +22,6 @@ import com.training.socialnetwork.service.impl.FriendService;
 import com.training.socialnetwork.util.constant.Constant;
 
 @ExtendWith(MockitoExtension.class)
-@DataJpaTest
-@Transactional
 public class FriendServiceTest {
 
 	@InjectMocks
@@ -155,7 +150,7 @@ public class FriendServiceTest {
 
 		when(userRepository.findById(any())).thenReturn(Optional.of(user1));
 		when(userRepository.findById(any())).thenReturn(Optional.of(user2));
-		when(friendRepository.findFriendByUserIdAndStatus(userId1, userId2, Constant.FRIEND_REQUEST)).thenReturn(friend1);
+		when(friendRepository.findFriendRequestByUserId(userId1, userId2)).thenReturn(friend1);
 		when(friendRepository.save(any())).thenReturn(friend1);
 
 		friendService.acceptFriendRequest(userId1, userId2);
@@ -191,7 +186,7 @@ public class FriendServiceTest {
 
 		when(userRepository.findById(any())).thenReturn(Optional.of(user1));
 		when(userRepository.findById(any())).thenReturn(Optional.of(user2));
-		when(friendRepository.findFriendByUserIdAndStatus(userId1, userId2, Constant.FRIEND_REQUEST)).thenReturn(friend1);
+		when(friendRepository.findFriendRequestByUserId(userId1, userId2)).thenReturn(friend1);
 		when(friendRepository.save(any())).thenReturn(friend1);
 
 		friendService.acceptFriendRequest(userId1, userId2);
@@ -227,7 +222,7 @@ public class FriendServiceTest {
 
 		when(userRepository.findById(any())).thenReturn(Optional.of(user1));
 		when(userRepository.findById(any())).thenReturn(Optional.of(user2));
-		when(friendRepository.findFriendByUserIdAndStatus(userId1, userId2, Constant.FRIEND_REQUEST)).thenReturn(friend1);
+		when(friendRepository.findFriendRequestByUserId(userId1, userId2)).thenReturn(friend1);
 		when(friendRepository.save(any())).thenReturn(friend1);
 
 		friendService.refuseFriendRequest(userId1, userId2);
@@ -352,7 +347,7 @@ public class FriendServiceTest {
 
 		when(userRepository.findById(any())).thenReturn(Optional.of(user1));
 		when(userRepository.findById(any())).thenReturn(Optional.of(user2));
-		when(friendRepository.findFriendByUserIdAndStatus(userId1, userId2 , Constant.FRIEND_REQUEST)).thenReturn(friend1);
+		when(friendRepository.findFriendRequestByUserId(userId1, userId2)).thenReturn(friend1);
 
 		friendService.removeFriendRequest(userId1, userId2);
 	}

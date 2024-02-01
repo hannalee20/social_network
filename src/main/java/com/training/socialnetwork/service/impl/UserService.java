@@ -106,11 +106,11 @@ public class UserService implements IUserService {
 	@Override
 	public boolean loginUser(String username, String password) throws Exception {
 		User user = userRepository.findByUsername(username);
-		
+
 		if (user == null) {
 			throw new CustomException(HttpStatus.NOT_FOUND, "User does not exist");
 		}
-		
+
 		if (bCryptPasswordEncoder.matches(password, user.getPassword())) {
 			return true;
 		}
@@ -149,8 +149,10 @@ public class UserService implements IUserService {
 		userToUpdate = userRepository.save(userToUpdate);
 
 		UserUpdatedDto userUpdatedDto = modelMapper.map(userToUpdate, UserUpdatedDto.class);
-		userUpdatedDto.setGender(userUpdateDto.getGender().toLowerCase());
-		
+		if (userToUpdate.getGender() != null) {
+			userUpdatedDto.setSex(userUpdateDto.getGender().toLowerCase());
+		}
+
 		return userUpdatedDto;
 	}
 
@@ -163,12 +165,14 @@ public class UserService implements IUserService {
 		}
 
 		UserDetailDto userDetailDto = modelMapper.map(user, UserDetailDto.class);
-		if (user.getGender() == Constant.NUMBER_0) {
-			userDetailDto.setGender(Constant.MALE);
-		} else {
-			userDetailDto.setGender(Constant.FEMALE);
+		if (user.getGender() != null) {
+			if (user.getGender() == Constant.NUMBER_0) {
+				userDetailDto.setGender(Constant.MALE);
+			} else {
+				userDetailDto.setGender(Constant.FEMALE);
+			}
 		}
-
+		
 		return userDetailDto;
 	}
 
