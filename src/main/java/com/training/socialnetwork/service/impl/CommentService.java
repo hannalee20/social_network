@@ -64,10 +64,10 @@ public class CommentService implements ICommentService {
 		}
 		comment.setCreateDate(new Date());
 		comment.setUpdateDate(new Date());
-		Comment commentCreated = commentRepository.save(comment);
+		comment = commentRepository.save(comment);
 
-		CommentCreatedDto commentCreatedDto = modelMapper.map(commentCreated, CommentCreatedDto.class);
-		commentCreatedDto.setUsername(commentCreated.getUser().getUsername());
+		CommentCreatedDto commentCreatedDto = modelMapper.map(comment, CommentCreatedDto.class);
+		commentCreatedDto.setUsername(comment.getUser().getUsername());
 
 		return commentCreatedDto;
 	}
@@ -79,11 +79,6 @@ public class CommentService implements ICommentService {
 
 		if (commentToUpdate == null) {
 			throw new CustomException(HttpStatus.NOT_FOUND, "Comment does not exist");
-		}
-		Post post = postRepository.findById(commentToUpdate.getPost().getPostId()).orElse(null);
-
-		if (post == null) {
-			throw new CustomException(HttpStatus.NOT_FOUND, "Post does not exist");
 		}
 		
 		if (commentToUpdate.getUser().getUserId() != userId) {
@@ -99,10 +94,11 @@ public class CommentService implements ICommentService {
 			commentToUpdate.setPhotoUrl(photoUrl);
 		}
 
-		Comment commentUpdated = commentRepository.save(commentToUpdate);
+		commentToUpdate.setUpdateDate(new Date());
+		commentToUpdate = commentRepository.save(commentToUpdate);
 
-		CommentUpdatedDto commentUpdatedDto = modelMapper.map(commentUpdated, CommentUpdatedDto.class);
-		commentUpdatedDto.setUsername(commentUpdated.getUser().getUsername());
+		CommentUpdatedDto commentUpdatedDto = modelMapper.map(commentToUpdate, CommentUpdatedDto.class);
+		commentUpdatedDto.setUsername(commentToUpdate.getUser().getUsername());
 		
 		return commentUpdatedDto;
 	}
@@ -120,7 +116,8 @@ public class CommentService implements ICommentService {
 		}
 		
 		comment.setDeleteFlg(Constant.DELETED_FlG);
-
+		comment.setUpdateDate(new Date());
+		
 		return commentRepository.save(comment) != null;
 	}
 

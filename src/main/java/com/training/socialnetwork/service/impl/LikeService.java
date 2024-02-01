@@ -1,5 +1,7 @@
 package com.training.socialnetwork.service.impl;
 
+import java.util.Date;
+
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,12 +43,14 @@ public class LikeService implements ILikeService {
 		Like like = likeRepository.findByPostAndUser(post, user);
 		if (like != null && like.getDeleteFlg() == Constant.DELETED_FlG) {
 			
-			throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, "You have liked this post");
+			throw new CustomException(HttpStatus.BAD_REQUEST, "You have liked this post");
 		} else {
 			like = new Like();
 			like.setPost(post);
 			like.setUser(user);
 			like.setDeleteFlg(Constant.UNDELETED_FLG);
+			like.setCreateDate(new Date());
+			like.setUpdateDate(new Date());
 			
 			return likeRepository.save(like) != null;
 		}
@@ -65,10 +69,11 @@ public class LikeService implements ILikeService {
 		
 		if (like != null && like.getDeleteFlg() == Constant.UNDELETED_FLG) {
 			like.setDeleteFlg(Constant.DELETED_FlG);
+			like.setUpdateDate(new Date());
 
 			return likeRepository.save(like) != null;
 		} else {
-			throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, "You haven't liked this post");
+			throw new CustomException(HttpStatus.BAD_REQUEST, "You haven't liked this post");
 		}
 	}
 

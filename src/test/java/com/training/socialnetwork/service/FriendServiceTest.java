@@ -1,5 +1,6 @@
 package com.training.socialnetwork.service;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -20,6 +21,7 @@ import com.training.socialnetwork.repository.FriendRepository;
 import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.impl.FriendService;
 import com.training.socialnetwork.util.constant.Constant;
+import com.training.socialnetwork.util.exception.CustomException;
 
 @ExtendWith(MockitoExtension.class)
 public class FriendServiceTest {
@@ -71,8 +73,8 @@ public class FriendServiceTest {
 
 		Friend friend2 = new Friend();
 		friend2.setFriendId(2);
-		friend2.setUser1(user1);
-		friend2.setUser2(user3);
+		friend2.setUser1(user3);
+		friend2.setUser2(user1);
 		friend2.setStatus(1);
 
 		List<Friend> friendList = new ArrayList<Friend>();
@@ -119,6 +121,34 @@ public class FriendServiceTest {
 
 		friendService.createFriendRequest(userId1, userId2);
 	}
+	
+	@Test
+	public void createFriendRequestFail() throws Exception {
+		int userId1 = 1;
+		int userId2 = 2;
+		User user1 = new User();
+		user1.setUserId(1);
+		user1.setUsername("test1");
+		user1.setPassword("123456");
+		user1.setEmail("test1@gmail.com");
+		user1.setGender(0);
+		user1.setBirthDate(new Date());
+		user1.setAddress("Hanoi");
+
+		User user2 = new User();
+		user2.setUserId(2);
+		user2.setUsername("test2");
+		user2.setPassword("123456");
+		user2.setEmail("test2@gmail.com");
+		user2.setGender(1);
+		user2.setBirthDate(new Date());
+		user2.setAddress("HCM");
+
+		when(userRepository.findById(any())).thenReturn(Optional.of(user1));
+		when(userRepository.findById(any())).thenReturn(Optional.empty());
+
+		assertThrows(CustomException.class, () -> friendService.createFriendRequest(userId1, userId2));
+	}
 
 	@Test
 	public void acceptFriendRequestFail() throws Exception {
@@ -150,10 +180,37 @@ public class FriendServiceTest {
 
 		when(userRepository.findById(any())).thenReturn(Optional.of(user1));
 		when(userRepository.findById(any())).thenReturn(Optional.of(user2));
-		when(friendRepository.findFriendRequestByUserId(userId1, userId2)).thenReturn(friend1);
-		when(friendRepository.save(any())).thenReturn(friend1);
+		when(friendRepository.findFriendRequestByUserId(userId1, userId2)).thenReturn(null);
 
-		friendService.acceptFriendRequest(userId1, userId2);
+		assertThrows(CustomException.class, () -> friendService.acceptFriendRequest(userId1, userId2));
+	}
+	
+	@Test
+	public void acceptFriendRequestFail2() throws Exception {
+		int userId1 = 1;
+		int userId2 = 2;
+		User user1 = new User();
+		user1.setUserId(1);
+		user1.setUsername("test1");
+		user1.setPassword("123456");
+		user1.setEmail("test1@gmail.com");
+		user1.setGender(0);
+		user1.setBirthDate(new Date());
+		user1.setAddress("Hanoi");
+
+		User user2 = new User();
+		user2.setUserId(2);
+		user2.setUsername("test2");
+		user2.setPassword("123456");
+		user2.setEmail("test2@gmail.com");
+		user2.setGender(1);
+		user2.setBirthDate(new Date());
+		user2.setAddress("HCM");
+
+		when(userRepository.findById(any())).thenReturn(Optional.of(user1));
+		when(userRepository.findById(any())).thenReturn(Optional.empty());
+
+		assertThrows(CustomException.class, () -> friendService.acceptFriendRequest(userId1, userId2));
 	}
 	
 	@Test
@@ -227,6 +284,69 @@ public class FriendServiceTest {
 
 		friendService.refuseFriendRequest(userId1, userId2);
 	}
+	
+	@Test
+	public void refuseFriendRequestFail() throws Exception {
+		int userId1 = 1;
+		int userId2 = 2;
+		User user1 = new User();
+		user1.setUserId(1);
+		user1.setUsername("test1");
+		user1.setPassword("123456");
+		user1.setEmail("test1@gmail.com");
+		user1.setGender(0);
+		user1.setBirthDate(new Date());
+		user1.setAddress("Hanoi");
+
+		User user2 = new User();
+		user2.setUserId(2);
+		user2.setUsername("test2");
+		user2.setPassword("123456");
+		user2.setEmail("test2@gmail.com");
+		user2.setGender(1);
+		user2.setBirthDate(new Date());
+		user2.setAddress("HCM");
+
+		Friend friend1 = new Friend();
+		friend1.setFriendId(1);
+		friend1.setUser1(user1);
+		friend1.setUser2(user2);
+		friend1.setStatus(1);
+
+		when(userRepository.findById(any())).thenReturn(Optional.of(user1));
+		when(userRepository.findById(any())).thenReturn(Optional.of(user2));
+		when(friendRepository.findFriendRequestByUserId(userId1, userId2)).thenReturn(null);
+
+		assertThrows(CustomException.class, () -> friendService.refuseFriendRequest(userId1, userId2));
+	}
+	
+	@Test
+	public void refuseFriendRequestFail2() throws Exception {
+		int userId1 = 1;
+		int userId2 = 2;
+		User user1 = new User();
+		user1.setUserId(1);
+		user1.setUsername("test1");
+		user1.setPassword("123456");
+		user1.setEmail("test1@gmail.com");
+		user1.setGender(0);
+		user1.setBirthDate(new Date());
+		user1.setAddress("Hanoi");
+
+		User user2 = new User();
+		user2.setUserId(2);
+		user2.setUsername("test2");
+		user2.setPassword("123456");
+		user2.setEmail("test2@gmail.com");
+		user2.setGender(1);
+		user2.setBirthDate(new Date());
+		user2.setAddress("HCM");
+
+		when(userRepository.findById(any())).thenReturn(Optional.of(user1));
+		when(userRepository.findById(any())).thenReturn(Optional.empty());
+
+		assertThrows(CustomException.class, () -> friendService.refuseFriendRequest(userId1, userId2));
+	}
 
 	@Test
 	public void unfriendRequestSuccess() throws Exception {
@@ -264,6 +384,68 @@ public class FriendServiceTest {
 		friendService.unfriend(userId1, userId2);
 	}
 
+	@Test
+	public void unfriendRequestFail() throws Exception {
+		int userId1 = 1;
+		int userId2 = 2;
+		User user1 = new User();
+		user1.setUserId(1);
+		user1.setUsername("test1");
+		user1.setPassword("123456");
+		user1.setEmail("test1@gmail.com");
+		user1.setGender(0);
+		user1.setBirthDate(new Date());
+		user1.setAddress("Hanoi");
+
+		User user2 = new User();
+		user2.setUserId(2);
+		user2.setUsername("test2");
+		user2.setPassword("123456");
+		user2.setEmail("test2@gmail.com");
+		user2.setGender(1);
+		user2.setBirthDate(new Date());
+		user2.setAddress("HCM");
+
+		Friend friend1 = new Friend();
+		friend1.setFriendId(1);
+		friend1.setUser1(user1);
+		friend1.setUser2(user2);
+		friend1.setStatus(1);
+
+		when(userRepository.findById(any())).thenReturn(Optional.of(user1));
+		when(userRepository.findById(any())).thenReturn(Optional.of(user2));
+		
+		assertThrows(CustomException.class, () -> friendService.unfriend(userId1, userId2));
+	}
+	
+	@Test
+	public void unfriendRequestFail2() throws Exception {
+		int userId1 = 1;
+		int userId2 = 2;
+		User user1 = new User();
+		user1.setUserId(1);
+		user1.setUsername("test1");
+		user1.setPassword("123456");
+		user1.setEmail("test1@gmail.com");
+		user1.setGender(0);
+		user1.setBirthDate(new Date());
+		user1.setAddress("Hanoi");
+
+		User user2 = new User();
+		user2.setUserId(2);
+		user2.setUsername("test2");
+		user2.setPassword("123456");
+		user2.setEmail("test2@gmail.com");
+		user2.setGender(1);
+		user2.setBirthDate(new Date());
+		user2.setAddress("HCM");
+
+		when(userRepository.findById(any())).thenReturn(Optional.of(user1));
+		when(userRepository.findById(any())).thenReturn(Optional.empty());
+
+		assertThrows(CustomException.class, () -> friendService.unfriend(userId1, userId2));
+	}
+	
 	@Test
 	public void findAllAddFriendRequestSuccess() {
 		int userId = 1;
@@ -350,5 +532,68 @@ public class FriendServiceTest {
 		when(friendRepository.findFriendRequestByUserId(userId1, userId2)).thenReturn(friend1);
 
 		friendService.removeFriendRequest(userId1, userId2);
+	}
+	
+	@Test
+	public void removeFriendRequestFail() throws Exception {
+		int userId1 = 1;
+		int userId2 = 2;
+		User user1 = new User();
+		user1.setUserId(1);
+		user1.setUsername("test1");
+		user1.setPassword("123456");
+		user1.setEmail("test1@gmail.com");
+		user1.setGender(0);
+		user1.setBirthDate(new Date());
+		user1.setAddress("Hanoi");
+
+		User user2 = new User();
+		user2.setUserId(2);
+		user2.setUsername("test2");
+		user2.setPassword("123456");
+		user2.setEmail("test2@gmail.com");
+		user2.setGender(1);
+		user2.setBirthDate(new Date());
+		user2.setAddress("HCM");
+
+		Friend friend1 = new Friend();
+		friend1.setFriendId(1);
+		friend1.setUser1(user1);
+		friend1.setUser2(user2);
+		friend1.setStatus(1);
+
+		when(userRepository.findById(any())).thenReturn(Optional.of(user1));
+		when(userRepository.findById(any())).thenReturn(Optional.of(user2));
+		when(friendRepository.findFriendRequestByUserId(userId1, userId2)).thenReturn(null);
+
+		assertThrows(CustomException.class, () -> friendService.removeFriendRequest(userId1, userId2));
+	}
+	
+	@Test
+	public void removeFriendRequestFail2() throws Exception {
+		int userId1 = 1;
+		int userId2 = 2;
+		User user1 = new User();
+		user1.setUserId(1);
+		user1.setUsername("test1");
+		user1.setPassword("123456");
+		user1.setEmail("test1@gmail.com");
+		user1.setGender(0);
+		user1.setBirthDate(new Date());
+		user1.setAddress("Hanoi");
+
+		User user2 = new User();
+		user2.setUserId(2);
+		user2.setUsername("test2");
+		user2.setPassword("123456");
+		user2.setEmail("test2@gmail.com");
+		user2.setGender(1);
+		user2.setBirthDate(new Date());
+		user2.setAddress("HCM");
+
+		when(userRepository.findById(any())).thenReturn(Optional.of(user1));
+		when(userRepository.findById(any())).thenReturn(Optional.empty());
+
+		assertThrows(CustomException.class, () -> friendService.removeFriendRequest(userId1, userId2));
 	}
 }

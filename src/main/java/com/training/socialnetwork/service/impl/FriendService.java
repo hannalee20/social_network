@@ -71,6 +71,12 @@ public class FriendService implements IFriendService {
 			friend = new Friend();
 			friend.setUser1(user1);
 			friend.setUser2(user2);
+		} else {
+			if (friend.getStatus() == Constant.NUMBER_0) {
+				throw new CustomException(HttpStatus.BAD_REQUEST, "You have already sent a friend request");
+			} else if (friend.getStatus() == Constant.NUMBER_1) {
+				throw new CustomException(HttpStatus.BAD_REQUEST, "You are already friends");
+			}
 		}
 		friend.setStatus(Constant.FRIEND_REQUEST);
 		friend.setCreateDate(new Date());
@@ -102,7 +108,7 @@ public class FriendService implements IFriendService {
 	@Override
 	public boolean refuseFriendRequest(int userId1, int userId2) {
 		User user1 = userRepository.findById(userId1).orElse(null);
-		
+
 		if (user1 == null) {
 			throw new CustomException(HttpStatus.NOT_FOUND, "User does not exist");
 		}

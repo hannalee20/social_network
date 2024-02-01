@@ -64,8 +64,8 @@ public class PostService implements IPostService {
 		post.setCreateDate(new Date());
 		post.setUpdateDate(new Date());
 
-		Post postCreated = postRepository.save(post);
-		if (postCreated == null) {
+		post = postRepository.save(post);
+		if (post == null) {
 			throw new Exception(Constant.SERVER_ERROR);
 		}
 
@@ -75,7 +75,7 @@ public class PostService implements IPostService {
 			for (MultipartFile file : photos) {
 				String photoUrl = imageUtils.saveImage(file);
 				Photo photo = new Photo();
-				photo.setPost(postCreated);
+				photo.setPost(post);
 				photo.setName(photoUrl);
 				photo.setCreateDate(new Date());
 
@@ -86,10 +86,10 @@ public class PostService implements IPostService {
 				photoList.add(photo);
 				photoUrls.add(photoUrl);
 			}
-			postCreated.setListPhoto(photoList);
+			post.setListPhoto(photoList);
 		}
 
-		PostCreatedDto postCreatedDto = modelMapper.map(postCreated, PostCreatedDto.class);
+		PostCreatedDto postCreatedDto = modelMapper.map(post, PostCreatedDto.class);
 		postCreatedDto.setPhotoUrl(photoUrls);
 		postCreatedDto.setUsername(user.getUsername());
 		return postCreatedDto;
@@ -223,6 +223,7 @@ public class PostService implements IPostService {
 			throw new CustomException(HttpStatus.FORBIDDEN, "You do not have permission to update");
 		}
 		post.setDeleteFlg(Constant.DELETED_FlG);
+		post.setUpdateDate(new Date());
 
 		return postRepository.save(post) != null;
 	}

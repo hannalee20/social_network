@@ -56,7 +56,7 @@ public class WebSecurityConfig {
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.authorizeHttpRequests(auth -> 
 				auth.antMatchers("/user/register", "/user/forgot-password", "/user/reset-password").permitAll()
-				.antMatchers("/user/login", "/user/token", "/user/logput").permitAll()
+				.antMatchers("/user/login", "/user/token").permitAll()
 				.antMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 				.anyRequest().authenticated()
 			);

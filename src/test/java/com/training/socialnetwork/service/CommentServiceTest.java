@@ -1,6 +1,8 @@
 package com.training.socialnetwork.service;
 
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
@@ -25,6 +27,7 @@ import com.training.socialnetwork.repository.PostRepository;
 import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.impl.CommentService;
 import com.training.socialnetwork.util.constant.Constant;
+import com.training.socialnetwork.util.exception.CustomException;
 import com.training.socialnetwork.util.image.ImageUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -85,6 +88,21 @@ public class CommentServiceTest {
 	}
 	
 	@Test
+	public void createCommentFail() {
+		int userId = 1;
+		CommentCreateDto commentCreateDto = new CommentCreateDto();
+		commentCreateDto.setPostId(1);
+		commentCreateDto.setContent("comment content");
+		
+		MockMultipartFile photo1 =
+                new MockMultipartFile("data1", "filename1.jpg", "multipart/form-data", "some xml".getBytes());
+		
+		when(postRepository.findById(anyInt())).thenReturn(Optional.empty());
+		
+		assertThrows(CustomException.class, () -> commentService.createComment(userId, commentCreateDto, photo1));
+	}
+	
+	@Test
 	public void updateCommentSuccess() throws Exception {
 		int commentId = 1;
 		int userId = 1;
@@ -111,11 +129,43 @@ public class CommentServiceTest {
 		CommentUpdatedDto commentUpdatedDto = new CommentUpdatedDto();
 		
 		when(commentRepository.findById(any())).thenReturn(Optional.of(comment));
-		when(postRepository.findById(any())).thenReturn(Optional.of(post));
 		when(commentRepository.save(any())).thenReturn(comment);
 		when(modelMapper.map(any(), any())).thenReturn(commentUpdatedDto);
 		
 		commentService.updateComment(content, photo1, commentId, userId);
+	}
+	
+	@Test
+	public void updateCommentFail() {
+		int userId = 1;
+		int commentId = 2;
+		String content = "test";
+		MockMultipartFile photo1 =
+                new MockMultipartFile("data1", "filename1.jpg", "multipart/form-data", "some xml".getBytes());
+		
+		when(commentRepository.findById(anyInt())).thenReturn(Optional.empty());
+
+		assertThrows(CustomException.class, () -> commentService.updateComment(content, photo1, commentId, userId));
+	}
+	
+	@Test
+	public void updateCommentFail2() {
+		int userId = 1;
+		int commentId = 2;
+		String content = "test";
+		MockMultipartFile photo1 =
+                new MockMultipartFile("data1", "filename1.jpg", "multipart/form-data", "some xml".getBytes());
+		
+		User user = new User();
+		user.setUserId(2);
+		
+		Comment comment = new Comment();
+		comment.setUser(user);
+		comment.setContent("content");
+		
+		when(commentRepository.findById(anyInt())).thenReturn(Optional.of(comment));
+
+		assertThrows(CustomException.class, () -> commentService.updateComment(content, photo1, commentId, userId));
 	}
 	
 	@Test
@@ -141,6 +191,33 @@ public class CommentServiceTest {
 	}
 	
 	@Test
+	public void deleteCommentFail() {
+		int userId = 1;
+		int commentId = 2;
+		
+		User user = new User();
+		user.setUserId(2);
+		
+		Comment comment = new Comment();
+		comment.setUser(user);
+		comment.setContent("content");
+		
+		when(commentRepository.findById(anyInt())).thenReturn(Optional.of(comment));
+
+		assertThrows(CustomException.class, () -> commentService.deleteComment(commentId, userId));
+	}
+	
+	@Test
+	public void deleteCommentFail2() {
+		int userId = 1;
+		int commentId = 2;
+		
+		when(commentRepository.findById(anyInt())).thenReturn(Optional.empty());
+
+		assertThrows(CustomException.class, () -> commentService.deleteComment(commentId, userId));
+	}
+	
+	@Test
 	public void getCommentDetailSuccess() throws Exception {
 		int commentId = 1;
 		
@@ -159,5 +236,14 @@ public class CommentServiceTest {
 		when(modelMapper.map(any(), any())).thenReturn(commentDetailDto);
 		
 		commentService.getCommentDetail(commentId);
+	}
+	
+	@Test
+	public void getCommentDetailFail() {
+		int commentId = 2;
+		
+		when(commentRepository.findById(anyInt())).thenReturn(Optional.empty());
+
+		assertThrows(CustomException.class, () -> commentService.getCommentDetail(commentId));
 	}
 }

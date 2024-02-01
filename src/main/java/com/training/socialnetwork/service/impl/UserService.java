@@ -95,10 +95,10 @@ public class UserService implements IUserService {
 		user.setCreateDate(new Date());
 		user.setUpdateDate(new Date());
 
-		User userRegisted = userRepository.save(user);
+		user = userRepository.save(user);
 
 		UserRegistedDto userRegistedDto = new UserRegistedDto();
-		userRegistedDto = modelMapper.map(userRegisted, UserRegistedDto.class);
+		userRegistedDto = modelMapper.map(user, UserRegistedDto.class);
 		userRegistedDto.setRole(Constant.ROLE_USER);
 		return userRegistedDto;
 	}
