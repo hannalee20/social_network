@@ -2,6 +2,7 @@ package com.training.socialnetwork.service;
 
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -207,6 +208,7 @@ public class UserServiceTest {
 		userToUpdate.setUserId(1);
 		userToUpdate.setUsername("test");
 		userToUpdate.setEmail("test@gmail.com");
+		userToUpdate.setBirthDate(new Date());
 		
 		UserUpdatedDto userUpdatedDto = new UserUpdatedDto();
 		userUpdatedDto.setUserId(1);
@@ -348,8 +350,8 @@ public class UserServiceTest {
 		
 		Friend friend = new Friend();
 		friend.setFriendId(1);
-		friend.setUser1(user1);
-		friend.setUser2(user3);
+		friend.setSentUser(user1);
+		friend.setRecievedUser(user3);
 		friend.setStatus(1);
 		
 		List<Friend> friendList = new ArrayList<Friend>();
@@ -357,8 +359,8 @@ public class UserServiceTest {
 		
 		String keyword = "test";
 		UserSearchDto userSearchDto = new UserSearchDto();
-		when(userRepository.findAllUserByKeyword(3, keyword)).thenReturn(userList);
-		when(friendRepository.findAllByUserId(3)).thenReturn(friendList);
+		when(userRepository.findAllUserByKeyword(anyInt(), any(), any())).thenReturn(userList);
+		when(friendRepository.findAllByUserId(anyInt())).thenReturn(friendList);
 		when(modelMapper.map(any(), any())).thenReturn(userSearchDto);
 		
 		userService.searchUser(3, keyword, null);

@@ -24,6 +24,7 @@ import com.training.socialnetwork.entity.Like;
 import com.training.socialnetwork.entity.Photo;
 import com.training.socialnetwork.entity.Post;
 import com.training.socialnetwork.entity.User;
+import com.training.socialnetwork.repository.FriendRepository;
 import com.training.socialnetwork.repository.PhotoRepository;
 import com.training.socialnetwork.repository.PostRepository;
 import com.training.socialnetwork.repository.UserRepository;
@@ -41,6 +42,9 @@ public class PostService implements IPostService {
 
 	@Autowired
 	private UserRepository userRepository;
+	
+	@Autowired
+	private FriendRepository friendRepository;
 
 	@Autowired
 	private PhotoRepository photoRepository;
@@ -97,7 +101,8 @@ public class PostService implements IPostService {
 
 	@Override
 	public List<PostListDto> getTimeline(int userId, Pageable page) {
-		List<Post> postList = postRepository.findAllByUserId(userId, page);
+		List<Integer> friendUserIdList = friendRepository.findAllFriendUserId(userId);
+		List<Post> postList = postRepository.findAllByUserId(friendUserIdList, page);
 		List<PostListDto> postListDtos = new ArrayList<>();
 		for (Post post : postList) {
 			List<Photo> photoList = post.getListPhoto();

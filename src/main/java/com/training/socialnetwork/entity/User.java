@@ -73,11 +73,11 @@ public class User {
 	@Column
 	private Date updateDate;
 
-	@OneToMany(mappedBy = "user1")
-	private List<Friend> userId1;
+	@OneToMany(mappedBy = "sentUser")
+	private List<Friend> sentUserId;
 
-	@OneToMany(mappedBy = "user2")
-	private List<Friend> userId2;
+	@OneToMany(mappedBy = "recievedUser")
+	private List<Friend> recievedUserId;
 
 	@OneToMany(mappedBy = "user")
 	private List<Post> postList;
@@ -208,20 +208,24 @@ public class User {
 		this.updateDate = updateDate;
 	}
 
-	public List<Friend> getUserId1() {
-		return userId1;
+	public List<Friend> getSentUserId() {
+		return sentUserId;
 	}
 
-	public void setUserId1(List<Friend> userId1) {
-		this.userId1 = userId1;
+	public void setSentUserId(List<Friend> sentUserId) {
+		this.sentUserId = sentUserId;
 	}
 
-	public List<Friend> getUserId2() {
-		return userId2;
+	public List<Friend> getRecievedUserId() {
+		return recievedUserId;
 	}
 
-	public void setUserId2(List<Friend> userId2) {
-		this.userId2 = userId2;
+	public void setRecievedUserId(List<Friend> recievedUserId) {
+		this.recievedUserId = recievedUserId;
+	}
+
+	public void setGender(Integer gender) {
+		this.gender = gender;
 	}
 
 	public List<Post> getPostList() {

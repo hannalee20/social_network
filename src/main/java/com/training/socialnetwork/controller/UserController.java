@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -52,7 +52,6 @@ import com.training.socialnetwork.util.exception.CustomException;
 import com.training.socialnetwork.util.generator.ReportGenerator;
 
 @RestController
-@Validated
 @RequestMapping(value = "/user")
 public class UserController {
 
@@ -128,7 +127,7 @@ public class UserController {
 
 	@PatchMapping(value = "/update/{userId}", consumes = { "multipart/form-data" })
 	public ResponseEntity<Object> updateUser(HttpServletRequest request, @PathVariable(value = "userId") int userId,
-			@ParameterObject @ModelAttribute UserUpdateDto userUpdateDto,
+			@ParameterObject @ModelAttribute @Valid UserUpdateDto userUpdateDto,
 			@RequestParam(value = "file", required = false) MultipartFile avatar) {
 		int loggedInUserId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		try {

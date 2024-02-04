@@ -5,7 +5,7 @@ public class UserSearchDto {
 	private int userId;
 	private String username;
 	private String avatar;
-	private int friendStatus;
+	private String friendStatus;
 
 	public int getUserId() {
 		return userId;
@@ -31,11 +31,11 @@ public class UserSearchDto {
 		this.avatar = avatar;
 	}
 
-	public int getFriendStatus() {
+	public String getFriendStatus() {
 		return friendStatus;
 	}
 
-	public void setFriendStatus(int friendStatus) {
+	public void setFriendStatus(String friendStatus) {
 		this.friendStatus = friendStatus;
 	}
 

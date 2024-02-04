@@ -18,11 +18,11 @@ public interface LikeRepository extends JpaRepository<Like, Integer>{
 	
 	@Query(value = "" + 
 			"select count(l.like_id) as likes " + 
-			"from users as u " + 
-			"inner join posts p on u.user_id = p.user_id " + 
-			"inner join likes l on p.post_id = l.post_id " +
-			"where u.user_id = :userId " + 
+			"from posts as p " + 
+			"inner join likes l on p.post_id = l.post_id " + 
+			"and p.user_id = :userId " +
+			"and l.user_id <> :userId " + 
 			"and l.delete_flg = 0 " + 
-			"and l.create_date >= :dateStart <= :dateEnd ", nativeQuery = true)
+			"and l.create_date >= :dateStart and l.create_date <= :dateEnd ", nativeQuery = true)
 	int countLike(@Param(value = "userId") int userId, @Param(value = "dateStart") LocalDate dateStart, @Param(value = "dateEnd") LocalDate dateEnd);
 }

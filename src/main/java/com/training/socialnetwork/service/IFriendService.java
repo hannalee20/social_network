@@ -13,15 +13,13 @@ public interface IFriendService {
 	
 	List<FriendRequestDto> findAllAddFriendRequest(int userId, Pageable paging);
 	
-	boolean createFriendRequest(int userId1, int userId2) throws Exception;
+	boolean createFriendRequest(int sentUserId, int recievedUserId) throws Exception;
 	
-	boolean acceptFriendRequest(int userId1, int userId2) throws Exception;
+	boolean acceptFriendRequest(int sentUserId, int recievedUserId) throws Exception;
 	
-	boolean refuseFriendRequest(int userId1, int userId2);
+	boolean refuseFriendRequest(int sentUserId, int recievedUserId);
 	
-	boolean unfriend(int userId1, int userId2);
+	boolean unfriend(int friendUserId, int loggedInUserId);
 	
-//	int countFriend(int userId);
-	
-	boolean removeFriendRequest(int userId1, int userId2) throws Exception;
+	boolean removeFriendRequest(int sentUserId, int recievedUserId) throws Exception;
 }

@@ -77,89 +77,89 @@ public class FriendControllerTest {
 
 	@Test
 	public void createFriendRequestSuccess() throws Exception {
-		int userId2 = 2;
+		int recievedUserId = 2;
 
 		when(friendService.createFriendRequest(anyInt(), anyInt())).thenReturn(true);
 
 		mockMvc.perform(post("/friend/add-request").header("Authorization", "Bearer dummyToken")
-				.contentType(MediaType.APPLICATION_JSON).param("userId2", Integer.toString(userId2)))
+				.contentType(MediaType.APPLICATION_JSON).param("recievedUserId", Integer.toString(recievedUserId)))
 				.andExpect(status().isCreated()).andExpect(content().string(Constant.SEND_FRIEND_REQUEST_SUCCESSFULLY));
 	}
 
 	@Test
 	public void createFriendRequestFail() throws Exception {
-		int userId2 = 2;
+		int recievedUserId = 2;
 
 		when(friendService.createFriendRequest(anyInt(), anyInt())).thenThrow(new Exception());
 
 		mockMvc.perform(post("/friend/add-request").header("Authorization", "Bearer dummyToken")
-				.contentType(MediaType.APPLICATION_JSON).param("userId2", Integer.toString(userId2)))
+				.contentType(MediaType.APPLICATION_JSON).param("recievedUserId", Integer.toString(recievedUserId)))
 				.andExpect(status().isInternalServerError());
 	}
 
 	@Test
 	public void acceptFriendSuccess() throws Exception {
-		int userId1 = 2;
+		int sentUserId = 2;
 
 		when(friendService.acceptFriendRequest(anyInt(), anyInt())).thenReturn(true);
 
 		mockMvc.perform(post("/friend/accept-request").header("Authorization", "Bearer dummyToken")
-				.contentType(MediaType.APPLICATION_JSON).param("userId1", Integer.toString(userId1)))
+				.contentType(MediaType.APPLICATION_JSON).param("sentUserId", Integer.toString(sentUserId)))
 				.andExpect(status().isOk()).andExpect(content().string(Constant.ACCEPT_FRIEND_REQUEST_SUCCESSFULLY));
 	}
 
 	@Test
 	public void acceptFriendFail() throws Exception {
-		int userId1 = 2;
+		int sentUserId = 2;
 
 		when(friendService.acceptFriendRequest(anyInt(), anyInt())).thenThrow(new Exception());
 
 		mockMvc.perform(post("/friend/accept-request").header("Authorization", "Bearer dummyToken")
-				.contentType(MediaType.APPLICATION_JSON).param("userId1", Integer.toString(userId1)))
+				.contentType(MediaType.APPLICATION_JSON).param("sentUserId", Integer.toString(sentUserId)))
 				.andExpect(status().isInternalServerError());
 	}
 
 	@Test
 	public void refuseFriendRequestSuccess() throws Exception {
-		int userId1 = 2;
+		int sentUserId = 2;
 
 		when(friendService.refuseFriendRequest(anyInt(), anyInt())).thenReturn(true);
 
 		mockMvc.perform(post("/friend/refuse-request").header("Authorization", "Bearer dummyToken")
-				.contentType(MediaType.APPLICATION_JSON).param("userId1", Integer.toString(userId1)))
+				.contentType(MediaType.APPLICATION_JSON).param("sentUserId", Integer.toString(sentUserId)))
 				.andExpect(status().isOk()).andExpect(content().string(Constant.REFUSE_FRIEND_REQUEST_SUCCESSFULLY));
 	}
 	
 	@Test
 	public void refuseFriendRequestFail() throws Exception {
-		int userId1 = 2;
+		int sentUserId = 2;
 
 		when(friendService.refuseFriendRequest(anyInt(), anyInt())).thenThrow(new RuntimeException());
 
 		mockMvc.perform(post("/friend/refuse-request").header("Authorization", "Bearer dummyToken")
-				.contentType(MediaType.APPLICATION_JSON).param("userId1", Integer.toString(userId1)))
+				.contentType(MediaType.APPLICATION_JSON).param("sentUserId", Integer.toString(sentUserId)))
 				.andExpect(status().isInternalServerError());
 	}
 
 	@Test
 	public void removeFriendSuccess() throws Exception {
-		int userId1 = 2;
+		int friendUserId = 2;
 
 		when(friendService.unfriend(anyInt(), anyInt())).thenReturn(true);
 
 		mockMvc.perform(post("/friend/remove-friend").header("Authorization", "Bearer dummyToken")
-				.contentType(MediaType.APPLICATION_JSON).param("userId1", Integer.toString(userId1)))
+				.contentType(MediaType.APPLICATION_JSON).param("friendUserId", Integer.toString(friendUserId)))
 				.andExpect(status().isOk()).andExpect(content().string(Constant.REMOVE_FRIEND_SUCCESSFULLY));
 	}
 
 	@Test
 	public void removeFriendFail() throws Exception {
-		int userId1 = 2;
+		int friendUserId = 2;
 
 		when(friendService.unfriend(anyInt(), anyInt())).thenThrow(new RuntimeException());
 
 		mockMvc.perform(post("/friend/remove-friend").header("Authorization", "Bearer dummyToken")
-				.contentType(MediaType.APPLICATION_JSON).param("userId1", Integer.toString(userId1)))
+				.contentType(MediaType.APPLICATION_JSON).param("friendUserId", Integer.toString(friendUserId)))
 				.andExpect(status().isInternalServerError());
 	}
 	
@@ -195,23 +195,23 @@ public class FriendControllerTest {
 
 	@Test
 	public void removeFriendRequestSuccess() throws Exception {
-		int userId2 = 2;
+		int recievedUserId = 2;
 
 		when(friendService.removeFriendRequest(anyInt(), anyInt())).thenReturn(true);
 
 		mockMvc.perform(post("/friend/remove-friend-request").header("Authorization", "Bearer dummyToken")
-				.contentType(MediaType.APPLICATION_JSON).param("userId2", Integer.toString(userId2)))
+				.contentType(MediaType.APPLICATION_JSON).param("recievedUserId", Integer.toString(recievedUserId)))
 				.andExpect(status().isOk()).andExpect(content().string(Constant.REMOVE_FRIEND_REQUEST_SUCCESSFULLY));
 	}
 	
 	@Test
 	public void removeFriendRequestFail() throws Exception {
-		int userId2 = 2;
+		int recievedUserId = 2;
 
 		when(friendService.removeFriendRequest(anyInt(), anyInt())).thenThrow(new Exception());
 
 		mockMvc.perform(post("/friend/remove-friend-request").header("Authorization", "Bearer dummyToken")
-				.contentType(MediaType.APPLICATION_JSON).param("userId2", Integer.toString(userId2)))
+				.contentType(MediaType.APPLICATION_JSON).param("recievedUserId", Integer.toString(recievedUserId)))
 				.andExpect(status().isInternalServerError());
 	}
 }

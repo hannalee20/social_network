@@ -20,12 +20,12 @@ public class Friend {
 	private int friendId;
 	
 	@ManyToOne
-	@JoinColumn(name = "userId1")
-	private User user1;
+	@JoinColumn(name = "sentUserId")
+	private User sentUser;
 	
 	@ManyToOne
-	@JoinColumn(name = "userId2")
-	private User user2;
+	@JoinColumn(name = "recievedUserId")
+	private User recievedUser;
 	
 	@Column
 	private int status;
@@ -43,21 +43,21 @@ public class Friend {
 	public void setFriendId(int friendId) {
 		this.friendId = friendId;
 	}
-	
-	public User getUser1() {
-		return user1;
+
+	public User getSentUser() {
+		return sentUser;
 	}
 
-	public void setUser1(User user1) {
-		this.user1 = user1;
+	public void setSentUser(User sentUser) {
+		this.sentUser = sentUser;
 	}
 
-	public User getUser2() {
-		return user2;
+	public User getRecievedUser() {
+		return recievedUser;
 	}
 
-	public void setUser2(User user2) {
-		this.user2 = user2;
+	public void setRecievedUser(User recievedUser) {
+		this.recievedUser = recievedUser;
 	}
 
 	public int getStatus() {

@@ -1,6 +1,8 @@
 package com.training.socialnetwork.service.impl;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
@@ -132,7 +134,7 @@ public class UserService implements IUserService {
 			throw new CustomException(HttpStatus.FORBIDDEN, "You do not have permission to update");
 		}
 
-		if (userUpdateDto.getGender() != null) {
+		if (null != userUpdateDto.getGender()) {
 			if (userUpdateDto.getGender().toUpperCase().equals(Constant.MALE)) {
 				userToUpdate.setGender(Constant.NUMBER_0);
 			} else {
@@ -140,6 +142,15 @@ public class UserService implements IUserService {
 			}
 		}
 		objectMapper.copyProperties(userUpdateDto, userToUpdate);
+		if(null != userUpdateDto.getBirthDate()) {
+			try {
+				SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+				formatter.setLenient(false);
+				userToUpdate.setBirthDate(formatter.parse(userUpdateDto.getBirthDate()));
+			} catch (Exception e) {
+				throw new CustomException(HttpStatus.BAD_REQUEST, "Invalid date");
+			}
+		}
 		userToUpdate.setUserId(userId);
 		if (avatar != null) {
 			String avatarUrl = imageUtils.saveImage(avatar);
@@ -149,9 +160,14 @@ public class UserService implements IUserService {
 		userToUpdate = userRepository.save(userToUpdate);
 
 		UserUpdatedDto userUpdatedDto = modelMapper.map(userToUpdate, UserUpdatedDto.class);
-		if (userToUpdate.getGender() != null) {
-			userUpdatedDto.setSex(userUpdateDto.getGender().toLowerCase());
+		if (null != userToUpdate.getGender()) {
+			if (userToUpdate.getGender() == Constant.NUMBER_0) {
+				userUpdatedDto.setSex(null);
+			} else {
+				userUpdatedDto.setSex(Constant.FEMALE);
+			}
 		}
+		userUpdatedDto.setBirthDate(userToUpdate.getBirthDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
 
 		return userUpdatedDto;
 	}
@@ -165,20 +181,21 @@ public class UserService implements IUserService {
 		}
 
 		UserDetailDto userDetailDto = modelMapper.map(user, UserDetailDto.class);
-		if (user.getGender() != null) {
+		if (null != user.getGender()) {
 			if (user.getGender() == Constant.NUMBER_0) {
 				userDetailDto.setGender(Constant.MALE);
 			} else {
 				userDetailDto.setGender(Constant.FEMALE);
 			}
 		}
-		
+		userDetailDto.setBirthDate(user.getBirthDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+
 		return userDetailDto;
 	}
 
 	@Override
 	public List<UserSearchDto> searchUser(int userId, String keyword, Pageable paging) {
-		List<User> userList = userRepository.findAllUserByKeyword(userId, keyword);
+		List<User> userList = userRepository.findAllUserByKeyword(userId, keyword, paging);
 
 		List<Friend> friendList = friendRepository.findAllByUserId(userId);
 
@@ -188,11 +205,17 @@ public class UserService implements IUserService {
 			userSearchList.add(userSearchDto);
 		}
 		for (UserSearchDto user : userSearchList) {
-			user.setFriendStatus(Constant.NOT_FRIEND);
+			user.setFriendStatus(Constant.SEND_REQUEST);
 			for (Friend friend : friendList) {
-				if (friend.getUser1().getUserId() == user.getUserId()
-						|| friend.getUser2().getUserId() == user.getUserId()) {
-					user.setFriendStatus(friend.getStatus());
+				if (friend.getSentUser().getUserId() == user.getUserId()
+						|| friend.getRecievedUser().getUserId() == user.getUserId()) {
+					if (friend.getStatus() == Constant.NUMBER_0) {
+						user.setFriendStatus(Constant.SENT_REQUEST);
+					} else if (friend.getStatus() == Constant.NUMBER_1) {
+						user.setFriendStatus(Constant.FRIENDED);
+					} else {
+						user.setFriendStatus(Constant.SEND_REQUEST);
+					}
 					break;
 				}
 			}

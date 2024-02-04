@@ -14,8 +14,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -222,7 +222,7 @@ public class UserControllerTest {
 		userDetailDto.setUsername("test");
 		userDetailDto.setRealName("Test");
 		userDetailDto.setGender("female");
-		userDetailDto.setBirthDate(new Date());
+		userDetailDto.setBirthDate(LocalDate.now());
 		userDetailDto.setEmail("test");
 		userDetailDto.setAddress("hanoi");
 		userDetailDto.setJob("developer");
@@ -265,7 +265,7 @@ public class UserControllerTest {
 	public void updateUserSuccess() throws Exception {
 		int userId = 1;
 		UserUpdateDto userUpdateDto = new UserUpdateDto();
-		userUpdateDto.setBirthDate(new Date());
+		userUpdateDto.setBirthDate("2020-02-02");
 		userUpdateDto.setAddress("HCM");
 		userUpdateDto.setUniversity("test");
 		userUpdateDto.setJob("test");
@@ -276,7 +276,7 @@ public class UserControllerTest {
 		
 		UserUpdatedDto userUpdatedDto = new UserUpdatedDto();
 		userUpdatedDto.setUserId(1);
-		userUpdatedDto.setBirthDate(new Date());
+		userUpdatedDto.setBirthDate(LocalDate.now());
 		userUpdatedDto.setSex("female");
 		userUpdatedDto.setEmail("test");
 		userUpdatedDto.setRealName("test");
@@ -311,7 +311,7 @@ public class UserControllerTest {
 		int userId = 1;
 		
 		UserUpdateDto userUpdateDto = new UserUpdateDto();
-		userUpdateDto.setBirthDate(new Date());
+		userUpdateDto.setBirthDate("2020-02-02");
 		userUpdateDto.setAddress("HCM");
 		
 		MultipartFile avatar = new MockMultipartFile("data2", "filename2.jpg", "multipart/form-data", "some xml".getBytes());
@@ -339,17 +339,17 @@ public class UserControllerTest {
 		UserSearchDto userSearchDto1 = new UserSearchDto();
 		userSearchDto1.setUserId(4);
 		userSearchDto1.setUsername("test1");
-		userSearchDto1.setFriendStatus(2);
+		userSearchDto1.setFriendStatus("Send request");
 		
 		UserSearchDto userSearchDto2 = new UserSearchDto();
 		userSearchDto2.setUserId(2);
 		userSearchDto2.setUsername("test2");
-		userSearchDto2.setFriendStatus(1);
+		userSearchDto2.setFriendStatus("Friend");
 		
 		UserSearchDto userSearchDto3 = new UserSearchDto();
 		userSearchDto3.setUserId(3);
 		userSearchDto3.setUsername("test3");
-		userSearchDto3.setFriendStatus(0);
+		userSearchDto3.setFriendStatus("Sent request");
 		
 		List<UserSearchDto> userSearchList = new ArrayList<>();
 		userSearchList.add(userSearchDto1);

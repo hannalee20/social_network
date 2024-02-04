@@ -1,13 +1,13 @@
 package com.training.socialnetwork.dto.response.user;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 public class UserDetailDto {
 
 	private int userId;
 	private String username;
 	private String realName;
-	private Date birthDate;
+	private LocalDate birthDate;
 	private String gender;
 	private String address;
 	private String email;
@@ -41,11 +41,11 @@ public class UserDetailDto {
 		this.realName = realName;
 	}
 
-	public Date getBirthDate() {
+	public LocalDate getBirthDate() {
 		return birthDate;
 	}
 
-	public void setBirthDate(Date birthDate) {
+	public void setBirthDate(LocalDate birthDate) {
 		this.birthDate = birthDate;
 	}
 

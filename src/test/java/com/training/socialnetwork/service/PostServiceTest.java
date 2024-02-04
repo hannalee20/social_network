@@ -3,6 +3,7 @@ package com.training.socialnetwork.service;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ import com.training.socialnetwork.entity.Like;
 import com.training.socialnetwork.entity.Photo;
 import com.training.socialnetwork.entity.Post;
 import com.training.socialnetwork.entity.User;
+import com.training.socialnetwork.repository.FriendRepository;
 import com.training.socialnetwork.repository.PhotoRepository;
 import com.training.socialnetwork.repository.PostRepository;
 import com.training.socialnetwork.repository.UserRepository;
@@ -50,6 +52,9 @@ public class PostServiceTest {
 
 	@Mock
 	private PostRepository postRepository;
+	
+	@Mock
+	private FriendRepository friendRepository;
 
 	@Mock
 	private UserRepository userRepository;
@@ -173,9 +178,11 @@ public class PostServiceTest {
 		postList.add(post1);
 		postList.add(post2);
 
+		List<Integer> friendUserIdList = new ArrayList<>();
 		PostListDto postListDto = new PostListDto();
 
-		when(postRepository.findAllByUserId(1, null)).thenReturn(postList);
+		when(friendRepository.findAllFriendUserId(anyInt())).thenReturn(friendUserIdList);
+		when(postRepository.findAllByUserId(anyList(), any())).thenReturn(postList);
 		when(modelMapper.map(any(), any())).thenReturn(postListDto);
 		postService.getTimeline(userId, null);
 	}

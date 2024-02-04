@@ -1,12 +1,8 @@
 package com.training.socialnetwork.dto.request.user;
 
 import java.io.Serializable;
-import java.util.Date;
 
-import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
-
-import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -17,10 +13,13 @@ public class UserUpdateDto implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	@Pattern(regexp = "^[a-zA-Z]+$", message = Constant.INVALID_REAL_NAME)
 	private String realName;
 	
-	private Date birthDate;
+	@Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = Constant.BIRTH_DATE_INVALID_MESSAGE)
+	private String birthDate;
 	
+	@Pattern(regexp = "^(Male|Female|male|female)$", message = Constant.GENDER_INVALID_MESSAGE)
 	private String gender;
 	
 	private String address;
@@ -33,7 +32,6 @@ public class UserUpdateDto implements Serializable {
 	
 	private String about;
 
-	@Pattern(regexp = "^[A-Z]([a-zA-Z]+)?$", message = Constant.INVALID_REAL_NAME)
 	public String getRealName() {
 		return realName;
 	}
@@ -42,17 +40,14 @@ public class UserUpdateDto implements Serializable {
 		this.realName = realName;
 	}
 
-	@Past
-	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	public Date getBirthDate() {
+	public String getBirthDate() {
 		return birthDate;
 	}
 
-	public void setBirthDate(Date birthDate) {
+	public void setBirthDate(String birthDate) {
 		this.birthDate = birthDate;
 	}
 
-	@Pattern(regexp = "^(Male|Female|male|female)$", message = Constant.GENDER_INVALID_MESSAGE)
 	public String getGender() {
 		return gender;
 	}

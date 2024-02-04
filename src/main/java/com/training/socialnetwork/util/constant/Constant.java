@@ -58,6 +58,8 @@ public class Constant {
 
 	public static final String GENDER_INVALID_MESSAGE = "Gender must be Male/male or Female/female";
 	
+	public static final String BIRTH_DATE_INVALID_MESSAGE = "Birth date must be like yyyy-MM-dd";
+	
 	public static final String TOKEN_HAS_EXPIRED = "Token has expired";
 	
 	public static final String TOKEN_INVALID = "Token invalid";
@@ -65,4 +67,10 @@ public class Constant {
 	public static final String MALE = "male";
 	
 	public static final String FEMALE = "female";
+	
+	public static final String SENT_REQUEST = "Sent request";
+	
+	public static final String FRIENDED = "Friended";
+	
+	public static final String SEND_REQUEST = "Send request";
 }
