@@ -162,7 +162,7 @@ public class UserService implements IUserService {
 		UserUpdatedDto userUpdatedDto = modelMapper.map(userToUpdate, UserUpdatedDto.class);
 		if (null != userToUpdate.getGender()) {
 			if (userToUpdate.getGender() == Constant.NUMBER_0) {
-				userUpdatedDto.setSex(null);
+				userUpdatedDto.setSex(Constant.MALE);
 			} else {
 				userUpdatedDto.setSex(Constant.FEMALE);
 			}

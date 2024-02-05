@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.training.socialnetwork.dto.request.user.UserForgotPasswordDto;
 import com.training.socialnetwork.dto.request.user.UserLoginDto;
 import com.training.socialnetwork.dto.request.user.UserRegisterDto;
@@ -66,9 +65,6 @@ public class UserController {
 
 	@Autowired
 	private OtpUtils otpUtils;
-
-	@Autowired
-	private ObjectMapper objectMapper;
 
 	@PostMapping(value = "/register")
 	public ResponseEntity<Object> registerUser(@ParameterObject @ModelAttribute UserRegisterDto userRegisterDto) {
@@ -133,7 +129,7 @@ public class UserController {
 		try {
 			UserUpdatedDto result = userService.updateInfo(userUpdateDto, avatar, userId, loggedInUserId);
 
-			return new ResponseEntity<Object>(objectMapper.writeValueAsString(result), HttpStatus.OK);
+			return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (CustomException e) {
 			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
 		} catch (Exception e) {

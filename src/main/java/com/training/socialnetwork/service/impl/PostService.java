@@ -102,6 +102,7 @@ public class PostService implements IPostService {
 	@Override
 	public List<PostListDto> getTimeline(int userId, Pageable page) {
 		List<Integer> friendUserIdList = friendRepository.findAllFriendUserId(userId);
+		friendUserIdList.add(userId);
 		List<Post> postList = postRepository.findAllByUserId(friendUserIdList, page);
 		List<PostListDto> postListDtos = new ArrayList<>();
 		for (Post post : postList) {
