@@ -13,7 +13,7 @@ public class UserUpdateDto implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@Pattern(regexp = "^[a-zA-Z]+$", message = Constant.INVALID_REAL_NAME)
+	@Pattern(regexp = "^[a-zA-Z]{2,}(?: [a-zA-Z]+){0,2}$", message = Constant.INVALID_REAL_NAME)
 	private String realName;
 	
 	@Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = Constant.BIRTH_DATE_INVALID_MESSAGE)

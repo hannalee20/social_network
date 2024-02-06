@@ -167,8 +167,10 @@ public class UserService implements IUserService {
 				userUpdatedDto.setSex(Constant.FEMALE);
 			}
 		}
-		userUpdatedDto.setBirthDate(userToUpdate.getBirthDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-
+		if(null != userToUpdate.getBirthDate()) {
+			userUpdatedDto.setBirthDate(userToUpdate.getBirthDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+		}
+		
 		return userUpdatedDto;
 	}
 
