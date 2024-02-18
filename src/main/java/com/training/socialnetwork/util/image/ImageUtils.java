@@ -28,4 +28,23 @@ public class ImageUtils {
 		
 		return imagePath.resolve(image.getOriginalFilename()).toString();
 	}
+	
+	public boolean isValid(MultipartFile multipartFile) {
+
+        boolean result = true;
+
+        String contentType = multipartFile.getContentType();
+        if (!isSupportedContentType(contentType)) {
+
+            result = false;
+        }
+
+        return result;
+    }
+
+    private boolean isSupportedContentType(String contentType) {
+        return contentType.equals("image/png")
+                || contentType.equals("image/jpg")
+                || contentType.equals("image/jpeg");
+    }
 }

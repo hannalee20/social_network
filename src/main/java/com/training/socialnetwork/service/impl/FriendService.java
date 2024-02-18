@@ -7,6 +7,8 @@ import java.util.List;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -32,8 +34,8 @@ public class FriendService implements IFriendService {
 	private UserRepository userRepository;
 
 	@Override
-	public List<FriendListDto> findAllFriendWithStatus(int userId, Pageable paging) {
-		List<Friend> friendList = friendRepository.findAllFriendByUserIdAndStatus(userId, Constant.FRIENDED_STATUS,
+	public Page<FriendListDto> findAllFriendWithStatus(int userId, Pageable paging) {
+		Page<Friend> friendList = friendRepository.findAllFriendByUserIdAndStatus(userId, Constant.FRIENDED_STATUS,
 				paging);
 
 		List<FriendListDto> friendListDtos = new ArrayList<>();
@@ -42,18 +44,19 @@ public class FriendService implements IFriendService {
 			FriendListDto friendListDto = new FriendListDto();
 			friendListDto.setFriendId(friend.getFriendId());
 			if (friend.getSentUser().getUserId() == userId) {
-				friendListDto.setUserId(friend.getRecievedUser().getUserId());
-				friendListDto.setUsername(friend.getRecievedUser().getUsername());
-				friendListDto.setAvatar(friend.getRecievedUser().getAvatarUrl());
+				friendListDto.setUserId(friend.getReceivedUser().getUserId());
+				friendListDto.setUsername(friend.getReceivedUser().getUsername());
+//				friendListDto.setAvatar(friend.getReceivedUser().getAvatarUrl());
 			} else {
 				friendListDto.setUserId(friend.getSentUser().getUserId());
 				friendListDto.setUsername(friend.getSentUser().getUsername());
-				friendListDto.setAvatar(friend.getSentUser().getAvatarUrl());
+//				friendListDto.setAvatar(friend.getSentUser().getAvatarUrl());
 			}
 
 			friendListDtos.add(friendListDto);
 		}
-		return friendListDtos;
+		Page<FriendListDto> page = new PageImpl<FriendListDto>(friendListDtos);
+		return page;
 	}
 
 	@Override
@@ -65,12 +68,12 @@ public class FriendService implements IFriendService {
 			throw new CustomException(HttpStatus.NOT_FOUND, "User does not exist");
 		}
 
-		Friend friend = friendRepository.findFriendBySentUserAndRecievedUser(sentUserId, recievedUserId);
+		Friend friend = friendRepository.findFriendBySentUserAndReceivedUser(sentUserId, recievedUserId);
 
 		if (friend == null) {
 			friend = new Friend();
 			friend.setSentUser(sentUser);
-			friend.setRecievedUser(recievedUser);
+			friend.setReceivedUser(recievedUser);
 		} else {
 			if (friend.getStatus() == Constant.NUMBER_0) {
 				throw new CustomException(HttpStatus.BAD_REQUEST, "You have already sent a friend request");
@@ -156,7 +159,7 @@ public class FriendService implements IFriendService {
 			FriendRequestDto friendRequestDto = new FriendRequestDto();
 			friendRequestDto.setUserId(friendRequest.getSentUser().getUserId());
 			friendRequestDto.setUsername(friendRequest.getSentUser().getUsername());
-			friendRequestDto.setAvatar(friendRequest.getSentUser().getAvatarUrl());
+//			friendRequestDto.setAvatar(friendRequest.getSentUser().getAvatarUrl());
 			friendRequestDtos.add(friendRequestDto);
 		}
 		return friendRequestDtos;

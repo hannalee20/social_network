@@ -2,26 +2,25 @@ package com.training.socialnetwork.controller;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.training.socialnetwork.dto.request.comment.CommentCreateDto;
+import com.training.socialnetwork.dto.request.comment.CommentUpdateDto;
 import com.training.socialnetwork.dto.response.comment.CommentCreatedDto;
 import com.training.socialnetwork.dto.response.comment.CommentDetailDto;
 import com.training.socialnetwork.dto.response.comment.CommentUpdatedDto;
+import com.training.socialnetwork.dto.response.common.MessageDto;
 import com.training.socialnetwork.security.JwtUtils;
 import com.training.socialnetwork.service.ICommentService;
 import com.training.socialnetwork.util.constant.Constant;
@@ -38,46 +37,66 @@ public class CommentController {
 	@Autowired
 	private JwtUtils jwtUtils;
 
-	@PostMapping(value = "/create", consumes = "multipart/form-data")
-	public ResponseEntity<Object> createComment(HttpServletRequest request, @ParameterObject @ModelAttribute CommentCreateDto commentCreateDto, @RequestParam(value = "file", required = false) MultipartFile photo) {
+	@PostMapping(value = "/create")
+	public ResponseEntity<Object> createComment(HttpServletRequest request,
+			@RequestBody CommentCreateDto commentCreateDto) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		try {
-			CommentCreatedDto result = commentService.createComment(userId, commentCreateDto, photo);
+			CommentCreatedDto result = commentService.createComment(userId, commentCreateDto);
 			return new ResponseEntity<Object>(result, HttpStatus.CREATED);
 		} catch (CustomException e) {
-			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
+			MessageDto result = new MessageDto();
+			result.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(result, e.getHttpStatus());
 		} catch (Exception e) {
-			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+			MessageDto result = new MessageDto();
+			result.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(result, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
-	@PutMapping(value = "/update/{commentId}", consumes = {"multipart/form-data"})
-	public ResponseEntity<Object> updateComment(HttpServletRequest request, @PathVariable(value = "commentId") int commentId, @RequestParam(required = false) String content, @RequestParam(value = "file", required = false) MultipartFile photo) {
+	@PutMapping(value = "/update/{commentId}")
+	public ResponseEntity<Object> updateComment(HttpServletRequest request,
+			@PathVariable(value = "commentId") int commentId, @RequestBody CommentUpdateDto commentUpdateDto) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		try {
-			CommentUpdatedDto result = commentService.updateComment(content, photo, commentId, userId);
+			CommentUpdatedDto result = commentService.updateComment(commentUpdateDto, commentId, userId);
 
 			return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (CustomException e) {
-			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
+			MessageDto result = new MessageDto();
+			result.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(result, e.getHttpStatus());
 		} catch (Exception e) {
-			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+			MessageDto result = new MessageDto();
+			result.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(result, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-
 	}
 
 	@DeleteMapping(value = "delete/{commentId}")
 	public ResponseEntity<Object> deleteComment(HttpServletRequest request,
 			@PathVariable(value = "commentId") int commentId) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
+		MessageDto result = new MessageDto();
 		try {
 			commentService.deleteComment(commentId, userId);
 
-			return new ResponseEntity<Object>(Constant.DELETE_SUCCESSFULLY, HttpStatus.OK);
+			result.setMessage(Constant.DELETE_SUCCESSFULLY);
+			
+			return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (CustomException e) {
-			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
+			result.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(result, e.getHttpStatus());
 		} catch (Exception e) {
-			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+			result.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(result, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -88,9 +107,15 @@ public class CommentController {
 
 			return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (CustomException e) {
-			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
+			MessageDto result = new MessageDto();
+			result.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(result, e.getHttpStatus());
 		} catch (Exception e) {
-			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+			MessageDto result = new MessageDto();
+			result.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(result, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 }

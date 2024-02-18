@@ -351,7 +351,7 @@ public class UserServiceTest {
 		Friend friend = new Friend();
 		friend.setFriendId(1);
 		friend.setSentUser(user1);
-		friend.setRecievedUser(user3);
+		friend.setReceivedUser(user3);
 		friend.setStatus(1);
 		
 		List<Friend> friendList = new ArrayList<Friend>();

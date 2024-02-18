@@ -53,9 +53,9 @@ public class User {
 
 	@Column
 	private String about;
-
-	@Column
-	private String avatarUrl;
+//
+//	@Column
+//	private String avatarUrl;
 
 	@ManyToOne
 	@JoinColumn(name = "roleId")
@@ -76,8 +76,8 @@ public class User {
 	@OneToMany(mappedBy = "sentUser")
 	private List<Friend> sentUserId;
 
-	@OneToMany(mappedBy = "recievedUser")
-	private List<Friend> recievedUserId;
+	@OneToMany(mappedBy = "receivedUser")
+	private List<Friend> receivedUserId;
 
 	@OneToMany(mappedBy = "user")
 	private List<Post> postList;
@@ -183,14 +183,14 @@ public class User {
 	public void setAbout(String about) {
 		this.about = about;
 	}
-
-	public String getAvatarUrl() {
-		return avatarUrl;
-	}
-
-	public void setAvatarUrl(String avatarUrl) {
-		this.avatarUrl = avatarUrl;
-	}
+//
+//	public String getAvatarUrl() {
+//		return avatarUrl;
+//	}
+//
+//	public void setAvatarUrl(String avatarUrl) {
+//		this.avatarUrl = avatarUrl;
+//	}
 
 	public Date getCreateDate() {
 		return createDate;
@@ -216,12 +216,12 @@ public class User {
 		this.sentUserId = sentUserId;
 	}
 
-	public List<Friend> getRecievedUserId() {
-		return recievedUserId;
+	public List<Friend> getReceivedUserId() {
+		return receivedUserId;
 	}
 
-	public void setRecievedUserId(List<Friend> recievedUserId) {
-		this.recievedUserId = recievedUserId;
+	public void setReceivedUserId(List<Friend> receivedUserId) {
+		this.receivedUserId = receivedUserId;
 	}
 
 	public void setGender(Integer gender) {

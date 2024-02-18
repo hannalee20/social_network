@@ -79,7 +79,7 @@ public class PostService implements IPostService {
 			for (MultipartFile file : photos) {
 				String photoUrl = imageUtils.saveImage(file);
 				Photo photo = new Photo();
-				photo.setPost(post);
+//				photo.setPost(post);
 				photo.setName(photoUrl);
 				photo.setCreateDate(new Date());
 
@@ -90,7 +90,7 @@ public class PostService implements IPostService {
 				photoList.add(photo);
 				photoUrls.add(photoUrl);
 			}
-			post.setListPhoto(photoList);
+			post.setPhotoList(photoList);
 		}
 
 		PostCreatedDto postCreatedDto = modelMapper.map(post, PostCreatedDto.class);
@@ -106,7 +106,7 @@ public class PostService implements IPostService {
 		List<Post> postList = postRepository.findAllByUserId(friendUserIdList, page);
 		List<PostListDto> postListDtos = new ArrayList<>();
 		for (Post post : postList) {
-			List<Photo> photoList = post.getListPhoto();
+			List<Photo> photoList = post.getPhotoList();
 			List<String> photoUrlList = new ArrayList<>();
 			photoList.stream().map(photo -> photoUrlList.add(photo.getName())).collect(Collectors.toList());
 			PostListDto postListDto = modelMapper.map(post, PostListDto.class);
@@ -152,7 +152,7 @@ public class PostService implements IPostService {
 		}
 		
 		List<String> photoUrls = new ArrayList<>();
-		for (Photo photo : post.getListPhoto()) {
+		for (Photo photo : post.getPhotoList()) {
 			photoUrls.add(photo.getName());
 		}
 
@@ -192,7 +192,7 @@ public class PostService implements IPostService {
 			for (MultipartFile file : photos) {
 				String photoUrl = imageUtils.saveImage(file);
 				Photo photo = new Photo();
-				photo.setPost(postToUpdate);
+//				photo.setPost(postToUpdate);
 				photo.setName(photoUrl);
 				photo.setCreateDate(new Date());
 
@@ -202,13 +202,13 @@ public class PostService implements IPostService {
 				}
 				photoList.add(photo);
 			}
-			postToUpdate.setListPhoto(photoList);
+			postToUpdate.setPhotoList(photoList);
 		}
 		postToUpdate.setUpdateDate(new Date());
 		postToUpdate = postRepository.save(postToUpdate);
 
 		PostUpdatedDto postUpdatedDto = modelMapper.map(postToUpdate, PostUpdatedDto.class);
-		for (Photo photo : postToUpdate.getListPhoto()) {
+		for (Photo photo : postToUpdate.getPhotoList()) {
 			photoUrls.add(photo.getName());
 		}
 		postUpdatedDto.setPhotoUrls(photoUrls);

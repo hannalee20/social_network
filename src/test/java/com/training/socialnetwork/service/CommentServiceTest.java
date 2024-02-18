@@ -13,9 +13,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-import org.springframework.mock.web.MockMultipartFile;
 
 import com.training.socialnetwork.dto.request.comment.CommentCreateDto;
+import com.training.socialnetwork.dto.request.comment.CommentUpdateDto;
 import com.training.socialnetwork.dto.response.comment.CommentCreatedDto;
 import com.training.socialnetwork.dto.response.comment.CommentDetailDto;
 import com.training.socialnetwork.dto.response.comment.CommentUpdatedDto;
@@ -68,13 +68,10 @@ public class CommentServiceTest {
 		commentCreateDto.setPostId(1);
 		commentCreateDto.setContent("comment content");
 		
-		MockMultipartFile photo1 =
-                new MockMultipartFile("data1", "filename1.jpg", "multipart/form-data", "some xml".getBytes());
 		Comment comment = new Comment();
 		comment.setPost(post);
 		comment.setUser(user);
 		comment.setContent("comment content");
-		comment.setPhotoUrl(imageUtils.saveImage(photo1));
 		
 		when(postRepository.findById(any())).thenReturn(Optional.of(post));
 		when(userRepository.findById(any())).thenReturn(Optional.of(user));
@@ -84,7 +81,7 @@ public class CommentServiceTest {
 		when(commentRepository.save(any())).thenReturn(comment);
 		when(modelMapper.map(any(), any())).thenReturn(commentCreatedDto);
 		
-		commentService.createComment(userId, commentCreateDto, photo1);
+		commentService.createComment(userId, commentCreateDto);
 	}
 	
 	@Test
@@ -94,12 +91,9 @@ public class CommentServiceTest {
 		commentCreateDto.setPostId(1);
 		commentCreateDto.setContent("comment content");
 		
-		MockMultipartFile photo1 =
-                new MockMultipartFile("data1", "filename1.jpg", "multipart/form-data", "some xml".getBytes());
-		
 		when(postRepository.findById(anyInt())).thenReturn(Optional.empty());
 		
-		assertThrows(CustomException.class, () -> commentService.createComment(userId, commentCreateDto, photo1));
+		assertThrows(CustomException.class, () -> commentService.createComment(userId, commentCreateDto));
 	}
 	
 	@Test
@@ -107,8 +101,8 @@ public class CommentServiceTest {
 		int commentId = 1;
 		int userId = 1;
 		String content = "content update";
-		MockMultipartFile photo1 =
-                new MockMultipartFile("data1", "filename1.jpg", "multipart/form-data", "some xml".getBytes());
+		CommentUpdateDto commentUpdateDto = new CommentUpdateDto();
+		commentUpdateDto.setContent(content);
 		
 		User user = new User();
 		user.setUserId(1);
@@ -124,7 +118,6 @@ public class CommentServiceTest {
 		comment.setPost(post);
 		comment.setUser(user);
 		comment.setContent("comment update content");
-		comment.setPhotoUrl(imageUtils.saveImage(photo1));
 		
 		CommentUpdatedDto commentUpdatedDto = new CommentUpdatedDto();
 		
@@ -132,7 +125,7 @@ public class CommentServiceTest {
 		when(commentRepository.save(any())).thenReturn(comment);
 		when(modelMapper.map(any(), any())).thenReturn(commentUpdatedDto);
 		
-		commentService.updateComment(content, photo1, commentId, userId);
+		commentService.updateComment(commentUpdateDto, commentId, userId);
 	}
 	
 	@Test
@@ -140,12 +133,12 @@ public class CommentServiceTest {
 		int userId = 1;
 		int commentId = 2;
 		String content = "test";
-		MockMultipartFile photo1 =
-                new MockMultipartFile("data1", "filename1.jpg", "multipart/form-data", "some xml".getBytes());
+		CommentUpdateDto commentUpdateDto = new CommentUpdateDto();
+		commentUpdateDto.setContent(content);
 		
 		when(commentRepository.findById(anyInt())).thenReturn(Optional.empty());
 
-		assertThrows(CustomException.class, () -> commentService.updateComment(content, photo1, commentId, userId));
+		assertThrows(CustomException.class, () -> commentService.updateComment(commentUpdateDto, commentId, userId));
 	}
 	
 	@Test
@@ -153,8 +146,8 @@ public class CommentServiceTest {
 		int userId = 1;
 		int commentId = 2;
 		String content = "test";
-		MockMultipartFile photo1 =
-                new MockMultipartFile("data1", "filename1.jpg", "multipart/form-data", "some xml".getBytes());
+		CommentUpdateDto commentUpdateDto = new CommentUpdateDto();
+		commentUpdateDto.setContent(content);
 		
 		User user = new User();
 		user.setUserId(2);
@@ -165,7 +158,7 @@ public class CommentServiceTest {
 		
 		when(commentRepository.findById(anyInt())).thenReturn(Optional.of(comment));
 
-		assertThrows(CustomException.class, () -> commentService.updateComment(content, photo1, commentId, userId));
+		assertThrows(CustomException.class, () -> commentService.updateComment(commentUpdateDto, commentId, userId));
 	}
 	
 	@Test

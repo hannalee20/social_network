@@ -1,10 +1,13 @@
 package com.training.socialnetwork.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -39,12 +42,19 @@ public class FriendController {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		Pageable paging = PageRequest.of(page, pageSize);
 		try {
-			List<FriendListDto> friendList = friendService.findAllFriendWithStatus(userId, paging);
-			if(!friendList.isEmpty()) {
-				return new ResponseEntity<>(friendList, HttpStatus.OK);
-			} else {
-				return new ResponseEntity<>(Constant.NO_RESULT, HttpStatus.NO_CONTENT);
-			}
+			Page<FriendListDto> friendList = friendService.findAllFriendWithStatus(userId, paging);
+			Map<String, Object> response = new HashMap<>();
+			response.put("friendList", friendList.getContent());
+			response.put("currentPage", friendList.getNumber());
+			response.put("totalItems", friendList.getTotalElements());
+			response.put("totalPages", friendList.getTotalPages());
+
+			return new ResponseEntity<Object>(response, HttpStatus.OK);
+//			if(!friendList.isEmpty()) {
+//				return new ResponseEntity<>(friendList, HttpStatus.OK);
+//			} else {
+//				return new ResponseEntity<>(Constant.NO_RESULT, HttpStatus.NO_CONTENT);
+//			}
 		} catch (CustomException e) {
 			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
 		} catch (Exception e) {
@@ -102,8 +112,8 @@ public class FriendController {
 	}
 
 	@PostMapping(value = "remove-friend")
-	public ResponseEntity<Object> removeFriend(HttpServletRequest request, @RequestParam(value = "friendUserId") int friendUserId)
-			throws Exception {
+	public ResponseEntity<Object> removeFriend(HttpServletRequest request,
+			@RequestParam(value = "friendUserId") int friendUserId) throws Exception {
 		int loggedInUserId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		try {
 			friendService.unfriend(friendUserId, loggedInUserId);
@@ -131,7 +141,7 @@ public class FriendController {
 			} else {
 				return new ResponseEntity<Object>(Constant.NO_RESULT, HttpStatus.NO_CONTENT);
 			}
-			
+
 		} catch (CustomException e) {
 			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
 		} catch (Exception e) {

@@ -2,6 +2,7 @@ package com.training.socialnetwork.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.training.socialnetwork.dto.response.friend.FriendListDto;
@@ -9,7 +10,7 @@ import com.training.socialnetwork.dto.response.friend.FriendRequestDto;
 
 public interface IFriendService {
 
-	List<FriendListDto> findAllFriendWithStatus(int userId, Pageable paging);
+	Page<FriendListDto> findAllFriendWithStatus(int userId, Pageable paging);
 	
 	List<FriendRequestDto> findAllAddFriendRequest(int userId, Pageable paging);
 	

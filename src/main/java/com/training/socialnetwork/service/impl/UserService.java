@@ -152,10 +152,10 @@ public class UserService implements IUserService {
 			}
 		}
 		userToUpdate.setUserId(userId);
-		if (avatar != null) {
-			String avatarUrl = imageUtils.saveImage(avatar);
-			userToUpdate.setAvatarUrl(avatarUrl);
-		}
+//		if (avatar != null) {
+//			String avatarUrl = imageUtils.saveImage(avatar);
+//			userToUpdate.setAvatarUrl(avatarUrl);
+//		}
 		userToUpdate.setUpdateDate(new Date());
 		userToUpdate = userRepository.save(userToUpdate);
 
@@ -210,7 +210,7 @@ public class UserService implements IUserService {
 			user.setFriendStatus(Constant.SEND_REQUEST);
 			for (Friend friend : friendList) {
 				if (friend.getSentUser().getUserId() == user.getUserId()
-						|| friend.getRecievedUser().getUserId() == user.getUserId()) {
+						|| friend.getReceivedUser().getUserId() == user.getUserId()) {
 					if (friend.getStatus() == Constant.NUMBER_0) {
 						user.setFriendStatus(Constant.SENT_REQUEST);
 					} else if (friend.getStatus() == Constant.NUMBER_1) {

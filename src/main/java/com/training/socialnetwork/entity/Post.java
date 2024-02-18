@@ -9,6 +9,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -20,29 +22,30 @@ public class Post {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int postId;
-	
+
 	@ManyToOne(targetEntity = User.class)
 	@JoinColumn(name = "userId")
 	private User user;
-	
+
 	@Column
 	private String content;
-	
-	@OneToMany(targetEntity = Photo.class, mappedBy = "post")
-	private List<Photo> listPhoto;
-	
+
+	@ManyToMany
+	@JoinTable(name = "posts_photos", joinColumns = @JoinColumn(name = "post_id"), inverseJoinColumns = @JoinColumn(name = "photo_id"))
+	private List<Photo> photoList;
+
 	@Column
 	private Date createDate;
-	
+
 	@Column
 	private Date updateDate;
-	
+
 	@Column
 	private int deleteFlg;
-	
+
 	@OneToMany(targetEntity = Like.class, mappedBy = "post")
 	private List<Like> likeList;
-	
+
 	@OneToMany(targetEntity = Comment.class, mappedBy = "post")
 	private List<Comment> commentList;
 
@@ -70,12 +73,12 @@ public class Post {
 		this.content = content;
 	}
 
-	public List<Photo> getListPhoto() {
-		return listPhoto;
+	public List<Photo> getPhotoList() {
+		return photoList;
 	}
 
-	public void setListPhoto(List<Photo> listPhoto) {
-		this.listPhoto = listPhoto;
+	public void setPhotoList(List<Photo> photoList) {
+		this.photoList = photoList;
 	}
 
 	public Date getCreateDate() {
@@ -117,5 +120,5 @@ public class Post {
 	public void setCommentList(List<Comment> commentList) {
 		this.commentList = commentList;
 	}
-	
+
 }

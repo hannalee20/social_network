@@ -1,6 +1,7 @@
 package com.training.socialnetwork.entity;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -8,7 +9,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -19,15 +22,27 @@ public class Photo {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int photoId;
 
-	@ManyToOne
-	@JoinColumn(name = "postId")
-	private Post post;
+	@ManyToMany(mappedBy = "photoList")
+	private List<Post> postList;
+
+	@ManyToOne(targetEntity = User.class)
+	@JoinColumn(name = "userId")
+	private User user;
+
+	@OneToMany(targetEntity = Comment.class, mappedBy = "photo")
+	private List<Comment> commentList;
 
 	@Column
 	private String name;
 
 	@Column
+	private int avatar;
+
+	@Column
 	private Date createDate;
+
+	@Column
+	private Date updateDate;
 
 	@Column
 	private int deleteFlg;
@@ -40,12 +55,28 @@ public class Photo {
 		this.photoId = photoId;
 	}
 
-	public Post getPost() {
-		return post;
+	public List<Post> getPostList() {
+		return postList;
 	}
 
-	public void setPost(Post post) {
-		this.post = post;
+	public void setPostList(List<Post> postList) {
+		this.postList = postList;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	public List<Comment> getCommentList() {
+		return commentList;
+	}
+
+	public void setCommentList(List<Comment> commentList) {
+		this.commentList = commentList;
 	}
 
 	public String getName() {
@@ -56,12 +87,28 @@ public class Photo {
 		this.name = name;
 	}
 
+	public int getAvatar() {
+		return avatar;
+	}
+
+	public void setAvatar(int avatar) {
+		this.avatar = avatar;
+	}
+
 	public Date getCreateDate() {
 		return createDate;
 	}
 
 	public void setCreateDate(Date createDate) {
 		this.createDate = createDate;
+	}
+
+	public Date getUpdateDate() {
+		return updateDate;
+	}
+
+	public void setUpdateDate(Date updateDate) {
+		this.updateDate = updateDate;
 	}
 
 	public int getDeleteFlg() {

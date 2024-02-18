@@ -24,8 +24,8 @@ public class Friend {
 	private User sentUser;
 	
 	@ManyToOne
-	@JoinColumn(name = "recievedUserId")
-	private User recievedUser;
+	@JoinColumn(name = "receivedUserId")
+	private User receivedUser;
 	
 	@Column
 	private int status;
@@ -52,12 +52,12 @@ public class Friend {
 		this.sentUser = sentUser;
 	}
 
-	public User getRecievedUser() {
-		return recievedUser;
+	public User getReceivedUser() {
+		return receivedUser;
 	}
 
-	public void setRecievedUser(User recievedUser) {
-		this.recievedUser = recievedUser;
+	public void setReceivedUser(User receivedUser) {
+		this.receivedUser = receivedUser;
 	}
 
 	public int getStatus() {

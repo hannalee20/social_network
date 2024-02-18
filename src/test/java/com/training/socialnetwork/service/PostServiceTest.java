@@ -87,7 +87,7 @@ public class PostServiceTest {
 		when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
 		Photo photo = new Photo();
-		photo.setPost(post);
+//		photo.setPost(post);
 		photo.setName("data1");
 		photo.setCreateDate(new Date());
 
@@ -159,7 +159,7 @@ public class PostServiceTest {
 
 		Photo photo = new Photo();
 		photo.setPhotoId(1);
-		photo.setPost(post1);
+//		photo.setPost(post1);
 		photo.setName("test");
 		photo.setDeleteFlg(Constant.UNDELETED_FLG);
 
@@ -167,10 +167,10 @@ public class PostServiceTest {
 		List<Photo> photoList2 = new ArrayList<>();
 		photoList1.add(photo);
 
-		post1.setListPhoto(photoList1);
+		post1.setPhotoList(photoList1);
 		post1.setLikeList(likeList1);
 		post1.setCommentList(commentList1);
-		post2.setListPhoto(photoList2);
+		post2.setPhotoList(photoList2);
 		post2.setLikeList(likeList2);
 		post2.setCommentList(commentList2);
 
@@ -236,7 +236,7 @@ public class PostServiceTest {
 		
 		Photo photo1 = new Photo();
 		photo1.setPhotoId(1);
-		photo1.setPost(post1);
+//		photo1.setPost(post1);
 		photo1.setName("test");
 		
 		List<Photo> photoList = new ArrayList<>();
@@ -244,7 +244,7 @@ public class PostServiceTest {
 
 		post1.setLikeList(likeList1);
 		post1.setCommentList(commentList1);
-		post1.setListPhoto(photoList);
+		post1.setPhotoList(photoList);
 
 		PostDetailDto postDetailDto = new PostDetailDto();
 		CommentDetailDto commentDetailDto = new CommentDetailDto();
@@ -296,7 +296,7 @@ public class PostServiceTest {
 		when(postRepository.findById(postId)).thenReturn(Optional.of(post1));
 
 		Photo photo = new Photo();
-		photo.setPost(post1);
+//		photo.setPost(post1);
 		photo.setName("data1");
 		photo.setCreateDate(new Date());
 

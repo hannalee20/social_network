@@ -15,6 +15,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 
 import com.training.socialnetwork.entity.Friend;
 import com.training.socialnetwork.entity.User;
@@ -69,20 +71,21 @@ public class FriendServiceTest {
 		Friend friend1 = new Friend();
 		friend1.setFriendId(1);
 		friend1.setSentUser(user1);
-		friend1.setRecievedUser(user2);
+		friend1.setReceivedUser(user2);
 		friend1.setStatus(1);
 
 		Friend friend2 = new Friend();
 		friend2.setFriendId(2);
 		friend2.setSentUser(user3);
-		friend2.setRecievedUser(user1);
+		friend2.setReceivedUser(user1);
 		friend2.setStatus(1);
 
 		List<Friend> friendList = new ArrayList<Friend>();
 		friendList.add(friend1);
 		friendList.add(friend2);
 
-		when(friendRepository.findAllFriendByUserIdAndStatus(1, 1, null)).thenReturn(friendList);
+		Page<Friend> page = new PageImpl<Friend>(friendList);
+		when(friendRepository.findAllFriendByUserIdAndStatus(1, 1, null)).thenReturn(page);
 
 		friendService.findAllFriendWithStatus(userId, null);
 	}
@@ -112,12 +115,12 @@ public class FriendServiceTest {
 		Friend friend1 = new Friend();
 		friend1.setFriendId(1);
 		friend1.setSentUser(user1);
-		friend1.setRecievedUser(user2);
+		friend1.setReceivedUser(user2);
 		friend1.setStatus(0);
 
 		when(userRepository.findById(any())).thenReturn(Optional.of(user1));
 		when(userRepository.findById(any())).thenReturn(Optional.of(user2));
-		when(friendRepository.findFriendBySentUserAndRecievedUser(userId1, userId2)).thenReturn(null);
+		when(friendRepository.findFriendBySentUserAndReceivedUser(userId1, userId2)).thenReturn(null);
 		when(friendRepository.save(any())).thenReturn(friend1);
 
 		friendService.createFriendRequest(userId1, userId2);
@@ -176,7 +179,7 @@ public class FriendServiceTest {
 		Friend friend1 = new Friend();
 		friend1.setFriendId(1);
 		friend1.setSentUser(user1);
-		friend1.setRecievedUser(user2);
+		friend1.setReceivedUser(user2);
 		friend1.setStatus(1);
 
 		when(userRepository.findById(any())).thenReturn(Optional.of(user1));
@@ -239,7 +242,7 @@ public class FriendServiceTest {
 		Friend friend1 = new Friend();
 		friend1.setFriendId(1);
 		friend1.setSentUser(user1);
-		friend1.setRecievedUser(user2);
+		friend1.setReceivedUser(user2);
 		friend1.setStatus(0);
 
 		when(userRepository.findById(any())).thenReturn(Optional.of(user1));
@@ -275,7 +278,7 @@ public class FriendServiceTest {
 		Friend friend1 = new Friend();
 		friend1.setFriendId(1);
 		friend1.setSentUser(user1);
-		friend1.setRecievedUser(user2);
+		friend1.setReceivedUser(user2);
 		friend1.setStatus(0);
 
 		when(userRepository.findById(any())).thenReturn(Optional.of(user1));
@@ -311,7 +314,7 @@ public class FriendServiceTest {
 		Friend friend1 = new Friend();
 		friend1.setFriendId(1);
 		friend1.setSentUser(user1);
-		friend1.setRecievedUser(user2);
+		friend1.setReceivedUser(user2);
 		friend1.setStatus(1);
 
 		when(userRepository.findById(any())).thenReturn(Optional.of(user1));
@@ -374,7 +377,7 @@ public class FriendServiceTest {
 		Friend friend1 = new Friend();
 		friend1.setFriendId(1);
 		friend1.setSentUser(user1);
-		friend1.setRecievedUser(user2);
+		friend1.setReceivedUser(user2);
 		friend1.setStatus(1);
 
 		when(userRepository.findById(any())).thenReturn(Optional.of(user1));
@@ -410,7 +413,7 @@ public class FriendServiceTest {
 		Friend friend1 = new Friend();
 		friend1.setFriendId(1);
 		friend1.setSentUser(user1);
-		friend1.setRecievedUser(user2);
+		friend1.setReceivedUser(user2);
 		friend1.setStatus(1);
 
 		when(userRepository.findById(any())).thenReturn(Optional.of(user1));
@@ -481,7 +484,7 @@ public class FriendServiceTest {
 		Friend friend1 = new Friend();
 		friend1.setFriendId(1);
 		friend1.setSentUser(user2);
-		friend1.setRecievedUser(user1);
+		friend1.setReceivedUser(user1);
 		friend1.setStatus(0);
 		
 		List<Friend> friendList = new ArrayList<Friend>();
@@ -518,7 +521,7 @@ public class FriendServiceTest {
 		Friend friend1 = new Friend();
 		friend1.setFriendId(1);
 		friend1.setSentUser(user1);
-		friend1.setRecievedUser(user2);
+		friend1.setReceivedUser(user2);
 		friend1.setStatus(0);
 
 		when(userRepository.findById(any())).thenReturn(Optional.of(user1));
@@ -553,7 +556,7 @@ public class FriendServiceTest {
 		Friend friend1 = new Friend();
 		friend1.setFriendId(1);
 		friend1.setSentUser(user1);
-		friend1.setRecievedUser(user2);
+		friend1.setReceivedUser(user2);
 		friend1.setStatus(1);
 
 		when(userRepository.findById(any())).thenReturn(Optional.of(user1));

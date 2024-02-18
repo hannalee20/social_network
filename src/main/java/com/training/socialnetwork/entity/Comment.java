@@ -11,7 +11,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-
 @Entity
 @Table(name = "comments")
 public class Comment {
@@ -19,27 +18,28 @@ public class Comment {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int commentId;
-	
+
 	@ManyToOne(targetEntity = Post.class)
 	@JoinColumn(name = "postId")
 	private Post post;
-	
-	@ManyToOne 
+
+	@ManyToOne
 	@JoinColumn(name = "userId")
 	private User user;
-	
+
 	@Column
 	private String content;
-	
-	@Column
-	private String photoUrl;
-	
+
+	@ManyToOne(targetEntity = Photo.class)
+	@JoinColumn(name = "photoId")
+	private Photo photo;
+
 	@Column
 	private Date createDate;
-	
+
 	@Column
 	private Date updateDate;
-	
+
 	@Column
 	private int deleteFlg;
 
@@ -75,12 +75,12 @@ public class Comment {
 		this.content = content;
 	}
 
-	public String getPhotoUrl() {
-		return photoUrl;
+	public Photo getPhoto() {
+		return photo;
 	}
 
-	public void setPhotoUrl(String photoUrl) {
-		this.photoUrl = photoUrl;
+	public void setPhoto(Photo photo) {
+		this.photo = photo;
 	}
 
 	public Date getCreateDate() {
@@ -106,5 +106,5 @@ public class Comment {
 	public void setDeleteFlg(int deleteFlg) {
 		this.deleteFlg = deleteFlg;
 	}
-	
+
 }

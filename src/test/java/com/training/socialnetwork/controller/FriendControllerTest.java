@@ -19,6 +19,8 @@ import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -61,7 +63,8 @@ public class FriendControllerTest {
 		List<FriendListDto> friendList = new ArrayList<>();
 		friendList.add(friendListDto);
 
-		when(friendService.findAllFriendWithStatus(anyInt(), any())).thenReturn(friendList);
+		Page<FriendListDto> page = new PageImpl<FriendListDto>(friendList);
+		when(friendService.findAllFriendWithStatus(anyInt(), any())).thenReturn(page);
 
 		mockMvc.perform(get("/friend/all-friends").header("Authorization", "Bearer dummyToken"))
 				.andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1)));

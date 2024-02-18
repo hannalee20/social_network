@@ -78,7 +78,7 @@ public class CommentControllerTest {
 		commentCreatedDto.setPhotoUrl("photo.png");
 
 		when(jwtUtils.getUserIdFromJwt(anyString())).thenReturn(userId);
-		when(commentService.createComment(anyInt(), any(), any())).thenReturn(commentCreatedDto);
+		when(commentService.createComment(anyInt(), any())).thenReturn(commentCreatedDto);
 		
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.putIfAbsent("commentCreateDto", commentCreateDto);
@@ -104,7 +104,7 @@ public class CommentControllerTest {
 		MockMultipartFile photo = new MockMultipartFile("data", "photo.png", "multipart/form-data",
 				"some data".getBytes());
 
-		when(commentService.createComment(anyInt(), any(), any())).thenThrow(new Exception());
+		when(commentService.createComment(anyInt(), any())).thenThrow(new Exception());
 
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.putIfAbsent("commentCreateDto", commentCreateDto);
@@ -142,35 +142,28 @@ public class CommentControllerTest {
 	@Test
 	public void updateCommentSuccess() throws Exception {
 		String content = "update content";
-		MockMultipartFile photo1 = new MockMultipartFile("data1", "filename1.jpg", "multipart/form-data",
-				"some xml".getBytes());
-
 		CommentUpdatedDto commentUpdatedDto = new CommentUpdatedDto();
 		commentUpdatedDto.setCommentId(1);
 		commentUpdatedDto.setPostId(1);
 		commentUpdatedDto.setUserId(1);
 		commentUpdatedDto.setContent(content);
-		commentUpdatedDto.setPhotoUrl(photo1.getOriginalFilename());
 		commentUpdatedDto.setUpdateDate(new Date());
 
-		when(commentService.updateComment(any(), any(), anyInt(), anyInt())).thenReturn(commentUpdatedDto);
+		when(commentService.updateComment(any(), anyInt(), anyInt())).thenReturn(commentUpdatedDto);
 
-		mockMvc.perform(MockMvcRequestBuilders.multipart(HttpMethod.PUT, "/comment/update/{commentId}", 1).file(photo1)
+		mockMvc.perform(MockMvcRequestBuilders.multipart(HttpMethod.PUT, "/comment/update/{commentId}", 1)
 				.header("Authorization", "Bearer dummyToken").contentType(MediaType.MULTIPART_FORM_DATA)
 				.param("content", content)).andExpect(status().isOk())
-				.andExpect(jsonPath("$.content").value(commentUpdatedDto.getContent()))
-				.andExpect(jsonPath("$.photoUrl").value(commentUpdatedDto.getPhotoUrl()));
+				.andExpect(jsonPath("$.content").value(commentUpdatedDto.getContent()));
 	}
 
 	@Test
 	public void updateCommentFail() throws Exception {
 		String content = "update content";
-		MockMultipartFile photo1 = new MockMultipartFile("data1", "filename1.jpg", "multipart/form-data",
-				"some xml".getBytes());
 
-		when(commentService.updateComment(any(), any(), anyInt(), anyInt())).thenThrow(new Exception());
+		when(commentService.updateComment(any(), anyInt(), anyInt())).thenThrow(new Exception());
 
-		mockMvc.perform(MockMvcRequestBuilders.multipart(HttpMethod.PUT, "/comment/update/{commentId}", 1).file(photo1)
+		mockMvc.perform(MockMvcRequestBuilders.multipart(HttpMethod.PUT, "/comment/update/{commentId}", 1)
 				.header("Authorization", "Bearer dummyToken").contentType(MediaType.MULTIPART_FORM_DATA)
 				.param("content", content)).andExpect(status().isInternalServerError());
 	}
