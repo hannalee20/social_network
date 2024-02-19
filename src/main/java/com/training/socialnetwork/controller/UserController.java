@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,6 +37,7 @@ import com.training.socialnetwork.dto.request.user.UserRegisterDto;
 import com.training.socialnetwork.dto.request.user.UserResetPasswordDto;
 import com.training.socialnetwork.dto.request.user.UserTokenDto;
 import com.training.socialnetwork.dto.request.user.UserUpdateDto;
+import com.training.socialnetwork.dto.response.common.MessageDto;
 import com.training.socialnetwork.dto.response.user.JwtResponse;
 import com.training.socialnetwork.dto.response.user.OtpResponse;
 import com.training.socialnetwork.dto.response.user.UserDetailDto;
@@ -67,21 +69,27 @@ public class UserController {
 	private OtpUtils otpUtils;
 
 	@PostMapping(value = "/register")
-	public ResponseEntity<Object> registerUser(@ParameterObject @ModelAttribute UserRegisterDto userRegisterDto) {
+	public ResponseEntity<Object> registerUser(@RequestBody UserRegisterDto userRegisterDto) {
 		try {
 			UserRegistedDto result = userService.createUser(userRegisterDto);
 
 			return new ResponseEntity<Object>(result, HttpStatus.CREATED);
 		} catch (CustomException e) {
-			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
+			MessageDto result = new MessageDto();
+			result.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(result, e.getHttpStatus());
 		} catch (Exception e) {
-			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+			MessageDto result = new MessageDto();
+			result.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(result, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 	}
 
 	@PostMapping(value = "/login")
-	public ResponseEntity<Object> loginUser(@ParameterObject @ModelAttribute UserLoginDto userLoginDto)
+	public ResponseEntity<Object> loginUser(@RequestBody UserLoginDto userLoginDto)
 			throws Exception {
 		try {
 			boolean checkLogin = userService.loginUser(userLoginDto.getUsername(), userLoginDto.getPassword());
@@ -90,18 +98,26 @@ public class UserController {
 				int otp = otpUtils.generateOtp(userLoginDto.getUsername());
 				return ResponseEntity.ok(new OtpResponse(String.valueOf(otp)));
 			} else {
-				return new ResponseEntity<Object>(Constant.INVALID_USERNAME_OR_PASSWORD, HttpStatus.BAD_REQUEST);
+				MessageDto result = new MessageDto();
+				result.setMessage(Constant.INVALID_USERNAME_OR_PASSWORD);
+				return new ResponseEntity<Object>(result, HttpStatus.BAD_REQUEST);
 			}
 		} catch (CustomException e) {
-			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
+			MessageDto result = new MessageDto();
+			result.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(result, e.getHttpStatus());
 		} catch (Exception e) {
-			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+			MessageDto result = new MessageDto();
+			result.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(result, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 	}
 
 	@PostMapping(value = "/token")
-	public ResponseEntity<Object> getToken(@ParameterObject @ModelAttribute UserTokenDto userTokenDto) {
+	public ResponseEntity<Object> getToken(@RequestBody UserTokenDto userTokenDto) {
 		Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(userTokenDto.getUsername(), userTokenDto.getPassword()));
 		SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -123,7 +139,7 @@ public class UserController {
 
 	@PatchMapping(value = "/update/{userId}", consumes = { "multipart/form-data" })
 	public ResponseEntity<Object> updateUser(HttpServletRequest request, @PathVariable(value = "userId") int userId,
-			@ParameterObject @ModelAttribute @Valid UserUpdateDto userUpdateDto,
+			@RequestBody @Valid UserUpdateDto userUpdateDto,
 			@RequestParam(value = "file", required = false) MultipartFile avatar) {
 		int loggedInUserId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		try {
@@ -205,7 +221,7 @@ public class UserController {
 
 	@PostMapping(value = "/forgot-password")
 	public ResponseEntity<Object> forgotPassword(
-			@ParameterObject @ModelAttribute UserForgotPasswordDto userForgotPasswordDto) {
+			@RequestBody UserForgotPasswordDto userForgotPasswordDto) {
 		try {
 			String result = userService.forgotPassword(userForgotPasswordDto.getEmail());
 			if (result != null) {
@@ -223,7 +239,7 @@ public class UserController {
 
 	@PutMapping(value = "/reset-password")
 	public ResponseEntity<Object> resetPassword(
-			@ParameterObject @ModelAttribute UserResetPasswordDto userResetPasswordDto) {
+			@RequestBody UserResetPasswordDto userResetPasswordDto) {
 		try {
 			String result = userService.resetPassword(userResetPasswordDto.getToken(),
 					userResetPasswordDto.getNewPassword());

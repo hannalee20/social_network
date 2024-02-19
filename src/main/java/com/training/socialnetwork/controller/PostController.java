@@ -1,10 +1,12 @@
 package com.training.socialnetwork.controller;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -17,11 +19,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.training.socialnetwork.dto.request.post.PostCreateDto;
+import com.training.socialnetwork.dto.request.post.PostUpdateDto;
+import com.training.socialnetwork.dto.response.common.MessageDto;
 import com.training.socialnetwork.dto.response.post.PostCreatedDto;
 import com.training.socialnetwork.dto.response.post.PostDetailDto;
 import com.training.socialnetwork.dto.response.post.PostListDto;
@@ -49,9 +51,15 @@ public class PostController {
 
 			return new ResponseEntity<Object>(result, HttpStatus.CREATED);
 		} catch (CustomException e) {
-			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
+			MessageDto result = new MessageDto();
+			result.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(result, e.getHttpStatus());
 		} catch (Exception e) {
-			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+			MessageDto result = new MessageDto();
+			result.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(result, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -62,17 +70,24 @@ public class PostController {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		Pageable paging = PageRequest.of(page, pageSize);
 		try {
-			List<PostListDto> postList = postService.getTimeline(userId, paging);
-			if(!postList.isEmpty()) {
-				return new ResponseEntity<>(postList, HttpStatus.OK);
-			} else {
-				return new ResponseEntity<>(Constant.NO_RESULT, HttpStatus.NO_CONTENT);
-			}
-			
+			Page<PostListDto> postList = postService.getTimeline(userId, paging);
+			Map<String, Object> result = new HashMap<>();
+			result.put("postList", postList.getContent());
+			result.put("currentPage", postList.getNumber());
+			result.put("totalItems", postList.getTotalElements());
+			result.put("totalPages", postList.getTotalPages());
+
+			return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (CustomException e) {
-			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
+			MessageDto result = new MessageDto();
+			result.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(result, e.getHttpStatus());
 		} catch (Exception e) {
-			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+			MessageDto result = new MessageDto();
+			result.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(result, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -83,24 +98,36 @@ public class PostController {
 
 			return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (CustomException e) {
-			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
+			MessageDto result = new MessageDto();
+			result.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(result, e.getHttpStatus());
 		} catch (Exception e) {
-			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+			MessageDto result = new MessageDto();
+			result.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(result, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 	}
 
-	@PutMapping(value = "/update/{postId}", consumes = "multipart/form-data")
-	public ResponseEntity<Object> updatePost(HttpServletRequest request, @PathVariable(value = "postId") int postId, @RequestParam(required = false) String content, @RequestPart(value = "files", required = false) MultipartFile[] photos) {
+	@PutMapping(value = "/update/{postId}")
+	public ResponseEntity<Object> updatePost(HttpServletRequest request, @PathVariable(value = "postId") int postId, @RequestBody PostUpdateDto postUpdateDto) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		try {
-			PostUpdatedDto result = postService.updatePost(content, photos, postId, userId);
+			PostUpdatedDto result = postService.updatePost(postUpdateDto, postId, userId);
 
 			return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (CustomException e) {
-			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
+			MessageDto result = new MessageDto();
+			result.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(result, e.getHttpStatus());
 		} catch (Exception e) {
-			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+			MessageDto result = new MessageDto();
+			result.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(result, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 	}
@@ -108,14 +135,20 @@ public class PostController {
 	@DeleteMapping(value = "/delete/{postId}")
 	public ResponseEntity<Object> deletePost(HttpServletRequest request, @RequestParam(value = "postId") int postId) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
+		MessageDto result = new MessageDto();
 		try {
 			postService.deletePost(postId, userId);
 			
-			return new ResponseEntity<Object>(Constant.DELETE_SUCCESSFULLY, HttpStatus.OK);
+			result.setMessage(Constant.DELETE_SUCCESSFULLY);
+			return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (CustomException e) {
-			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
+			result.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(result, e.getHttpStatus());
 		} catch (Exception e) {
-			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+			result.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(result, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 

@@ -9,12 +9,14 @@ import javax.transaction.Transactional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.training.socialnetwork.dto.request.post.PostCreateDto;
+import com.training.socialnetwork.dto.request.post.PostUpdateDto;
 import com.training.socialnetwork.dto.response.comment.CommentDetailDto;
 import com.training.socialnetwork.dto.response.post.PostCreatedDto;
 import com.training.socialnetwork.dto.response.post.PostDetailDto;
@@ -32,7 +34,6 @@ import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.IPostService;
 import com.training.socialnetwork.util.constant.Constant;
 import com.training.socialnetwork.util.exception.CustomException;
-import com.training.socialnetwork.util.image.ImageUtils;
 
 @Service
 @Transactional
@@ -52,9 +53,6 @@ public class PostService implements IPostService {
 
 	@Autowired
 	private ModelMapper modelMapper;
-
-	@Autowired
-	private ImageUtils imageUtils;
 
 	@Override
 	public PostCreatedDto createPost(int userId, PostCreateDto postCreateDto) throws Exception {
@@ -98,10 +96,10 @@ public class PostService implements IPostService {
 	}
 
 	@Override
-	public List<PostListDto> getTimeline(int userId, Pageable page) {
+	public Page<PostListDto> getTimeline(int userId, Pageable page) {
 		List<Integer> friendUserIdList = friendRepository.findAllFriendUserId(userId);
 		friendUserIdList.add(userId);
-		List<Post> postList = postRepository.findAllByUserId(friendUserIdList, page);
+		Page<Post> postList = postRepository.findAllByUserId(friendUserIdList, page);
 		List<PostListDto> postListDtos = new ArrayList<>();
 		for (Post post : postList) {
 			List<Photo> photoList = post.getPhotoList();
@@ -126,7 +124,9 @@ public class PostService implements IPostService {
 			postListDto.setUsername(post.getUser().getUsername());
 			postListDtos.add(postListDto);
 		}
-		return postListDtos;
+		Page<PostListDto> result = new PageImpl<PostListDto>(postListDtos);
+		
+		return result;
 	}
 
 	@Override
@@ -168,7 +168,7 @@ public class PostService implements IPostService {
 	}
 
 	@Override
-	public PostUpdatedDto updatePost(String content, MultipartFile[] photos, int postId, int userId) throws Exception {
+	public PostUpdatedDto updatePost(PostUpdateDto postUpdateDto, int postId, int userId) throws Exception {
 		User user = userRepository.findById(userId).orElse(null);
 		Post postToUpdate = postRepository.findById(postId).orElse(null);
 
@@ -180,27 +180,24 @@ public class PostService implements IPostService {
 			throw new CustomException(HttpStatus.FORBIDDEN, "You do not have permission to update");
 		}
 		
-		if(content != null) {
-			postToUpdate.setContent(content);
+		if(null != postToUpdate.getContent()) {
+			postToUpdate.setContent(postToUpdate.getContent());
 		}
 		
 		List<String> photoUrls = new ArrayList<>();
-		if (photos != null) {
-			List<Photo> photoList = new ArrayList<>();
-			for (MultipartFile file : photos) {
-				String photoUrl = imageUtils.saveImage(file);
-				Photo photo = new Photo();
-//				photo.setPost(postToUpdate);
-				photo.setName(photoUrl);
-				photo.setCreateDate(new Date());
-
-				photo = photoRepository.save(photo);
-				if (photo == null) {
-					throw new Exception(Constant.SERVER_ERROR);
+		if(null != postUpdateDto.getPhotoIdList()) {
+			for (int photoId : postUpdateDto.getPhotoIdList()) {
+				Photo photo = photoRepository.findById(photoId).orElse(null);
+				
+				if(photo == null) {
+					throw new CustomException(HttpStatus.NOT_FOUND, "Photo does not exist");
 				}
-				photoList.add(photo);
+				if(photo.getUser().getUserId() != userId) {
+					throw new CustomException(HttpStatus.FORBIDDEN, "You do not have permission to use this photo");
+				}
+				photo.getPostList().add(postToUpdate);
+				photoRepository.save(photo);
 			}
-			postToUpdate.setPhotoList(photoList);
 		}
 		postToUpdate.setUpdateDate(new Date());
 		postToUpdate = postRepository.save(postToUpdate);

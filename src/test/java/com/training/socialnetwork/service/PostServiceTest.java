@@ -17,9 +17,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 
 import com.training.socialnetwork.dto.request.post.PostCreateDto;
+import com.training.socialnetwork.dto.request.post.PostUpdateDto;
 import com.training.socialnetwork.dto.response.comment.CommentDetailDto;
 import com.training.socialnetwork.dto.response.post.PostCreatedDto;
 import com.training.socialnetwork.dto.response.post.PostDetailDto;
@@ -183,12 +185,14 @@ public class PostServiceTest {
 		List<Post> postList = new ArrayList<>();
 		postList.add(post1);
 		postList.add(post2);
+		
+		Page<Post> postPage = new PageImpl<Post>(postList);
 
 		List<Integer> friendUserIdList = new ArrayList<>();
 		PostListDto postListDto = new PostListDto();
 
 		when(friendRepository.findAllFriendUserId(anyInt())).thenReturn(friendUserIdList);
-		when(postRepository.findAllByUserId(anyList(), any())).thenReturn(postList);
+		when(postRepository.findAllByUserId(anyList(), any())).thenReturn(postPage);
 		when(modelMapper.map(any(), any())).thenReturn(postListDto);
 		postService.getTimeline(userId, null);
 	}
@@ -278,6 +282,9 @@ public class PostServiceTest {
 	@Test
 	public void updatePostSuccess() throws Exception {
 		String content = "content update post";
+		PostUpdateDto postUpdateDto = new PostUpdateDto();
+		postUpdateDto.setContent(content);
+
 		int userId = 1;
 		int postId = 1;
 
@@ -291,12 +298,6 @@ public class PostServiceTest {
 		post1.setPostId(1);
 		post1.setUser(user);
 		post1.setContent("content1");
-
-		MockMultipartFile photo1 = new MockMultipartFile("data1", "filename1.jpg", "multipart/form-data",
-				"some xml".getBytes());
-		MockMultipartFile photo2 = new MockMultipartFile("data2", "filename2.jpg", "multipart/form-data",
-				"some xml".getBytes());
-		MockMultipartFile[] photos = { photo1, photo2 };
 
 		when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 		when(postRepository.findById(postId)).thenReturn(Optional.of(post1));
@@ -312,7 +313,7 @@ public class PostServiceTest {
 		when(postRepository.save(any())).thenReturn(post1);
 		when(modelMapper.map(any(), any())).thenReturn(postUpdatedDto);
 
-		postService.updatePost(content, photos, postId, userId);
+		postService.updatePost(postUpdateDto, postId, userId);
 	}
 
 	@Test
@@ -320,11 +321,13 @@ public class PostServiceTest {
 		int userId = 1;
 		int postId = 2;
 		String content = "Updated Content";
+		PostUpdateDto postUpdateDto = new PostUpdateDto();
+		postUpdateDto.setContent(content);
 
 		when(userRepository.findById(userId)).thenReturn(Optional.of(new User()));
 		when(postRepository.findById(postId)).thenReturn(Optional.empty());
 
-		assertThrows(CustomException.class, () -> postService.updatePost(content, null, postId, userId));
+		assertThrows(CustomException.class, () -> postService.updatePost(postUpdateDto, postId, userId));
 	}
 
 	@Test
@@ -332,6 +335,8 @@ public class PostServiceTest {
 		int userId = 1;
 		int postId = 2;
 		String content = "Updated Content";
+		PostUpdateDto postUpdateDto = new PostUpdateDto();
+		postUpdateDto.setContent(content);
 
 		User user = new User();
 		user.setUserId(userId);
@@ -343,7 +348,7 @@ public class PostServiceTest {
 		when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 		when(postRepository.findById(postId)).thenReturn(Optional.of(postToUpdate));
 
-		assertThrows(CustomException.class, () -> postService.updatePost(content, null, postId, userId));
+		assertThrows(CustomException.class, () -> postService.updatePost(postUpdateDto, postId, userId));
 	}
 
 	@Test

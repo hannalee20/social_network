@@ -3,6 +3,7 @@ package com.training.socialnetwork.repository;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -19,7 +20,7 @@ public interface PostRepository extends JpaRepository<Post, Integer>{
 				"where p.user_id in ( :friendUserId) " + 
 				"and p.delete_flg = 0 " + 
 				"order by p.update_date ", nativeQuery = true)
-	List<Post> findAllByUserId(@Param(value = "friendUserId") List<Integer> friendUserId, Pageable paging);
+	Page<Post> findAllByUserId(@Param(value = "friendUserId") List<Integer> friendUserId, Pageable paging);
 	
 	@Query(value = "" + 
 				"select count(p.post_id) as post " + 
