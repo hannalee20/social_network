@@ -10,8 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.training.socialnetwork.dto.response.common.MessageDto;
 import com.training.socialnetwork.security.JwtUtils;
 import com.training.socialnetwork.service.ILikeService;
+import com.training.socialnetwork.util.constant.Constant;
 import com.training.socialnetwork.util.exception.CustomException;
 
 @RestController
@@ -28,13 +30,19 @@ public class LikeController {
 	public ResponseEntity<Object> addLike(HttpServletRequest request, @RequestParam(value = "postId") int postId)
 			throws Exception {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
+		MessageDto result = new MessageDto();
 		try {
-			boolean result = likeService.addLikePost(postId, userId);
+			likeService.addLikePost(postId, userId);
 
+			result.setMessage(Constant.LIKED);
 			return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (CustomException e) {
-			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
+			result.setMessage(e.getMessage());
+
+			return new ResponseEntity<Object>(result, e.getHttpStatus());
 		} catch (Exception e) {
+			result.setMessage(e.getMessage());
+
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
@@ -44,13 +52,19 @@ public class LikeController {
 	public ResponseEntity<Object> unlike(HttpServletRequest request, @RequestParam(value = "postId") int postId)
 			throws Exception {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
+		MessageDto result = new MessageDto();
 		try {
-			boolean result = likeService.unlikePost(postId, userId);
+			likeService.unlikePost(postId, userId);
 
+			result.setMessage(Constant.UNLIKED);
 			return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (CustomException e) {
-			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
+			result.setMessage(e.getMessage());
+
+			return new ResponseEntity<Object>(result, e.getHttpStatus());
 		} catch (Exception e) {
+			result.setMessage(e.getMessage());
+
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 

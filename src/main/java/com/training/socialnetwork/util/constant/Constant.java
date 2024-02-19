@@ -73,4 +73,10 @@ public class Constant {
 	public static final String FRIENDED = "Friended";
 	
 	public static final String SEND_REQUEST = "Send request";
+	
+	public static final String LIKED = "Liked";
+	
+	public static final String UNLIKED = "Unliked";
+	
+	public static final String FILE_NOT_FOUND = "File not found";
 }

@@ -1,7 +1,6 @@
 package com.training.socialnetwork.controller;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.training.socialnetwork.dto.response.common.MessageDto;
 import com.training.socialnetwork.dto.response.friend.FriendListDto;
 import com.training.socialnetwork.dto.response.friend.FriendRequestDto;
 import com.training.socialnetwork.security.JwtUtils;
@@ -43,22 +43,28 @@ public class FriendController {
 		Pageable paging = PageRequest.of(page, pageSize);
 		try {
 			Page<FriendListDto> friendList = friendService.findAllFriendWithStatus(userId, paging);
-			Map<String, Object> response = new HashMap<>();
-			response.put("friendList", friendList.getContent());
-			response.put("currentPage", friendList.getNumber());
-			response.put("totalItems", friendList.getTotalElements());
-			response.put("totalPages", friendList.getTotalPages());
+			Map<String, Object> result = new HashMap<>();
+			result.put("friendList", friendList.getContent());
+			result.put("currentPage", friendList.getNumber());
+			result.put("totalItems", friendList.getTotalElements());
+			result.put("totalPages", friendList.getTotalPages());
 
-			return new ResponseEntity<Object>(response, HttpStatus.OK);
+			return new ResponseEntity<Object>(result, HttpStatus.OK);
 //			if(!friendList.isEmpty()) {
 //				return new ResponseEntity<>(friendList, HttpStatus.OK);
 //			} else {
 //				return new ResponseEntity<>(Constant.NO_RESULT, HttpStatus.NO_CONTENT);
 //			}
 		} catch (CustomException e) {
-			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
+			MessageDto result = new MessageDto();
+			result.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(result, e.getHttpStatus());
 		} catch (Exception e) {
-			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+			MessageDto result = new MessageDto();
+			result.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(result, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 	}
@@ -67,14 +73,20 @@ public class FriendController {
 	public ResponseEntity<Object> createFriendRequest(HttpServletRequest request,
 			@RequestParam(value = "recievedUserId") int recievedUserId) throws Exception {
 		int sentUserId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
+		MessageDto result = new MessageDto();
 		try {
 			friendService.createFriendRequest(sentUserId, recievedUserId);
 
-			return new ResponseEntity<Object>(Constant.SEND_FRIEND_REQUEST_SUCCESSFULLY, HttpStatus.CREATED);
+			result.setMessage(Constant.SEND_FRIEND_REQUEST_SUCCESSFULLY);
+			return new ResponseEntity<Object>(result, HttpStatus.CREATED);
 		} catch (CustomException e) {
-			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
+			result.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(result, e.getHttpStatus());
 		} catch (Exception e) {
-			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+			result.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(result, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 	}
@@ -83,14 +95,20 @@ public class FriendController {
 	public ResponseEntity<Object> acceptFriendRequest(HttpServletRequest request,
 			@RequestParam(value = "sentUserId") int sentUserId) throws Exception {
 		int recievedUserId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
+		MessageDto result = new MessageDto();
 		try {
 			friendService.acceptFriendRequest(sentUserId, recievedUserId);
 
-			return new ResponseEntity<Object>(Constant.ACCEPT_FRIEND_REQUEST_SUCCESSFULLY, HttpStatus.OK);
+			result.setMessage(Constant.ACCEPT_FRIEND_REQUEST_SUCCESSFULLY);
+			return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (CustomException e) {
-			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
+			result.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(result, e.getHttpStatus());
 		} catch (Exception e) {
-			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+			result.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(result, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 	}
@@ -99,14 +117,20 @@ public class FriendController {
 	public ResponseEntity<Object> refuseFriendRequest(HttpServletRequest request,
 			@RequestParam(value = "sentUserId") int sentUserId) throws Exception {
 		int recievedUserId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
+		MessageDto result = new MessageDto();
 		try {
 			friendService.refuseFriendRequest(sentUserId, recievedUserId);
 
-			return new ResponseEntity<Object>(Constant.REFUSE_FRIEND_REQUEST_SUCCESSFULLY, HttpStatus.OK);
+			result.setMessage(Constant.REFUSE_FRIEND_REQUEST_SUCCESSFULLY);
+			return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (CustomException e) {
-			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
+			result.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(result, e.getHttpStatus());
 		} catch (Exception e) {
-			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+			result.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(result, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 	}
@@ -115,14 +139,20 @@ public class FriendController {
 	public ResponseEntity<Object> removeFriend(HttpServletRequest request,
 			@RequestParam(value = "friendUserId") int friendUserId) throws Exception {
 		int loggedInUserId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
+		MessageDto result = new MessageDto();
 		try {
 			friendService.unfriend(friendUserId, loggedInUserId);
 
-			return new ResponseEntity<Object>(Constant.REMOVE_FRIEND_SUCCESSFULLY, HttpStatus.OK);
+			result.setMessage(Constant.REMOVE_FRIEND_SUCCESSFULLY);
+			return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (CustomException e) {
-			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
+			result.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(result, e.getHttpStatus());
 		} catch (Exception e) {
-			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+			result.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(result, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 	}
@@ -135,17 +165,25 @@ public class FriendController {
 		Pageable paging = PageRequest.of(page, pageSize);
 
 		try {
-			List<FriendRequestDto> friendRequestList = friendService.findAllAddFriendRequest(userId, paging);
-			if (!friendRequestList.isEmpty()) {
-				return new ResponseEntity<Object>(friendRequestList, HttpStatus.OK);
-			} else {
-				return new ResponseEntity<Object>(Constant.NO_RESULT, HttpStatus.NO_CONTENT);
-			}
+			Page<FriendRequestDto> friendRequestList = friendService.findAllAddFriendRequest(userId, paging);
+			
+			Map<String, Object> result = new HashMap<>();
+			result.put("friendList", friendRequestList.getContent());
+			result.put("currentPage", friendRequestList.getNumber());
+			result.put("totalItems", friendRequestList.getTotalElements());
+			result.put("totalPages", friendRequestList.getTotalPages());
 
+			return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (CustomException e) {
-			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
+			MessageDto result = new MessageDto();
+			result.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(result, e.getHttpStatus());
 		} catch (Exception e) {
-			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+			MessageDto result = new MessageDto();
+			result.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(result, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -153,14 +191,20 @@ public class FriendController {
 	public ResponseEntity<Object> removeFriendRequest(HttpServletRequest request,
 			@RequestParam(value = "recievedUserId") int recievedUserId) throws Exception {
 		int sentUserId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
+		MessageDto result = new MessageDto();
 		try {
 			friendService.removeFriendRequest(sentUserId, recievedUserId);
 
-			return new ResponseEntity<Object>(Constant.REMOVE_FRIEND_REQUEST_SUCCESSFULLY, HttpStatus.OK);
+			result.setMessage(Constant.REMOVE_FRIEND_REQUEST_SUCCESSFULLY);
+			return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (CustomException e) {
-			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
+			result.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(result, e.getHttpStatus());
 		} catch (Exception e) {
-			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+			result.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(result, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 	}

@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.training.socialnetwork.dto.request.post.PostCreateDto;
 import com.training.socialnetwork.dto.response.comment.CommentDetailDto;
 import com.training.socialnetwork.dto.response.post.PostCreatedDto;
 import com.training.socialnetwork.dto.response.post.PostDetailDto;
@@ -56,7 +57,7 @@ public class PostService implements IPostService {
 	private ImageUtils imageUtils;
 
 	@Override
-	public PostCreatedDto createPost(int userId, String content, MultipartFile[] photos) throws Exception {
+	public PostCreatedDto createPost(int userId, PostCreateDto postCreateDto) throws Exception {
 		User user = userRepository.findById(userId).orElse(null);
 
 		if (user == null) {
@@ -64,7 +65,7 @@ public class PostService implements IPostService {
 		}
 		Post post = new Post();
 		post.setUser(user);
-		post.setContent(content);
+		post.setContent(postCreateDto.getContent());
 		post.setCreateDate(new Date());
 		post.setUpdateDate(new Date());
 
@@ -73,28 +74,25 @@ public class PostService implements IPostService {
 			throw new Exception(Constant.SERVER_ERROR);
 		}
 
-		List<Photo> photoList = new ArrayList<>();
-		List<String> photoUrls = new ArrayList<>();
-		if (photos != null) {
-			for (MultipartFile file : photos) {
-				String photoUrl = imageUtils.saveImage(file);
-				Photo photo = new Photo();
-//				photo.setPost(post);
-				photo.setName(photoUrl);
-				photo.setCreateDate(new Date());
-
-				photo = photoRepository.save(photo);
-				if (photo == null) {
-					throw new Exception(Constant.SERVER_ERROR);
+		List<Post> postList = new ArrayList<>();
+		postList.add(post);
+		
+		if(null != postCreateDto.getPhotoIdList()) {
+			for (int photoId : postCreateDto.getPhotoIdList()) {
+				Photo photo = photoRepository.findById(photoId).orElse(null);
+				
+				if(photo == null) {
+					throw new CustomException(HttpStatus.NOT_FOUND, "Photo does not exist");
 				}
-				photoList.add(photo);
-				photoUrls.add(photoUrl);
+				if(photo.getUser().getUserId() != userId) {
+					throw new CustomException(HttpStatus.FORBIDDEN, "You do not have permission to use this photo");
+				}
+				photo.getPostList().add(post);
+				photoRepository.save(photo);
 			}
-			post.setPhotoList(photoList);
 		}
 
 		PostCreatedDto postCreatedDto = modelMapper.map(post, PostCreatedDto.class);
-		postCreatedDto.setPhotoUrl(photoUrls);
 		postCreatedDto.setUsername(user.getUsername());
 		return postCreatedDto;
 	}

@@ -77,7 +77,7 @@ public class PostControllerTest {
 		postCreatedDto.setPhotoUrl(photoUrlList);
 		postCreatedDto.setUsername("test");
 
-		when(postService.createPost(anyInt(), any(), any())).thenReturn(postCreatedDto);
+		when(postService.createPost(anyInt(), any())).thenReturn(postCreatedDto);
 
 		mockMvc.perform(MockMvcRequestBuilders.multipart("/post/create").file(photo1).file(photo2)
 				.header("Authorization", "Bearer dummyToken").contentType(MediaType.MULTIPART_FORM_DATA)
@@ -98,7 +98,7 @@ public class PostControllerTest {
 				"some xml".getBytes());
 		
         when(jwtUtils.getUserIdFromJwt(anyString())).thenReturn(userId);
-        when(postService.createPost(anyInt(), any(), any())).thenThrow(new Exception("Some error message"));
+        when(postService.createPost(anyInt(), any())).thenThrow(new Exception("Some error message"));
 
         mockMvc.perform(MockMvcRequestBuilders.multipart("/post/create").file(photo1).file(photo2)
 				.header("Authorization", "Bearer dummyToken").contentType(MediaType.MULTIPART_FORM_DATA)

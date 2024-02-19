@@ -19,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.springframework.mock.web.MockMultipartFile;
 
+import com.training.socialnetwork.dto.request.post.PostCreateDto;
 import com.training.socialnetwork.dto.response.comment.CommentDetailDto;
 import com.training.socialnetwork.dto.response.post.PostCreatedDto;
 import com.training.socialnetwork.dto.response.post.PostDetailDto;
@@ -66,12 +67,12 @@ public class PostServiceTest {
 	public void createPostSuccess() throws Exception {
 		int userId = 1;
 		String content = "test create post";
-
-		MockMultipartFile photo1 = new MockMultipartFile("data1", "filename1.jpg", "multipart/form-data",
-				"some xml".getBytes());
-		MockMultipartFile photo2 = new MockMultipartFile("data2", "filename2.jpg", "multipart/form-data",
-				"some xml".getBytes());
-		MockMultipartFile[] photos = { photo1, photo2 };
+		List<Integer> photoIdList = new ArrayList<>();
+		photoIdList.add(1);
+		
+		PostCreateDto postCreateDto = new PostCreateDto();
+		postCreateDto.setContent(content);
+		postCreateDto.setPhotoIdList(photoIdList);
 
 		User user = new User();
 		user.setUserId(userId);
@@ -87,7 +88,6 @@ public class PostServiceTest {
 		when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
 		Photo photo = new Photo();
-//		photo.setPost(post);
 		photo.setName("data1");
 		photo.setCreateDate(new Date());
 
@@ -97,17 +97,23 @@ public class PostServiceTest {
 		when(postRepository.save(any())).thenReturn(post);
 		when(modelMapper.map(any(), any())).thenReturn(postCreatedDto);
 
-		postService.createPost(userId, content, photos);
+		postService.createPost(userId, postCreateDto);
 	}
 
 	@Test
 	void createPostFail() {
 		int userId = 1;
-		String content = "Test Content";
+		String content = "test create post";
+		List<Integer> photoIdList = new ArrayList<>();
+		photoIdList.add(1);
+		
+		PostCreateDto postCreateDto = new PostCreateDto();
+		postCreateDto.setContent(content);
+		postCreateDto.setPhotoIdList(photoIdList);
 
 		when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-		assertThrows(CustomException.class, () -> postService.createPost(userId, content, null));
+		assertThrows(CustomException.class, () -> postService.createPost(userId, postCreateDto));
 	}
 
 	@Test

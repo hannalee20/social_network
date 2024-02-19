@@ -30,7 +30,7 @@ public interface FriendRepository extends JpaRepository<Friend, Integer> {
 	
 	@Query(value = "" + "select * from friends as f " + "where f.received_user_id = :userId "
 			+ "and f.status = :status ", nativeQuery = true)
-	List<Friend> findAllFriendRequest(@Param(value = "userId") int userId, @Param(value = "status") int status,
+	Page<Friend> findAllFriendRequest(@Param(value = "userId") int userId, @Param(value = "status") int status,
 			Pageable paging);
 
 	@Query(value = "" + "select * from friends as f "

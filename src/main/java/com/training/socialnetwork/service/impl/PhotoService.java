@@ -6,7 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
-import java.util.UUID;
 
 import javax.transaction.Transactional;
 
@@ -17,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.training.socialnetwork.dto.response.photo.PhotoUploadedDto;
 import com.training.socialnetwork.entity.Photo;
 import com.training.socialnetwork.repository.PhotoRepository;
 import com.training.socialnetwork.service.IPhotoService;
@@ -38,7 +38,7 @@ public class PhotoService implements IPhotoService {
 	private Path foundFile;
 
 	@Override
-	public int uploadPhoto(MultipartFile photo) throws IOException {
+	public PhotoUploadedDto uploadPhoto(MultipartFile photo) throws IOException {
 		if (!imageUtils.isValid(photo)) {
 			throw new CustomException(HttpStatus.BAD_REQUEST, "Invalid photo");
 		}
@@ -48,29 +48,33 @@ public class PhotoService implements IPhotoService {
 		if (!Files.exists(CURRENT_FOLDER.resolve(staticPath).resolve(imagePath))) {
 			Files.createDirectories(CURRENT_FOLDER.resolve(staticPath).resolve(imagePath));
 		}
-		String photoCode = UUID.randomUUID().toString();
 
-		Path file = CURRENT_FOLDER.resolve(staticPath).resolve(imagePath)
-				.resolve(photoCode + "-" + photo.getOriginalFilename());
-		try (OutputStream os = Files.newOutputStream(file)) {
-			os.write(photo.getBytes());
-		}
 		Photo photoToSave = new Photo();
 		photoToSave.setName(photo.getOriginalFilename());
 		photoToSave.setCreateDate(new Date());
 
 		photoToSave = photoRepository.save(photoToSave);
+		
+		int photoId = photoToSave.getPhotoId();
+		Path file = CURRENT_FOLDER.resolve(staticPath).resolve(imagePath)
+				.resolve(photoId + "-" + photo.getOriginalFilename());
+		try (OutputStream os = Files.newOutputStream(file)) {
+			os.write(photo.getBytes());
+		}
 
-		return photoToSave.getPhotoId();
+		PhotoUploadedDto uploadedPhotoDto = new PhotoUploadedDto();
+		uploadedPhotoDto.setPhotoId(photoId);
+		
+		return uploadedPhotoDto;
 	}
 
 	@Override
-	public Resource downloadPhoto(String photoCode) throws IOException {
+	public Resource downloadPhoto(int photoId) throws IOException {
 		Path staticPath = Paths.get("static");
 		Path imagePath = Paths.get("images");
 
 		Files.list(CURRENT_FOLDER.resolve(staticPath).resolve(imagePath)).forEach(file -> {
-			if (file.getFileName().toString().startsWith(photoCode)) {
+			if (file.getFileName().toString().startsWith(Integer.toString(photoId))) {
 				foundFile = file;
 				return;
 			}

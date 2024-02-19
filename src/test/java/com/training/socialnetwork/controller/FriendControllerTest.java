@@ -174,8 +174,10 @@ public class FriendControllerTest {
 
 		List<FriendRequestDto> friendRequestList = new ArrayList<>();
 		friendRequestList.add(friendRequestDto);
+		
+		Page<FriendRequestDto> friendRequestPage = new PageImpl<FriendRequestDto>(friendRequestList);
 
-		when(friendService.findAllAddFriendRequest(anyInt(), any())).thenReturn(friendRequestList);
+		when(friendService.findAllAddFriendRequest(anyInt(), any())).thenReturn(friendRequestPage);
 
 		mockMvc.perform(get("/friend/all-friend-request").header("Authorization", "Bearer dummyToken"))
 				.andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1)));

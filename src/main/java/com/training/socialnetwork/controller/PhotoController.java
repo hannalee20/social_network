@@ -16,7 +16,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.training.socialnetwork.dto.response.common.MessageDto;
+import com.training.socialnetwork.dto.response.photo.PhotoUploadedDto;
 import com.training.socialnetwork.service.IPhotoService;
+import com.training.socialnetwork.util.constant.Constant;
 
 @RestController
 @RequestMapping(value = "/photo")
@@ -24,38 +27,43 @@ public class PhotoController {
 
 	@Autowired
 	private IPhotoService photoService;
-	
+
 	@PostMapping(value = "/upload", consumes = { "multipart/form-data" })
 	public ResponseEntity<Object> uploadPhoto(HttpServletRequest request, @RequestParam("image") MultipartFile photo) {
-		int photoId;
 		try {
-			photoId = photoService.uploadPhoto(photo);
+			PhotoUploadedDto result = photoService.uploadPhoto(photo);
+
+			return new ResponseEntity<Object>(result, HttpStatus.CREATED);
 		} catch (Exception e) {
-			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+			MessageDto result = new MessageDto();
+			result.setMessage(e.getMessage());
+			return new ResponseEntity<Object>(result, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		
-		return new ResponseEntity<Object>(photoId, HttpStatus.CREATED);
 	}
-	
+
 	@GetMapping(value = "/download")
-	public ResponseEntity<Object> downloadPhoto(String photoCode, HttpServletResponse response) {
+	public ResponseEntity<Object> downloadPhoto(int photoId, HttpServletResponse response) {
 		Resource resource = null;
 		try {
-			resource = photoService.downloadPhoto(photoCode);
+			resource = photoService.downloadPhoto(photoId);
 		} catch (Exception e) {
-			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+			MessageDto result = new MessageDto();
+			result.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(result, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		
-		if(resource == null) {
-			return new ResponseEntity<Object>("File not found", HttpStatus.NOT_FOUND);
+
+		if (resource == null) {
+			MessageDto result = new MessageDto();
+			result.setMessage(Constant.FILE_NOT_FOUND);
+			
+			return new ResponseEntity<Object>(result, HttpStatus.NOT_FOUND);
 		}
 		String contentType = "application/octet-stream";
-        String headerValue = "attachment; filename=\"" + resource.getFilename() + "\"";
-        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, headerValue);
-        
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)
-                .body(resource);
+		String headerValue = "attachment; filename=\"" + resource.getFilename() + "\"";
+		response.setHeader(HttpHeaders.CONTENT_DISPOSITION, headerValue);
+
+		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+				.header(HttpHeaders.CONTENT_DISPOSITION, headerValue).body(resource);
 	}
 }

@@ -55,8 +55,8 @@ public class FriendService implements IFriendService {
 
 			friendListDtos.add(friendListDto);
 		}
-		Page<FriendListDto> page = new PageImpl<FriendListDto>(friendListDtos);
-		return page;
+		Page<FriendListDto> result = new PageImpl<FriendListDto>(friendListDtos);
+		return result;
 	}
 
 	@Override
@@ -137,7 +137,8 @@ public class FriendService implements IFriendService {
 			throw new CustomException(HttpStatus.NOT_FOUND, "User does not exist");
 		}
 
-		Friend friend = friendRepository.findFriendByUserIdAndStatus(friendUserId, loggedInUserId, Constant.FRIENDED_STATUS);
+		Friend friend = friendRepository.findFriendByUserIdAndStatus(friendUserId, loggedInUserId,
+				Constant.FRIENDED_STATUS);
 
 		if (friend == null) {
 			throw new CustomException(HttpStatus.NOT_FOUND, "Friend does not exist");
@@ -150,8 +151,8 @@ public class FriendService implements IFriendService {
 	}
 
 	@Override
-	public List<FriendRequestDto> findAllAddFriendRequest(int userId, Pageable paging) {
-		List<Friend> friendRequestList = friendRepository.findAllFriendRequest(userId, Constant.FRIEND_REQUEST, paging);
+	public Page<FriendRequestDto> findAllAddFriendRequest(int userId, Pageable paging) {
+		Page<Friend> friendRequestList = friendRepository.findAllFriendRequest(userId, Constant.FRIEND_REQUEST, paging);
 
 		List<FriendRequestDto> friendRequestDtos = new ArrayList<>();
 
@@ -162,7 +163,9 @@ public class FriendService implements IFriendService {
 //			friendRequestDto.setAvatar(friendRequest.getSentUser().getAvatarUrl());
 			friendRequestDtos.add(friendRequestDto);
 		}
-		return friendRequestDtos;
+		Page<FriendRequestDto> result = new PageImpl<FriendRequestDto>(friendRequestDtos);
+		
+		return result;
 	}
 
 	@Override

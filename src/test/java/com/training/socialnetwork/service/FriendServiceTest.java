@@ -489,8 +489,10 @@ public class FriendServiceTest {
 		
 		List<Friend> friendList = new ArrayList<Friend>();
 		friendList.add(friend1);
+		
+		Page<Friend> friendPage = new PageImpl<Friend>(friendList);
 
-		when(friendRepository.findAllFriendRequest(anyInt(), anyInt(), any())).thenReturn(friendList);
+		when(friendRepository.findAllFriendRequest(anyInt(), anyInt(), any())).thenReturn(friendPage);
 
 		friendService.findAllAddFriendRequest(userId, null);
 	}
