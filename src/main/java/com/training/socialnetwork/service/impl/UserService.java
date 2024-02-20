@@ -15,6 +15,8 @@ import javax.transaction.Transactional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -138,7 +140,7 @@ public class UserService implements IUserService {
 			}
 		}
 		objectMapper.copyProperties(userUpdateDto, userToUpdate);
-		if(null != userUpdateDto.getBirthDate()) {
+		if (null != userUpdateDto.getBirthDate()) {
 			try {
 				SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 				formatter.setLenient(false);
@@ -163,10 +165,11 @@ public class UserService implements IUserService {
 				userUpdatedDto.setSex(Constant.FEMALE);
 			}
 		}
-		if(null != userToUpdate.getBirthDate()) {
-			userUpdatedDto.setBirthDate(userToUpdate.getBirthDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+		if (null != userToUpdate.getBirthDate()) {
+			userUpdatedDto
+					.setBirthDate(userToUpdate.getBirthDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
 		}
-		
+
 		return userUpdatedDto;
 	}
 
@@ -186,14 +189,16 @@ public class UserService implements IUserService {
 				userDetailDto.setGender(Constant.FEMALE);
 			}
 		}
-		userDetailDto.setBirthDate(user.getBirthDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-
+		if (null != user.getBirthDate()) {
+			userDetailDto.setBirthDate(user.getBirthDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+		}
+		
 		return userDetailDto;
 	}
 
 	@Override
-	public List<UserSearchResponseDto> searchUser(int userId, String keyword, Pageable paging) {
-		List<User> userList = userRepository.findAllUserByKeyword(userId, keyword, paging);
+	public Page<UserSearchResponseDto> searchUser(int userId, String keyword, Pageable paging) {
+		Page<User> userList = userRepository.findAllUserByKeyword(userId, keyword, paging);
 
 		List<Friend> friendList = friendRepository.findAllByUserId(userId);
 
@@ -219,7 +224,9 @@ public class UserService implements IUserService {
 			}
 		}
 
-		return userSearchList;
+		Page<UserSearchResponseDto> result = new PageImpl<UserSearchResponseDto>(userSearchList);
+
+		return result;
 	}
 
 	@Override
@@ -253,7 +260,7 @@ public class UserService implements IUserService {
 
 		UserForgotPasswordResponseDto userForgotPasswordDto = new UserForgotPasswordResponseDto();
 		userForgotPasswordDto.setToken(user.getToken());
-		
+
 		return userForgotPasswordDto;
 	}
 

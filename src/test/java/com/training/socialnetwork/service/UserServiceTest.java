@@ -22,6 +22,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.training.socialnetwork.dto.request.user.UserRegisterRequestDto;
@@ -341,6 +343,8 @@ public class UserServiceTest {
 		userList.add(user1);
 		userList.add(user2);
 		
+		Page<User> userPage = new PageImpl<User>(userList);
+		
 		Friend friend = new Friend();
 		friend.setFriendId(1);
 		friend.setSentUser(user1);
@@ -352,7 +356,7 @@ public class UserServiceTest {
 		
 		String keyword = "test";
 		UserSearchResponseDto userSearchDto = new UserSearchResponseDto();
-		when(userRepository.findAllUserByKeyword(anyInt(), any(), any())).thenReturn(userList);
+		when(userRepository.findAllUserByKeyword(anyInt(), any(), any())).thenReturn(userPage);
 		when(friendRepository.findAllByUserId(anyInt())).thenReturn(friendList);
 		when(modelMapper.map(any(), any())).thenReturn(userSearchDto);
 		

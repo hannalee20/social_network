@@ -26,6 +26,8 @@ import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -356,7 +358,9 @@ public class UserControllerTest {
 		userSearchList.add(userSearchDto2);
 		userSearchList.add(userSearchDto3);
 		
-		when(userService.searchUser(anyInt(), any(), any())).thenReturn(userSearchList);
+		Page<UserSearchResponseDto> userPage = new PageImpl<UserSearchResponseDto>(userSearchList);
+		
+		when(userService.searchUser(anyInt(), any(), any())).thenReturn(userPage);
 		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
 		
 		mockMvc.perform(get("/user/search")

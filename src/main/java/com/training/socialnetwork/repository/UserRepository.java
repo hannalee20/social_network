@@ -1,7 +1,6 @@
 package com.training.socialnetwork.repository;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -31,6 +30,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 	@Query(value = "" + "select * from users as u " + "where u.user_id <> :userId "
 			+ "and (lower(u.username) like concat('%', :keyword, '%') "
 			+ "or lower(u.real_name) like concat('%', :keyword, '%')) ", nativeQuery = true)
-	List<User> findAllUserByKeyword(@Param(value = "userId") int userId, @Param(value = "keyword") String keyword, Pageable paging);
+	Page<User> findAllUserByKeyword(@Param(value = "userId") int userId, @Param(value = "keyword") String keyword, Pageable paging);
 
 }

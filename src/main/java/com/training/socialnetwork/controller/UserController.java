@@ -3,13 +3,15 @@ package com.training.socialnetwork.controller;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -35,10 +37,10 @@ import com.training.socialnetwork.dto.request.user.UserRegisterRequestDto;
 import com.training.socialnetwork.dto.request.user.UserResetPasswordRequestDto;
 import com.training.socialnetwork.dto.request.user.UserUpdateRequestDto;
 import com.training.socialnetwork.dto.response.common.MessageResponseDto;
-import com.training.socialnetwork.dto.response.user.UserLoginResponseDto;
 import com.training.socialnetwork.dto.response.user.UserDetailResponseDto;
 import com.training.socialnetwork.dto.response.user.UserForgotPasswordResponseDto;
 import com.training.socialnetwork.dto.response.user.UserGetTokenResponseDto;
+import com.training.socialnetwork.dto.response.user.UserLoginResponseDto;
 import com.training.socialnetwork.dto.response.user.UserRegisterResponseDto;
 import com.training.socialnetwork.dto.response.user.UserReportResponseDto;
 import com.training.socialnetwork.dto.response.user.UserSearchResponseDto;
@@ -176,7 +178,7 @@ public class UserController {
 		}
 
 	}
-	
+
 	@GetMapping(value = "/detail")
 	public ResponseEntity<Object> getUserInfo(HttpServletRequest request) {
 
@@ -208,14 +210,15 @@ public class UserController {
 		Pageable paging = PageRequest.of(page, pageSize);
 
 		try {
-			List<UserSearchResponseDto> userSearchList = userService.searchUser(userId, keyword, paging);
+			Page<UserSearchResponseDto> userSearchList = userService.searchUser(userId, keyword, paging);
 
-			if (userSearchList.isEmpty()) {
-				return new ResponseEntity<Object>(Constant.NO_RESULT, HttpStatus.NO_CONTENT);
-			} else {
-				return new ResponseEntity<Object>(userSearchList, HttpStatus.OK);
-			}
+			Map<String, Object> result = new HashMap<>();
+			result.put("userList", userSearchList.getContent());
+			result.put("currentPage", userSearchList.getNumber());
+			result.put("totalItems", userSearchList.getTotalElements());
+			result.put("totalPages", userSearchList.getTotalPages());
 
+			return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (CustomException e) {
 			MessageResponseDto result = new MessageResponseDto();
 			result.setMessage(e.getMessage());
@@ -252,11 +255,11 @@ public class UserController {
 			return new ResponseEntity<>(result, HttpStatus.OK);
 		} catch (CustomException e) {
 			result.setMessage(e.getMessage());
-			
+
 			return new ResponseEntity<Object>(result, e.getHttpStatus());
 		} catch (Exception e) {
 			result.setMessage(e.getMessage());
-			
+
 			return new ResponseEntity<Object>(result, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -265,12 +268,18 @@ public class UserController {
 	public ResponseEntity<Object> forgotPassword(@RequestBody UserForgotPasswordRequestDto userForgotPasswordDto) {
 		try {
 			UserForgotPasswordResponseDto result = userService.forgotPassword(userForgotPasswordDto.getEmail());
-			
+
 			return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (CustomException e) {
-			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
+			MessageResponseDto result = new MessageResponseDto();
+			result.setMessage(e.getMessage());
+
+			return new ResponseEntity<Object>(result, e.getHttpStatus());
 		} catch (Exception e) {
-			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+			MessageResponseDto result = new MessageResponseDto();
+			result.setMessage(e.getMessage());
+
+			return new ResponseEntity<Object>(result, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 	}
@@ -283,9 +292,15 @@ public class UserController {
 
 			return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (CustomException e) {
-			return new ResponseEntity<Object>(e.getMessage(), e.getHttpStatus());
+			MessageResponseDto result = new MessageResponseDto();
+			result.setMessage(e.getMessage());
+
+			return new ResponseEntity<Object>(result, e.getHttpStatus());
 		} catch (Exception e) {
-			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+			MessageResponseDto result = new MessageResponseDto();
+			result.setMessage(e.getMessage());
+
+			return new ResponseEntity<Object>(result, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 	}

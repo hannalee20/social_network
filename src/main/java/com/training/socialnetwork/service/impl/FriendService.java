@@ -75,7 +75,7 @@ public class FriendService implements IFriendService {
 			friend.setSentUser(sentUser);
 			friend.setReceivedUser(recievedUser);
 		} else {
-			if (friend.getStatus() == Constant.NUMBER_0) {
+			if (friend.getStatus() == Constant.NUMBER_0 && friend.getSentUser().getUserId() == sentUserId) {
 				throw new CustomException(HttpStatus.BAD_REQUEST, "You have already sent a friend request");
 			} else if (friend.getStatus() == Constant.NUMBER_1) {
 				throw new CustomException(HttpStatus.BAD_REQUEST, "You are already friends");

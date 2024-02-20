@@ -50,11 +50,6 @@ public class FriendController {
 			result.put("totalPages", friendList.getTotalPages());
 
 			return new ResponseEntity<Object>(result, HttpStatus.OK);
-//			if(!friendList.isEmpty()) {
-//				return new ResponseEntity<>(friendList, HttpStatus.OK);
-//			} else {
-//				return new ResponseEntity<>(Constant.NO_RESULT, HttpStatus.NO_CONTENT);
-//			}
 		} catch (CustomException e) {
 			MessageResponseDto result = new MessageResponseDto();
 			result.setMessage(e.getMessage());
