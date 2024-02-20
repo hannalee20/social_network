@@ -1,6 +1,6 @@
 package com.training.socialnetwork.dto.response.photo;
 
-public class PhotoUploadedDto {
+public class PhotoUploadResponseDto {
 
 	private int photoId;
 

@@ -5,7 +5,7 @@ import java.io.Serializable;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
-public class UserForgotPasswordDto implements Serializable{
+public class UserForgotPasswordRequestDto implements Serializable{
 	
 	private static final long serialVersionUID = 1L;
 	

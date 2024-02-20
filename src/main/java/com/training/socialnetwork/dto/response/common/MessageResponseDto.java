@@ -2,7 +2,7 @@ package com.training.socialnetwork.dto.response.common;
 
 import java.io.Serializable;
 
-public class MessageDto implements Serializable {
+public class MessageResponseDto implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 

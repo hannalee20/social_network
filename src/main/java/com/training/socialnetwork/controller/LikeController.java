@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.training.socialnetwork.dto.response.common.MessageDto;
+import com.training.socialnetwork.dto.response.common.MessageResponseDto;
 import com.training.socialnetwork.security.JwtUtils;
 import com.training.socialnetwork.service.ILikeService;
 import com.training.socialnetwork.util.constant.Constant;
@@ -30,7 +30,7 @@ public class LikeController {
 	public ResponseEntity<Object> addLike(HttpServletRequest request, @RequestParam(value = "postId") int postId)
 			throws Exception {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
-		MessageDto result = new MessageDto();
+		MessageResponseDto result = new MessageResponseDto();
 		try {
 			likeService.addLikePost(postId, userId);
 
@@ -52,7 +52,7 @@ public class LikeController {
 	public ResponseEntity<Object> unlike(HttpServletRequest request, @RequestParam(value = "postId") int postId)
 			throws Exception {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
-		MessageDto result = new MessageDto();
+		MessageResponseDto result = new MessageResponseDto();
 		try {
 			likeService.unlikePost(postId, userId);
 

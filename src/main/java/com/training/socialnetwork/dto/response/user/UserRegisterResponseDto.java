@@ -1,6 +1,6 @@
 package com.training.socialnetwork.dto.response.user;
 
-public class UserRegistedDto {
+public class UserRegisterResponseDto {
 
 	private int userId;
 	private String username;

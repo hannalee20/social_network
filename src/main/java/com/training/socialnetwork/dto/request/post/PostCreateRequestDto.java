@@ -3,7 +3,7 @@ package com.training.socialnetwork.dto.request.post;
 import java.io.Serializable;
 import java.util.List;
 
-public class PostUpdateDto implements Serializable{
+public class PostCreateRequestDto implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 	
@@ -27,4 +27,3 @@ public class PostUpdateDto implements Serializable{
 	}
 
 }
-

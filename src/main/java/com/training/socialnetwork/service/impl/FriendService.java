@@ -13,8 +13,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import com.training.socialnetwork.dto.response.friend.FriendListDto;
-import com.training.socialnetwork.dto.response.friend.FriendRequestDto;
+import com.training.socialnetwork.dto.response.friend.FriendListResponseDto;
+import com.training.socialnetwork.dto.response.friend.FriendRequestListResponseDto;
 import com.training.socialnetwork.entity.Friend;
 import com.training.socialnetwork.entity.User;
 import com.training.socialnetwork.repository.FriendRepository;
@@ -34,14 +34,14 @@ public class FriendService implements IFriendService {
 	private UserRepository userRepository;
 
 	@Override
-	public Page<FriendListDto> findAllFriendWithStatus(int userId, Pageable paging) {
+	public Page<FriendListResponseDto> findAllFriendWithStatus(int userId, Pageable paging) {
 		Page<Friend> friendList = friendRepository.findAllFriendByUserIdAndStatus(userId, Constant.FRIENDED_STATUS,
 				paging);
 
-		List<FriendListDto> friendListDtos = new ArrayList<>();
+		List<FriendListResponseDto> friendListDtos = new ArrayList<>();
 
 		for (Friend friend : friendList) {
-			FriendListDto friendListDto = new FriendListDto();
+			FriendListResponseDto friendListDto = new FriendListResponseDto();
 			friendListDto.setFriendId(friend.getFriendId());
 			if (friend.getSentUser().getUserId() == userId) {
 				friendListDto.setUserId(friend.getReceivedUser().getUserId());
@@ -55,7 +55,7 @@ public class FriendService implements IFriendService {
 
 			friendListDtos.add(friendListDto);
 		}
-		Page<FriendListDto> result = new PageImpl<FriendListDto>(friendListDtos);
+		Page<FriendListResponseDto> result = new PageImpl<FriendListResponseDto>(friendListDtos);
 		return result;
 	}
 
@@ -151,19 +151,19 @@ public class FriendService implements IFriendService {
 	}
 
 	@Override
-	public Page<FriendRequestDto> findAllAddFriendRequest(int userId, Pageable paging) {
+	public Page<FriendRequestListResponseDto> findAllAddFriendRequest(int userId, Pageable paging) {
 		Page<Friend> friendRequestList = friendRepository.findAllFriendRequest(userId, Constant.FRIEND_REQUEST, paging);
 
-		List<FriendRequestDto> friendRequestDtos = new ArrayList<>();
+		List<FriendRequestListResponseDto> friendRequestDtos = new ArrayList<>();
 
 		for (Friend friendRequest : friendRequestList) {
-			FriendRequestDto friendRequestDto = new FriendRequestDto();
+			FriendRequestListResponseDto friendRequestDto = new FriendRequestListResponseDto();
 			friendRequestDto.setUserId(friendRequest.getSentUser().getUserId());
 			friendRequestDto.setUsername(friendRequest.getSentUser().getUsername());
 //			friendRequestDto.setAvatar(friendRequest.getSentUser().getAvatarUrl());
 			friendRequestDtos.add(friendRequestDto);
 		}
-		Page<FriendRequestDto> result = new PageImpl<FriendRequestDto>(friendRequestDtos);
+		Page<FriendRequestListResponseDto> result = new PageImpl<FriendRequestListResponseDto>(friendRequestDtos);
 		
 		return result;
 	}

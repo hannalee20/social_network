@@ -1,6 +1,6 @@
 package com.training.socialnetwork.dto.response.user;
 
-public class UserSearchDto {
+public class UserSearchResponseDto {
 
 	private int userId;
 	private String username;

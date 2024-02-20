@@ -1,10 +1,10 @@
 package com.training.socialnetwork.dto.response.user;
 
-public class JwtResponse {
+public class UserGetTokenResponseDto {
 
 	private String jwt;
 
-	public JwtResponse(String jwt) {
+	public UserGetTokenResponseDto(String jwt) {
 		this.jwt = jwt;
 	}
 

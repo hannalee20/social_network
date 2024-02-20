@@ -3,31 +3,31 @@ package com.training.socialnetwork.service;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.multipart.MultipartFile;
 
-import com.training.socialnetwork.dto.request.user.UserRegisterDto;
-import com.training.socialnetwork.dto.request.user.UserUpdateDto;
-import com.training.socialnetwork.dto.response.user.UserDetailDto;
-import com.training.socialnetwork.dto.response.user.UserRegistedDto;
-import com.training.socialnetwork.dto.response.user.UserReportDto;
-import com.training.socialnetwork.dto.response.user.UserSearchDto;
-import com.training.socialnetwork.dto.response.user.UserUpdatedDto;
+import com.training.socialnetwork.dto.request.user.UserRegisterRequestDto;
+import com.training.socialnetwork.dto.request.user.UserUpdateRequestDto;
+import com.training.socialnetwork.dto.response.user.UserDetailResponseDto;
+import com.training.socialnetwork.dto.response.user.UserForgotPasswordResponseDto;
+import com.training.socialnetwork.dto.response.user.UserRegisterResponseDto;
+import com.training.socialnetwork.dto.response.user.UserReportResponseDto;
+import com.training.socialnetwork.dto.response.user.UserSearchResponseDto;
+import com.training.socialnetwork.dto.response.user.UserUpdateResponseDto;
 
 public interface IUserService {
 	
-	UserRegistedDto createUser(UserRegisterDto user) throws Exception ;
+	UserRegisterResponseDto createUser(UserRegisterRequestDto user) throws Exception ;
 	
 	boolean loginUser(String username, String password) throws Exception;
 	
-	UserUpdatedDto updateInfo(UserUpdateDto user, MultipartFile image, int userId, int loggedInUserId) throws Exception;
+	UserUpdateResponseDto updateInfo(UserUpdateRequestDto user, int userId, int loggedInUserId) throws Exception;
 	
-	UserDetailDto getInfo(int userId) throws Exception;
+	UserDetailResponseDto getInfo(int userId) throws Exception;
 	
-	List<UserSearchDto> searchUser(int userId, String keyword, Pageable paging);
+	List<UserSearchResponseDto> searchUser(int userId, String keyword, Pageable paging);
 	
-	UserReportDto getReportUser(int userId);
+	UserReportResponseDto getReportUser(int userId);
 	
-	String forgotPassword(String email) throws Exception;
+	UserForgotPasswordResponseDto forgotPassword(String email) throws Exception;
 	
 	String resetPassword(String token, String newPassword) throws Exception;
 }

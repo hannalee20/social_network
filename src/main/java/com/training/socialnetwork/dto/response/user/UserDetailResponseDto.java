@@ -1,36 +1,37 @@
-package com.training.socialnetwork.dto.request.user;
+package com.training.socialnetwork.dto.response.user;
 
-import java.io.Serializable;
+import java.time.LocalDate;
 
-import javax.validation.constraints.Pattern;
+public class UserDetailResponseDto {
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.training.socialnetwork.util.constant.Constant;
-
-@JsonInclude(Include.NON_NULL)
-public class UserUpdateDto implements Serializable {
-
-	private static final long serialVersionUID = 1L;
-
-	@Pattern(regexp = "^[a-zA-Z]{2,}(?: [a-zA-Z]+){0,2}$", message = Constant.INVALID_REAL_NAME)
+	private int userId;
+	private String username;
 	private String realName;
-	
-	@Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = Constant.BIRTH_DATE_INVALID_MESSAGE)
-	private String birthDate;
-	
-	@Pattern(regexp = "^(Male|Female|male|female)$", message = Constant.GENDER_INVALID_MESSAGE)
+	private LocalDate birthDate;
 	private String gender;
-	
 	private String address;
-	
+	private String email;
 	private String university;
-	
 	private String job;
-	
 	private String status;
-	
 	private String about;
+	private String avatarUrl;
+
+	public int getUserId() {
+		return userId;
+	}
+
+	public void setUserId(int userId) {
+		this.userId = userId;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
 
 	public String getRealName() {
 		return realName;
@@ -40,11 +41,11 @@ public class UserUpdateDto implements Serializable {
 		this.realName = realName;
 	}
 
-	public String getBirthDate() {
+	public LocalDate getBirthDate() {
 		return birthDate;
 	}
 
-	public void setBirthDate(String birthDate) {
+	public void setBirthDate(LocalDate birthDate) {
 		this.birthDate = birthDate;
 	}
 
@@ -59,8 +60,17 @@ public class UserUpdateDto implements Serializable {
 	public String getAddress() {
 		return address;
 	}
+
 	public void setAddress(String address) {
 		this.address = address;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	public String getUniversity() {
@@ -93,6 +103,14 @@ public class UserUpdateDto implements Serializable {
 
 	public void setAbout(String about) {
 		this.about = about;
+	}
+
+	public String getAvatarUrl() {
+		return avatarUrl;
+	}
+
+	public void setAvatarUrl(String avatarUrl) {
+		this.avatarUrl = avatarUrl;
 	}
 
 }

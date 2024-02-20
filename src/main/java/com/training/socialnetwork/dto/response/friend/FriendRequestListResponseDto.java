@@ -1,19 +1,10 @@
 package com.training.socialnetwork.dto.response.friend;
 
-public class FriendListDto {
+public class FriendRequestListResponseDto {
 
-	private int friendId;
 	private int userId;
 	private String username;
 	private String avatar;
-
-	public int getFriendId() {
-		return friendId;
-	}
-
-	public void setFriendId(int friendId) {
-		this.friendId = friendId;
-	}
 
 	public int getUserId() {
 		return userId;

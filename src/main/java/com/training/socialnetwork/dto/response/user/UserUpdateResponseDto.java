@@ -2,7 +2,7 @@ package com.training.socialnetwork.dto.response.user;
 
 import java.time.LocalDate;
 
-public class UserUpdatedDto {
+public class UserUpdateResponseDto {
 
 	private int userId;
 	private String username;

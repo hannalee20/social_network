@@ -12,15 +12,15 @@ import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import com.training.socialnetwork.dto.response.user.UserReportDto;
+import com.training.socialnetwork.dto.response.user.UserReportResponseDto;
 
 public class ReportGenerator {
 
 	private XSSFWorkbook workbook;
 	private XSSFSheet sheet;
-	private UserReportDto user;
+	private UserReportResponseDto user;
 	
-	public ReportGenerator(UserReportDto user) {
+	public ReportGenerator(UserReportResponseDto user) {
 		this.user = user;
 		this.workbook = new XSSFWorkbook();
 	}

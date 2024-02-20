@@ -8,7 +8,7 @@ import javax.validation.constraints.Size;
 
 import com.training.socialnetwork.util.constant.Constant;
 
-public class UserLoginDto implements Serializable {
+public class UserGetTokenRequestDto implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -21,6 +21,11 @@ public class UserLoginDto implements Serializable {
 	@Size(min = 6, max = 16, message = Constant.INVALID)
 	@NotBlank
 	private String password;
+
+	@Pattern(regexp = "^[0-9]*$")
+	@Size(min = 100000, max = 999999, message = Constant.INVALID)
+	@NotBlank
+	private int otp;
 
 	public String getUsername() {
 		return username;
@@ -36,6 +41,14 @@ public class UserLoginDto implements Serializable {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public int getOtp() {
+		return otp;
+	}
+
+	public void setOtp(int otp) {
+		this.otp = otp;
 	}
 
 }

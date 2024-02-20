@@ -1,6 +1,6 @@
 package com.training.socialnetwork.dto.response.user;
 
-public class UserReportDto {
+public class UserReportResponseDto {
 
 	private int postCount;
 	private int commentCount;

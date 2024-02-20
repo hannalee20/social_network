@@ -1,13 +1,17 @@
 package com.training.socialnetwork.dto.response.comment;
 
-public class CommentDetailDto {
+import java.util.Date;
+
+public class CommentUpdateResponseDto {
 
 	private int commentId;
 	private int postId;
 	private int userId;
 	private String username;
 	private String content;
-	private String photoUrl;
+	private int photoId;
+	private Date createDate;
+	private Date updateDate;
 
 	public int getCommentId() {
 		return commentId;
@@ -49,12 +53,28 @@ public class CommentDetailDto {
 		this.content = content;
 	}
 
-	public String getPhotoUrl() {
-		return photoUrl;
+	public int getPhotoId() {
+		return photoId;
 	}
 
-	public void setPhotoUrl(String photoUrl) {
-		this.photoUrl = photoUrl;
+	public void setPhotoId(int photoId) {
+		this.photoId = photoId;
+	}
+
+	public Date getCreateDate() {
+		return createDate;
+	}
+
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
+	}
+
+	public Date getUpdateDate() {
+		return updateDate;
+	}
+
+	public void setUpdateDate(Date updateDate) {
+		this.updateDate = updateDate;
 	}
 
 }

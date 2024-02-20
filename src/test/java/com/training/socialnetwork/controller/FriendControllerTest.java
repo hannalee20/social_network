@@ -26,8 +26,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.training.socialnetwork.dto.response.friend.FriendListDto;
-import com.training.socialnetwork.dto.response.friend.FriendRequestDto;
+import com.training.socialnetwork.dto.response.friend.FriendListResponseDto;
+import com.training.socialnetwork.dto.response.friend.FriendRequestListResponseDto;
 import com.training.socialnetwork.security.JwtUtils;
 import com.training.socialnetwork.service.IFriendService;
 import com.training.socialnetwork.util.constant.Constant;
@@ -55,15 +55,15 @@ public class FriendControllerTest {
 
 	@Test
 	public void getFriendListSuccess() throws Exception {
-		FriendListDto friendListDto = new FriendListDto();
+		FriendListResponseDto friendListDto = new FriendListResponseDto();
 		friendListDto.setFriendId(1);
 		friendListDto.setUserId(2);
 		friendListDto.setUsername("test");
 
-		List<FriendListDto> friendList = new ArrayList<>();
+		List<FriendListResponseDto> friendList = new ArrayList<>();
 		friendList.add(friendListDto);
 
-		Page<FriendListDto> page = new PageImpl<FriendListDto>(friendList);
+		Page<FriendListResponseDto> page = new PageImpl<FriendListResponseDto>(friendList);
 		when(friendService.findAllFriendWithStatus(anyInt(), any())).thenReturn(page);
 
 		mockMvc.perform(get("/friend/all-friends").header("Authorization", "Bearer dummyToken"))
@@ -168,14 +168,14 @@ public class FriendControllerTest {
 	
 	@Test
 	public void getFriendRequestListSuccess() throws Exception {
-		FriendRequestDto friendRequestDto = new FriendRequestDto();
+		FriendRequestListResponseDto friendRequestDto = new FriendRequestListResponseDto();
 		friendRequestDto.setUserId(2);
 		friendRequestDto.setUsername("test");
 
-		List<FriendRequestDto> friendRequestList = new ArrayList<>();
+		List<FriendRequestListResponseDto> friendRequestList = new ArrayList<>();
 		friendRequestList.add(friendRequestDto);
 		
-		Page<FriendRequestDto> friendRequestPage = new PageImpl<FriendRequestDto>(friendRequestList);
+		Page<FriendRequestListResponseDto> friendRequestPage = new PageImpl<FriendRequestListResponseDto>(friendRequestList);
 
 		when(friendService.findAllAddFriendRequest(anyInt(), any())).thenReturn(friendRequestPage);
 
@@ -185,11 +185,11 @@ public class FriendControllerTest {
 	
 	@Test
 	public void getFriendRequestListFail() throws Exception {
-		FriendRequestDto friendRequestDto = new FriendRequestDto();
+		FriendRequestListResponseDto friendRequestDto = new FriendRequestListResponseDto();
 		friendRequestDto.setUserId(2);
 		friendRequestDto.setUsername("test");
 
-		List<FriendRequestDto> friendRequestList = new ArrayList<>();
+		List<FriendRequestListResponseDto> friendRequestList = new ArrayList<>();
 		friendRequestList.add(friendRequestDto);
 
 		when(friendService.findAllAddFriendRequest(anyInt(), any())).thenThrow(new RuntimeException());

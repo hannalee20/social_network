@@ -29,10 +29,10 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.training.socialnetwork.dto.request.comment.CommentCreateDto;
-import com.training.socialnetwork.dto.response.comment.CommentCreatedDto;
-import com.training.socialnetwork.dto.response.comment.CommentDetailDto;
-import com.training.socialnetwork.dto.response.comment.CommentUpdatedDto;
+import com.training.socialnetwork.dto.request.comment.CommentCreateRequestDto;
+import com.training.socialnetwork.dto.response.comment.CommentCreateResponseDto;
+import com.training.socialnetwork.dto.response.comment.CommentDetailResponseDto;
+import com.training.socialnetwork.dto.response.comment.CommentUpdateResponseDto;
 import com.training.socialnetwork.security.JwtUtils;
 import com.training.socialnetwork.service.ICommentService;
 import com.training.socialnetwork.util.constant.Constant;
@@ -62,14 +62,14 @@ public class CommentControllerTest {
 	@Test
 	public void createCommentSuccess() throws Exception {
 		int userId = 1;
-		CommentCreateDto commentCreateDto = new CommentCreateDto();
+		CommentCreateRequestDto commentCreateDto = new CommentCreateRequestDto();
 		commentCreateDto.setPostId(1);
 		commentCreateDto.setContent("create content");
 
 		MockMultipartFile photo = new MockMultipartFile("data", "photo.png", "multipart/form-data",
 				"some data".getBytes());
 
-		CommentCreatedDto commentCreatedDto = new CommentCreatedDto();
+		CommentCreateResponseDto commentCreatedDto = new CommentCreateResponseDto();
 		commentCreatedDto.setCommentId(1);
 		commentCreatedDto.setPostId(1);
 		commentCreatedDto.setUserId(1);
@@ -97,7 +97,7 @@ public class CommentControllerTest {
 
 	@Test
 	public void createCommentFail() throws Exception {
-		CommentCreateDto commentCreateDto = new CommentCreateDto();
+		CommentCreateRequestDto commentCreateDto = new CommentCreateRequestDto();
 		commentCreateDto.setPostId(1);
 		commentCreateDto.setContent("create content");
 
@@ -142,7 +142,7 @@ public class CommentControllerTest {
 	@Test
 	public void updateCommentSuccess() throws Exception {
 		String content = "update content";
-		CommentUpdatedDto commentUpdatedDto = new CommentUpdatedDto();
+		CommentUpdateResponseDto commentUpdatedDto = new CommentUpdateResponseDto();
 		commentUpdatedDto.setCommentId(1);
 		commentUpdatedDto.setPostId(1);
 		commentUpdatedDto.setUserId(1);
@@ -170,7 +170,7 @@ public class CommentControllerTest {
 
 	@Test
 	public void getCommentDetailSuccess() throws Exception {
-		CommentDetailDto commentDetailDto = new CommentDetailDto();
+		CommentDetailResponseDto commentDetailDto = new CommentDetailResponseDto();
 		commentDetailDto.setContent("comment content");
 		commentDetailDto.setCommentId(1);
 		commentDetailDto.setUserId(1);
@@ -186,7 +186,7 @@ public class CommentControllerTest {
 	
 	@Test
 	public void getCommentDetailFail() throws Exception {
-		CommentDetailDto commentDetailDto = new CommentDetailDto();
+		CommentDetailResponseDto commentDetailDto = new CommentDetailResponseDto();
 		commentDetailDto.setContent("comment content");
 		commentDetailDto.setCommentId(1);
 		commentDetailDto.setUserId(1);

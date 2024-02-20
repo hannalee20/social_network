@@ -1,14 +1,20 @@
 package com.training.socialnetwork.dto.response.post;
 
+import java.util.Date;
 import java.util.List;
 
-public class PostCreatedDto {
+import com.training.socialnetwork.dto.response.comment.CommentDetailResponseDto;
+
+public class PostDetailResponseDto {
 
 	private int postId;
 	private int userId;
 	private String username;
 	private String content;
 	private List<String> photoUrl;
+	private Date createDate;
+	private int likeCount;
+	private List<CommentDetailResponseDto> commentList;
 
 	public int getPostId() {
 		return postId;
@@ -48,6 +54,30 @@ public class PostCreatedDto {
 
 	public void setPhotoUrl(List<String> photoUrl) {
 		this.photoUrl = photoUrl;
+	}
+
+	public Date getCreateDate() {
+		return createDate;
+	}
+
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
+	}
+
+	public int getLikeCount() {
+		return likeCount;
+	}
+
+	public void setLikeCount(int likeCount) {
+		this.likeCount = likeCount;
+	}
+
+	public List<CommentDetailResponseDto> getCommentList() {
+		return commentList;
+	}
+
+	public void setCommentList(List<CommentDetailResponseDto> commentList) {
+		this.commentList = commentList;
 	}
 
 }

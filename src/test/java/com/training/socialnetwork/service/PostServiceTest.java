@@ -20,13 +20,13 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 
-import com.training.socialnetwork.dto.request.post.PostCreateDto;
-import com.training.socialnetwork.dto.request.post.PostUpdateDto;
-import com.training.socialnetwork.dto.response.comment.CommentDetailDto;
-import com.training.socialnetwork.dto.response.post.PostCreatedDto;
-import com.training.socialnetwork.dto.response.post.PostDetailDto;
-import com.training.socialnetwork.dto.response.post.PostListDto;
-import com.training.socialnetwork.dto.response.post.PostUpdatedDto;
+import com.training.socialnetwork.dto.request.post.PostCreateRequestDto;
+import com.training.socialnetwork.dto.request.post.PostUpdateRequestDto;
+import com.training.socialnetwork.dto.response.comment.CommentDetailResponseDto;
+import com.training.socialnetwork.dto.response.post.PostCreateResponseDto;
+import com.training.socialnetwork.dto.response.post.PostDetailResponseDto;
+import com.training.socialnetwork.dto.response.post.PostListResponseDto;
+import com.training.socialnetwork.dto.response.post.PostUpdateResponseDto;
 import com.training.socialnetwork.entity.Comment;
 import com.training.socialnetwork.entity.Like;
 import com.training.socialnetwork.entity.Photo;
@@ -72,7 +72,7 @@ public class PostServiceTest {
 		List<Integer> photoIdList = new ArrayList<>();
 		photoIdList.add(1);
 		
-		PostCreateDto postCreateDto = new PostCreateDto();
+		PostCreateRequestDto postCreateDto = new PostCreateRequestDto();
 		postCreateDto.setContent(content);
 		postCreateDto.setPhotoIdList(photoIdList);
 
@@ -93,7 +93,7 @@ public class PostServiceTest {
 		photo.setName("data1");
 		photo.setCreateDate(new Date());
 
-		PostCreatedDto postCreatedDto = new PostCreatedDto();
+		PostCreateResponseDto postCreatedDto = new PostCreateResponseDto();
 
 		when(photoRepository.save(any())).thenReturn(photo);
 		when(postRepository.save(any())).thenReturn(post);
@@ -109,7 +109,7 @@ public class PostServiceTest {
 		List<Integer> photoIdList = new ArrayList<>();
 		photoIdList.add(1);
 		
-		PostCreateDto postCreateDto = new PostCreateDto();
+		PostCreateRequestDto postCreateDto = new PostCreateRequestDto();
 		postCreateDto.setContent(content);
 		postCreateDto.setPhotoIdList(photoIdList);
 
@@ -189,7 +189,7 @@ public class PostServiceTest {
 		Page<Post> postPage = new PageImpl<Post>(postList);
 
 		List<Integer> friendUserIdList = new ArrayList<>();
-		PostListDto postListDto = new PostListDto();
+		PostListResponseDto postListDto = new PostListResponseDto();
 
 		when(friendRepository.findAllFriendUserId(anyInt())).thenReturn(friendUserIdList);
 		when(postRepository.findAllByUserId(anyList(), any())).thenReturn(postPage);
@@ -256,16 +256,16 @@ public class PostServiceTest {
 		post1.setCommentList(commentList1);
 		post1.setPhotoList(photoList);
 
-		PostDetailDto postDetailDto = new PostDetailDto();
-		CommentDetailDto commentDetailDto = new CommentDetailDto();
-		CommentDetailDto commentDetailDto2 = new CommentDetailDto();
+		PostDetailResponseDto postDetailDto = new PostDetailResponseDto();
+		CommentDetailResponseDto commentDetailDto = new CommentDetailResponseDto();
+		CommentDetailResponseDto commentDetailDto2 = new CommentDetailResponseDto();
 
 		when(postRepository.findById(postId)).thenReturn(Optional.of(post1));
 
-		when(modelMapper.map(comment1, CommentDetailDto.class)).thenReturn(commentDetailDto);
-		when(modelMapper.map(comment2, CommentDetailDto.class)).thenReturn(commentDetailDto2);
+		when(modelMapper.map(comment1, CommentDetailResponseDto.class)).thenReturn(commentDetailDto);
+		when(modelMapper.map(comment2, CommentDetailResponseDto.class)).thenReturn(commentDetailDto2);
 
-		when(modelMapper.map(post1, PostDetailDto.class)).thenReturn(postDetailDto);
+		when(modelMapper.map(post1, PostDetailResponseDto.class)).thenReturn(postDetailDto);
 
 		postService.getPost(postId);
 	}
@@ -282,7 +282,7 @@ public class PostServiceTest {
 	@Test
 	public void updatePostSuccess() throws Exception {
 		String content = "content update post";
-		PostUpdateDto postUpdateDto = new PostUpdateDto();
+		PostUpdateRequestDto postUpdateDto = new PostUpdateRequestDto();
 		postUpdateDto.setContent(content);
 
 		int userId = 1;
@@ -307,7 +307,7 @@ public class PostServiceTest {
 		photo.setName("data1");
 		photo.setCreateDate(new Date());
 
-		PostUpdatedDto postUpdatedDto = new PostUpdatedDto();
+		PostUpdateResponseDto postUpdatedDto = new PostUpdateResponseDto();
 
 		when(photoRepository.save(any())).thenReturn(photo);
 		when(postRepository.save(any())).thenReturn(post1);
@@ -321,7 +321,7 @@ public class PostServiceTest {
 		int userId = 1;
 		int postId = 2;
 		String content = "Updated Content";
-		PostUpdateDto postUpdateDto = new PostUpdateDto();
+		PostUpdateRequestDto postUpdateDto = new PostUpdateRequestDto();
 		postUpdateDto.setContent(content);
 
 		when(userRepository.findById(userId)).thenReturn(Optional.of(new User()));
@@ -335,7 +335,7 @@ public class PostServiceTest {
 		int userId = 1;
 		int postId = 2;
 		String content = "Updated Content";
-		PostUpdateDto postUpdateDto = new PostUpdateDto();
+		PostUpdateRequestDto postUpdateDto = new PostUpdateRequestDto();
 		postUpdateDto.setContent(content);
 
 		User user = new User();

@@ -1,10 +1,10 @@
 package com.training.socialnetwork.dto.response.user;
 
-public class OtpResponse {
+public class UserLoginResponseDto {
 
 	private String otp;
 
-	public OtpResponse(String otp) {
+	public UserLoginResponseDto(String otp) {
 		this.otp = otp;
 	}
 

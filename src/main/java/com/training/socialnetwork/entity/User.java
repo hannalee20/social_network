@@ -53,17 +53,14 @@ public class User {
 
 	@Column
 	private String about;
-//
-//	@Column
-//	private String avatarUrl;
 
 	@ManyToOne
 	@JoinColumn(name = "roleId")
 	private Role role;
-	
+
 	@Column
 	private String token;
-	
+
 	@Column
 	private Date tokenCreateDate;
 
@@ -87,6 +84,9 @@ public class User {
 
 	@OneToMany(mappedBy = "user")
 	private List<Comment> commentList;
+
+	@OneToMany(mappedBy = "user")
+	private List<Photo> photoList;
 
 	public int getUserId() {
 		return userId;
@@ -183,14 +183,6 @@ public class User {
 	public void setAbout(String about) {
 		this.about = about;
 	}
-//
-//	public String getAvatarUrl() {
-//		return avatarUrl;
-//	}
-//
-//	public void setAvatarUrl(String avatarUrl) {
-//		this.avatarUrl = avatarUrl;
-//	}
 
 	public Date getCreateDate() {
 		return createDate;
@@ -250,6 +242,14 @@ public class User {
 
 	public void setCommentList(List<Comment> commentList) {
 		this.commentList = commentList;
+	}
+
+	public List<Photo> getPhotoList() {
+		return photoList;
+	}
+
+	public void setPhotoList(List<Photo> photoList) {
+		this.photoList = photoList;
 	}
 
 	public Role getRole() {

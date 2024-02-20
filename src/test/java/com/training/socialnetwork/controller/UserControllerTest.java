@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -40,17 +39,18 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.training.socialnetwork.dto.request.user.UserForgotPasswordDto;
-import com.training.socialnetwork.dto.request.user.UserLoginDto;
-import com.training.socialnetwork.dto.request.user.UserRegisterDto;
-import com.training.socialnetwork.dto.request.user.UserResetPasswordDto;
-import com.training.socialnetwork.dto.request.user.UserTokenDto;
-import com.training.socialnetwork.dto.request.user.UserUpdateDto;
-import com.training.socialnetwork.dto.response.user.UserDetailDto;
-import com.training.socialnetwork.dto.response.user.UserRegistedDto;
-import com.training.socialnetwork.dto.response.user.UserReportDto;
-import com.training.socialnetwork.dto.response.user.UserSearchDto;
-import com.training.socialnetwork.dto.response.user.UserUpdatedDto;
+import com.training.socialnetwork.dto.request.user.UserForgotPasswordRequestDto;
+import com.training.socialnetwork.dto.request.user.UserGetTokenRequestDto;
+import com.training.socialnetwork.dto.request.user.UserLoginRequestDto;
+import com.training.socialnetwork.dto.request.user.UserRegisterRequestDto;
+import com.training.socialnetwork.dto.request.user.UserResetPasswordRequestDto;
+import com.training.socialnetwork.dto.request.user.UserUpdateRequestDto;
+import com.training.socialnetwork.dto.response.user.UserDetailResponseDto;
+import com.training.socialnetwork.dto.response.user.UserForgotPasswordResponseDto;
+import com.training.socialnetwork.dto.response.user.UserRegisterResponseDto;
+import com.training.socialnetwork.dto.response.user.UserReportResponseDto;
+import com.training.socialnetwork.dto.response.user.UserSearchResponseDto;
+import com.training.socialnetwork.dto.response.user.UserUpdateResponseDto;
 import com.training.socialnetwork.entity.User;
 import com.training.socialnetwork.security.JwtUtils;
 import com.training.socialnetwork.security.OtpUtils;
@@ -100,7 +100,7 @@ public class UserControllerTest {
 		this.bCryptPasswordEncoder = new BCryptPasswordEncoder();
 		mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
-		UserLoginDto userLoginDto = new UserLoginDto();
+		UserLoginRequestDto userLoginDto = new UserLoginRequestDto();
 		userLoginDto.setUsername("test");
 		userLoginDto.setPassword("123456");
 		
@@ -113,7 +113,7 @@ public class UserControllerTest {
 				.content(otpRequest))
 				.andExpect(status().isOk()).andReturn();
 		
-		UserTokenDto userTokenDto = new UserTokenDto();
+		UserGetTokenRequestDto userTokenDto = new UserGetTokenRequestDto();
 		userTokenDto.setUsername("test");
 		userTokenDto.setPassword("123456");
 		userTokenDto.setOtp(123456);
@@ -134,7 +134,7 @@ public class UserControllerTest {
 
 	@Test
 	public void createValidUser() throws Exception {
-		UserRegisterDto userRegisterDto = new UserRegisterDto();
+		UserRegisterRequestDto userRegisterDto = new UserRegisterRequestDto();
 
 		userRegisterDto.setUsername("test");
 		userRegisterDto.setPassword("123456");
@@ -146,7 +146,7 @@ public class UserControllerTest {
 		user.setPassword(bCryptPasswordEncoder.encode("123456"));
 		user.setEmail("test@gmail.com");
 
-		UserRegistedDto userRegistedDto = new UserRegistedDto();
+		UserRegisterResponseDto userRegistedDto = new UserRegisterResponseDto();
 		userRegistedDto.setUserId(1);
 		userRegistedDto.setUsername("test");
 		userRegistedDto.setPassword(bCryptPasswordEncoder.encode("123456"));
@@ -168,7 +168,7 @@ public class UserControllerTest {
 	@Test
 	public void loginSuccess() throws Exception {
 
-		UserLoginDto userLoginDto = new UserLoginDto();
+		UserLoginRequestDto userLoginDto = new UserLoginRequestDto();
 		userLoginDto.setUsername("test");
 		userLoginDto.setPassword("123456");
 		
@@ -183,7 +183,7 @@ public class UserControllerTest {
 	
 	@Test
 	public void loginFail() throws Exception {
-		UserLoginDto userLoginDto = new UserLoginDto();
+		UserLoginRequestDto userLoginDto = new UserLoginRequestDto();
 		
 		when(userService.loginUser(userLoginDto.getUsername(), userLoginDto.getPassword())).thenReturn(false);
 		String request = JSonHelper.toJson(userLoginDto).orElse("");
@@ -197,7 +197,7 @@ public class UserControllerTest {
 	
 	@Test
     public void testGetToken_Failure() throws Exception {
-		UserTokenDto userTokenDto = new UserTokenDto();
+		UserGetTokenRequestDto userTokenDto = new UserGetTokenRequestDto();
 		userTokenDto.setUsername("test");
 		userTokenDto.setPassword("123456");
 		userTokenDto.setOtp(123456);
@@ -217,7 +217,7 @@ public class UserControllerTest {
 	@Test
 	public void getUserInfoSuccess() throws Exception {
 		int userId = 1;
-		UserDetailDto userDetailDto = new UserDetailDto();
+		UserDetailResponseDto userDetailDto = new UserDetailResponseDto();
 		userDetailDto.setUserId(1);
 		userDetailDto.setUsername("test");
 		userDetailDto.setRealName("Test");
@@ -264,7 +264,7 @@ public class UserControllerTest {
 	@Test
 	public void updateUserSuccess() throws Exception {
 		int userId = 1;
-		UserUpdateDto userUpdateDto = new UserUpdateDto();
+		UserUpdateRequestDto userUpdateDto = new UserUpdateRequestDto();
 		userUpdateDto.setBirthDate("2020-02-02");
 		userUpdateDto.setAddress("HCM");
 		userUpdateDto.setUniversity("test");
@@ -274,7 +274,7 @@ public class UserControllerTest {
 		
 		MultipartFile avatar = new MockMultipartFile("data2", "filename2.jpg", "multipart/form-data", "some xml".getBytes());
 		
-		UserUpdatedDto userUpdatedDto = new UserUpdatedDto();
+		UserUpdateResponseDto userUpdatedDto = new UserUpdateResponseDto();
 		userUpdatedDto.setUserId(1);
 		userUpdatedDto.setBirthDate(LocalDate.now());
 		userUpdatedDto.setSex("female");
@@ -287,7 +287,7 @@ public class UserControllerTest {
 		userUpdatedDto.setStatus("test");
 		userUpdatedDto.setAbout("");
 		
-		when(userService.updateInfo(any(), any(), anyInt(), anyInt())).thenReturn(userUpdatedDto);
+		when(userService.updateInfo(any(), anyInt(), anyInt())).thenReturn(userUpdatedDto);
 		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
 		
 		Map<String, Object> requestBody = new HashMap<>();
@@ -310,13 +310,13 @@ public class UserControllerTest {
 	public void updateUserFail() throws Exception {
 		int userId = 1;
 		
-		UserUpdateDto userUpdateDto = new UserUpdateDto();
+		UserUpdateRequestDto userUpdateDto = new UserUpdateRequestDto();
 		userUpdateDto.setBirthDate("2020-02-02");
 		userUpdateDto.setAddress("HCM");
 		
 		MultipartFile avatar = new MockMultipartFile("data2", "filename2.jpg", "multipart/form-data", "some xml".getBytes());
 		
-		when(userService.updateInfo(any(), any(), anyInt(), anyInt())).thenThrow(new Exception());
+		when(userService.updateInfo(any(), anyInt(), anyInt())).thenThrow(new Exception());
 		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
 		
 		Map<String, Object> requestBody = new HashMap<>();
@@ -336,22 +336,22 @@ public class UserControllerTest {
 	public void searchUserSuccess() throws Exception {
 		String keyword = "test";
 		
-		UserSearchDto userSearchDto1 = new UserSearchDto();
+		UserSearchResponseDto userSearchDto1 = new UserSearchResponseDto();
 		userSearchDto1.setUserId(4);
 		userSearchDto1.setUsername("test1");
 		userSearchDto1.setFriendStatus("Send request");
 		
-		UserSearchDto userSearchDto2 = new UserSearchDto();
+		UserSearchResponseDto userSearchDto2 = new UserSearchResponseDto();
 		userSearchDto2.setUserId(2);
 		userSearchDto2.setUsername("test2");
 		userSearchDto2.setFriendStatus("Friend");
 		
-		UserSearchDto userSearchDto3 = new UserSearchDto();
+		UserSearchResponseDto userSearchDto3 = new UserSearchResponseDto();
 		userSearchDto3.setUserId(3);
 		userSearchDto3.setUsername("test3");
 		userSearchDto3.setFriendStatus("Sent request");
 		
-		List<UserSearchDto> userSearchList = new ArrayList<>();
+		List<UserSearchResponseDto> userSearchList = new ArrayList<>();
 		userSearchList.add(userSearchDto1);
 		userSearchList.add(userSearchDto2);
 		userSearchList.add(userSearchDto3);
@@ -384,10 +384,13 @@ public class UserControllerTest {
 	
 	@Test
 	public void forgotPasswordSuccess() throws Exception {
-		UserForgotPasswordDto userForgotPasswordDto = new UserForgotPasswordDto();
+		UserForgotPasswordRequestDto userForgotPasswordDto = new UserForgotPasswordRequestDto();
 		userForgotPasswordDto.setEmail("test@gmail.com");
 		
-		when(userService.forgotPassword(any())).thenReturn(anyString());
+		UserForgotPasswordResponseDto userForgotPasswordResponseDto = new UserForgotPasswordResponseDto();
+		userForgotPasswordResponseDto.setToken("12345678");
+		
+		when(userService.forgotPassword(any())).thenReturn(userForgotPasswordResponseDto);
 		
 		String request = JSonHelper.toJson(userForgotPasswordDto).orElse("");
 		
@@ -399,7 +402,7 @@ public class UserControllerTest {
 	
 	@Test
 	public void forgotPasswordFail() throws Exception {
-		UserForgotPasswordDto userForgotPasswordDto = new UserForgotPasswordDto();
+		UserForgotPasswordRequestDto userForgotPasswordDto = new UserForgotPasswordRequestDto();
 		userForgotPasswordDto.setEmail("test@gmail.com");
 		
 		when(userService.forgotPassword(any())).thenThrow(new Exception());
@@ -414,11 +417,13 @@ public class UserControllerTest {
 	
 	@Test
 	public void resetPasswordSuccess() throws Exception {
-		UserForgotPasswordDto userForgotPasswordDto = new UserForgotPasswordDto();
+		UserForgotPasswordRequestDto userForgotPasswordDto = new UserForgotPasswordRequestDto();
 		userForgotPasswordDto.setEmail("test@gmail.com");
 		
-		String tokenForgotPassword = UUID.randomUUID().toString();
-		when(userService.forgotPassword(any())).thenReturn(tokenForgotPassword);
+		UserForgotPasswordResponseDto userForgotPasswordResponseDto = new UserForgotPasswordResponseDto();
+		userForgotPasswordResponseDto.setToken("12345678");
+		
+		when(userService.forgotPassword(any())).thenReturn(userForgotPasswordResponseDto);
 		
 		String requestForgotPassword = JSonHelper.toJson(userForgotPasswordDto).orElse("");
 		
@@ -428,7 +433,7 @@ public class UserControllerTest {
 				.andExpect(status().isOk()).andReturn();
 		
 		String tokenResetPassword = tokenResult.getResponse().getContentAsString().substring(48);
-		UserResetPasswordDto userResetPasswordDto = new UserResetPasswordDto();
+		UserResetPasswordRequestDto userResetPasswordDto = new UserResetPasswordRequestDto();
 		userResetPasswordDto.setToken(tokenResetPassword);
 		userResetPasswordDto.setNewPassword("newpassword");
 		
@@ -444,7 +449,7 @@ public class UserControllerTest {
 	
 	@Test
 	public void resetPasswordFail() throws Exception {
-		UserResetPasswordDto userResetPasswordDto = new UserResetPasswordDto();
+		UserResetPasswordRequestDto userResetPasswordDto = new UserResetPasswordRequestDto();
 		userResetPasswordDto.setToken("wrong token");
 		userResetPasswordDto.setNewPassword("newpassword");
 		
@@ -459,7 +464,7 @@ public class UserControllerTest {
 	
 	@Test
 	public void getReportUserSuccess() throws Exception {
-		UserReportDto userReportDto = new UserReportDto();
+		UserReportResponseDto userReportDto = new UserReportResponseDto();
 		userReportDto.setCommentCount(1);
 		userReportDto.setFriendCount(2);
 		userReportDto.setLikeCount(3);

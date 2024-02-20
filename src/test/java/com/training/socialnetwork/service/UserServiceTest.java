@@ -22,16 +22,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import com.training.socialnetwork.dto.request.user.UserRegisterDto;
-import com.training.socialnetwork.dto.request.user.UserUpdateDto;
-import com.training.socialnetwork.dto.response.user.UserDetailDto;
-import com.training.socialnetwork.dto.response.user.UserRegistedDto;
-import com.training.socialnetwork.dto.response.user.UserReportDto;
-import com.training.socialnetwork.dto.response.user.UserSearchDto;
-import com.training.socialnetwork.dto.response.user.UserUpdatedDto;
+import com.training.socialnetwork.dto.request.user.UserRegisterRequestDto;
+import com.training.socialnetwork.dto.request.user.UserUpdateRequestDto;
+import com.training.socialnetwork.dto.response.user.UserDetailResponseDto;
+import com.training.socialnetwork.dto.response.user.UserRegisterResponseDto;
+import com.training.socialnetwork.dto.response.user.UserReportResponseDto;
+import com.training.socialnetwork.dto.response.user.UserSearchResponseDto;
+import com.training.socialnetwork.dto.response.user.UserUpdateResponseDto;
 import com.training.socialnetwork.entity.Friend;
 import com.training.socialnetwork.entity.Role;
 import com.training.socialnetwork.entity.User;
@@ -85,7 +84,7 @@ public class UserServiceTest {
 	
 	@Test
 	public void createUserSuccess() throws Exception {
-		UserRegisterDto userRegisterDto = new UserRegisterDto();
+		UserRegisterRequestDto userRegisterDto = new UserRegisterRequestDto();
 		userRegisterDto.setUsername("test");
 		userRegisterDto.setPassword("123456");
 		userRegisterDto.setEmail("test@gmail.com");
@@ -103,7 +102,7 @@ public class UserServiceTest {
 		user.setCreateDate(new Date());
 		user.setUpdateDate(new Date());
 		
-		UserRegistedDto userRegistedDto = new UserRegistedDto();
+		UserRegisterResponseDto userRegistedDto = new UserRegisterResponseDto();
 		
 		when(userRepository.findByEmail(any())).thenReturn(null);
 		when(userRepository.findByUsername(any())).thenReturn(null);
@@ -116,7 +115,7 @@ public class UserServiceTest {
 	
 	@Test
     public void createUserFalse() throws Exception {
-		UserRegisterDto userRegisterDto = new UserRegisterDto();
+		UserRegisterRequestDto userRegisterDto = new UserRegisterRequestDto();
 		userRegisterDto.setUsername("test");
 		userRegisterDto.setPassword("123456");
 		userRegisterDto.setEmail("test@gmail.com");
@@ -136,7 +135,7 @@ public class UserServiceTest {
 	
 	@Test
     public void createUserFalse2() throws Exception {
-		UserRegisterDto userRegisterDto = new UserRegisterDto();
+		UserRegisterRequestDto userRegisterDto = new UserRegisterRequestDto();
 		userRegisterDto.setUsername("test");
 		userRegisterDto.setPassword("123456");
 		userRegisterDto.setEmail("test@gmail.com");
@@ -197,9 +196,7 @@ public class UserServiceTest {
 	
 	@Test
 	public void updateInfoSuccess() throws Exception {
-		MockMultipartFile avatar =
-                new MockMultipartFile("data2", "filename2.jpg", "multipart/form-data", "some xml".getBytes());
-		UserUpdateDto userUpdateDto = new UserUpdateDto();
+		UserUpdateRequestDto userUpdateDto = new UserUpdateRequestDto();
 		userUpdateDto.setRealName("Test");
 		userUpdateDto.setGender("female");
 		userUpdateDto.setAddress("Hanoi");
@@ -210,7 +207,7 @@ public class UserServiceTest {
 		userToUpdate.setEmail("test@gmail.com");
 		userToUpdate.setBirthDate(new Date());
 		
-		UserUpdatedDto userUpdatedDto = new UserUpdatedDto();
+		UserUpdateResponseDto userUpdatedDto = new UserUpdateResponseDto();
 		userUpdatedDto.setUserId(1);
 		userUpdatedDto.setRealName("Test");
 		userUpdatedDto.setSex("female");
@@ -223,31 +220,27 @@ public class UserServiceTest {
 		when(userRepository.save(any())).thenReturn(userToUpdate);
 		when(modelMapper.map(any(), any())).thenReturn(userUpdatedDto);
 		
-		userService.updateInfo(userUpdateDto, avatar, 1, 1);
+		userService.updateInfo(userUpdateDto, 1, 1);
 	}
 	
 	@Test
     public void updateInfoUserFail() throws Exception {
         int userId = 1;
-        MockMultipartFile avatar =
-                new MockMultipartFile("data2", "filename2.jpg", "multipart/form-data", "some xml".getBytes());
-		UserUpdateDto userUpdateDto = new UserUpdateDto();
+		UserUpdateRequestDto userUpdateDto = new UserUpdateRequestDto();
 		userUpdateDto.setRealName("Test");
 		userUpdateDto.setGender("female");
 		userUpdateDto.setAddress("Hanoi");
 
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        assertThrows(CustomException.class, () -> userService.updateInfo(userUpdateDto, avatar, 1, 1));
+        assertThrows(CustomException.class, () -> userService.updateInfo(userUpdateDto, 1, 1));
     }
 	
 	@Test
     public void testUpdateInfoForbidden() throws Exception {
         int userId = 1;
         int loggedInUserId = 2;
-        MockMultipartFile avatar =
-                new MockMultipartFile("data2", "filename2.jpg", "multipart/form-data", "some xml".getBytes());
-		UserUpdateDto userUpdateDto = new UserUpdateDto();
+		UserUpdateRequestDto userUpdateDto = new UserUpdateRequestDto();
 		userUpdateDto.setRealName("Test");
 		userUpdateDto.setGender("female");
 		userUpdateDto.setAddress("Hanoi");
@@ -258,7 +251,7 @@ public class UserServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(userToUpdate));
         when(userRepository.findById(loggedInUserId)).thenReturn(Optional.of(loggedInUser));
 
-        assertThrows(CustomException.class, () -> userService.updateInfo(userUpdateDto, avatar, 1, 2));
+        assertThrows(CustomException.class, () -> userService.updateInfo(userUpdateDto, 1, 2));
     }
 	
 	@Test
@@ -272,7 +265,7 @@ public class UserServiceTest {
 		user.setBirthDate(new Date());
 		user.setAddress("Hanoi");
 		
-		UserDetailDto userDetailDto = new UserDetailDto();
+		UserDetailResponseDto userDetailDto = new UserDetailResponseDto();
 		
 		when(userRepository.findById(1)).thenReturn(Optional.of(user));
 		when(modelMapper.map(any(), any())).thenReturn(userDetailDto);
@@ -291,7 +284,7 @@ public class UserServiceTest {
 		user.setBirthDate(new Date());
 		user.setAddress("Hanoi");
 		
-		UserDetailDto userDetailDto = new UserDetailDto();
+		UserDetailResponseDto userDetailDto = new UserDetailResponseDto();
 		
 		when(userRepository.findById(1)).thenReturn(Optional.of(user));
 		when(modelMapper.map(any(), any())).thenReturn(userDetailDto);
@@ -358,7 +351,7 @@ public class UserServiceTest {
 		friendList.add(friend);
 		
 		String keyword = "test";
-		UserSearchDto userSearchDto = new UserSearchDto();
+		UserSearchResponseDto userSearchDto = new UserSearchResponseDto();
 		when(userRepository.findAllUserByKeyword(anyInt(), any(), any())).thenReturn(userList);
 		when(friendRepository.findAllByUserId(anyInt())).thenReturn(friendList);
 		when(modelMapper.map(any(), any())).thenReturn(userSearchDto);
@@ -404,7 +397,7 @@ public class UserServiceTest {
 		LocalDate dateStart = date.with(fieldISO, 1);
 		LocalDate dateEnd = date.with(fieldISO, 7);
 		
-		UserReportDto userReportDto = new UserReportDto();
+		UserReportResponseDto userReportDto = new UserReportResponseDto();
 		int userId = 1;
 		int postCount = 1;
 		int commentCount = 2;

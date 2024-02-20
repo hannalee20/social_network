@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.training.socialnetwork.dto.response.common.MessageDto;
-import com.training.socialnetwork.dto.response.photo.PhotoUploadedDto;
+import com.training.socialnetwork.dto.response.common.MessageResponseDto;
+import com.training.socialnetwork.dto.response.photo.PhotoUploadResponseDto;
 import com.training.socialnetwork.service.IPhotoService;
 import com.training.socialnetwork.util.constant.Constant;
 
@@ -31,11 +31,11 @@ public class PhotoController {
 	@PostMapping(value = "/upload", consumes = { "multipart/form-data" })
 	public ResponseEntity<Object> uploadPhoto(HttpServletRequest request, @RequestParam("image") MultipartFile photo) {
 		try {
-			PhotoUploadedDto result = photoService.uploadPhoto(photo);
+			PhotoUploadResponseDto result = photoService.uploadPhoto(photo);
 
 			return new ResponseEntity<Object>(result, HttpStatus.CREATED);
 		} catch (Exception e) {
-			MessageDto result = new MessageDto();
+			MessageResponseDto result = new MessageResponseDto();
 			result.setMessage(e.getMessage());
 			return new ResponseEntity<Object>(result, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -47,14 +47,14 @@ public class PhotoController {
 		try {
 			resource = photoService.downloadPhoto(photoId);
 		} catch (Exception e) {
-			MessageDto result = new MessageDto();
+			MessageResponseDto result = new MessageResponseDto();
 			result.setMessage(e.getMessage());
 			
 			return new ResponseEntity<Object>(result, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 		if (resource == null) {
-			MessageDto result = new MessageDto();
+			MessageResponseDto result = new MessageResponseDto();
 			result.setMessage(Constant.FILE_NOT_FOUND);
 			
 			return new ResponseEntity<Object>(result, HttpStatus.NOT_FOUND);

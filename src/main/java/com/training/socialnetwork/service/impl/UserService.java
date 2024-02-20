@@ -19,15 +19,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import com.training.socialnetwork.dto.request.user.UserRegisterDto;
-import com.training.socialnetwork.dto.request.user.UserUpdateDto;
-import com.training.socialnetwork.dto.response.user.UserDetailDto;
-import com.training.socialnetwork.dto.response.user.UserRegistedDto;
-import com.training.socialnetwork.dto.response.user.UserReportDto;
-import com.training.socialnetwork.dto.response.user.UserSearchDto;
-import com.training.socialnetwork.dto.response.user.UserUpdatedDto;
+import com.training.socialnetwork.dto.request.user.UserRegisterRequestDto;
+import com.training.socialnetwork.dto.request.user.UserUpdateRequestDto;
+import com.training.socialnetwork.dto.response.user.UserDetailResponseDto;
+import com.training.socialnetwork.dto.response.user.UserForgotPasswordResponseDto;
+import com.training.socialnetwork.dto.response.user.UserRegisterResponseDto;
+import com.training.socialnetwork.dto.response.user.UserReportResponseDto;
+import com.training.socialnetwork.dto.response.user.UserSearchResponseDto;
+import com.training.socialnetwork.dto.response.user.UserUpdateResponseDto;
 import com.training.socialnetwork.entity.Friend;
 import com.training.socialnetwork.entity.Role;
 import com.training.socialnetwork.entity.User;
@@ -40,7 +40,6 @@ import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.IUserService;
 import com.training.socialnetwork.util.constant.Constant;
 import com.training.socialnetwork.util.exception.CustomException;
-import com.training.socialnetwork.util.image.ImageUtils;
 import com.training.socialnetwork.util.mapper.ObjectMapper;
 
 @Service
@@ -72,15 +71,12 @@ public class UserService implements IUserService {
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 
 	@Autowired
-	private ImageUtils imageUtils;
-
-	@Autowired
 	private ObjectMapper objectMapper;
 
 	private static final long EXPIRE_TOKEN = 30;
 
 	@Override
-	public UserRegistedDto createUser(UserRegisterDto userRegisterDto) throws Exception {
+	public UserRegisterResponseDto createUser(UserRegisterRequestDto userRegisterDto) throws Exception {
 		if (userRepository.findByEmail(userRegisterDto.getEmail()) != null) {
 			throw new CustomException(HttpStatus.BAD_REQUEST, "Email already exists");
 		}
@@ -99,8 +95,8 @@ public class UserService implements IUserService {
 
 		user = userRepository.save(user);
 
-		UserRegistedDto userRegistedDto = new UserRegistedDto();
-		userRegistedDto = modelMapper.map(user, UserRegistedDto.class);
+		UserRegisterResponseDto userRegistedDto = new UserRegisterResponseDto();
+		userRegistedDto = modelMapper.map(user, UserRegisterResponseDto.class);
 		userRegistedDto.setRole(Constant.ROLE_USER);
 		return userRegistedDto;
 	}
@@ -121,7 +117,7 @@ public class UserService implements IUserService {
 	}
 
 	@Override
-	public UserUpdatedDto updateInfo(UserUpdateDto userUpdateDto, MultipartFile avatar, int userId, int loggedInUserId)
+	public UserUpdateResponseDto updateInfo(UserUpdateRequestDto userUpdateDto, int userId, int loggedInUserId)
 			throws Exception {
 		User userToUpdate = userRepository.findById(userId).orElse(null);
 		User loggedInUser = userRepository.findById(loggedInUserId).orElse(null);
@@ -159,7 +155,7 @@ public class UserService implements IUserService {
 		userToUpdate.setUpdateDate(new Date());
 		userToUpdate = userRepository.save(userToUpdate);
 
-		UserUpdatedDto userUpdatedDto = modelMapper.map(userToUpdate, UserUpdatedDto.class);
+		UserUpdateResponseDto userUpdatedDto = modelMapper.map(userToUpdate, UserUpdateResponseDto.class);
 		if (null != userToUpdate.getGender()) {
 			if (userToUpdate.getGender() == Constant.NUMBER_0) {
 				userUpdatedDto.setSex(Constant.MALE);
@@ -175,14 +171,14 @@ public class UserService implements IUserService {
 	}
 
 	@Override
-	public UserDetailDto getInfo(int userId) throws Exception {
+	public UserDetailResponseDto getInfo(int userId) throws Exception {
 		User user = userRepository.findById(userId).orElse(null);
 
 		if (user == null) {
 			throw new CustomException(HttpStatus.NOT_FOUND, "User does not exist");
 		}
 
-		UserDetailDto userDetailDto = modelMapper.map(user, UserDetailDto.class);
+		UserDetailResponseDto userDetailDto = modelMapper.map(user, UserDetailResponseDto.class);
 		if (null != user.getGender()) {
 			if (user.getGender() == Constant.NUMBER_0) {
 				userDetailDto.setGender(Constant.MALE);
@@ -196,17 +192,17 @@ public class UserService implements IUserService {
 	}
 
 	@Override
-	public List<UserSearchDto> searchUser(int userId, String keyword, Pageable paging) {
+	public List<UserSearchResponseDto> searchUser(int userId, String keyword, Pageable paging) {
 		List<User> userList = userRepository.findAllUserByKeyword(userId, keyword, paging);
 
 		List<Friend> friendList = friendRepository.findAllByUserId(userId);
 
-		List<UserSearchDto> userSearchList = new ArrayList<>();
+		List<UserSearchResponseDto> userSearchList = new ArrayList<>();
 		for (User user : userList) {
-			UserSearchDto userSearchDto = modelMapper.map(user, UserSearchDto.class);
+			UserSearchResponseDto userSearchDto = modelMapper.map(user, UserSearchResponseDto.class);
 			userSearchList.add(userSearchDto);
 		}
-		for (UserSearchDto user : userSearchList) {
+		for (UserSearchResponseDto user : userSearchList) {
 			user.setFriendStatus(Constant.SEND_REQUEST);
 			for (Friend friend : friendList) {
 				if (friend.getSentUser().getUserId() == user.getUserId()
@@ -227,13 +223,13 @@ public class UserService implements IUserService {
 	}
 
 	@Override
-	public UserReportDto getReportUser(int userId) {
+	public UserReportResponseDto getReportUser(int userId) {
 		LocalDate date = LocalDate.now();
 		TemporalField fieldISO = WeekFields.of(Locale.FRANCE).dayOfWeek();
 		LocalDate dateStart = date.with(fieldISO, 1);
 		LocalDate dateEnd = date.with(fieldISO, 7);
 
-		UserReportDto userReportDto = new UserReportDto();
+		UserReportResponseDto userReportDto = new UserReportResponseDto();
 		userReportDto.setPostCount(postRepository.countPost(userId, dateStart, dateEnd));
 		userReportDto.setCommentCount(commentRepository.countComment(userId, dateStart, dateEnd));
 		userReportDto.setFriendCount(friendRepository.countFriend(userId, dateStart, dateEnd));
@@ -243,7 +239,7 @@ public class UserService implements IUserService {
 	}
 
 	@Override
-	public String forgotPassword(String email) throws Exception {
+	public UserForgotPasswordResponseDto forgotPassword(String email) throws Exception {
 		User user = userRepository.findByEmail(email);
 
 		if (user == null) {
@@ -255,7 +251,10 @@ public class UserService implements IUserService {
 
 		user = userRepository.save(user);
 
-		return user.getToken();
+		UserForgotPasswordResponseDto userForgotPasswordDto = new UserForgotPasswordResponseDto();
+		userForgotPasswordDto.setToken(user.getToken());
+		
+		return userForgotPasswordDto;
 	}
 
 	@Override

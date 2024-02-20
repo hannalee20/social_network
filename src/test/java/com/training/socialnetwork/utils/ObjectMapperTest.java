@@ -3,7 +3,7 @@ package com.training.socialnetwork.utils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.BeanUtils;
 
-import com.training.socialnetwork.dto.request.user.UserUpdateDto;
+import com.training.socialnetwork.dto.request.user.UserUpdateRequestDto;
 import com.training.socialnetwork.entity.User;
 import com.training.socialnetwork.util.mapper.ObjectMapper;
 
@@ -12,7 +12,7 @@ public class ObjectMapperTest {
 	@Test
     public void testCopyProperties() {
 		ObjectMapper objectMapper = new ObjectMapper();
-        UserUpdateDto userUpdateDto = new UserUpdateDto();
+        UserUpdateRequestDto userUpdateDto = new UserUpdateRequestDto();
         User userToUpdate = new User();
         
         objectMapper.copyProperties(userUpdateDto, userToUpdate);
@@ -23,7 +23,7 @@ public class ObjectMapperTest {
     @Test
     public void testGetNullPropertyNames() {
     	ObjectMapper objectMapper = new ObjectMapper();
-    	UserUpdateDto userUpdateDto = new UserUpdateDto();
+    	UserUpdateRequestDto userUpdateDto = new UserUpdateRequestDto();
         
         objectMapper.getNullPropertyNames(userUpdateDto);
     }

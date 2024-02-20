@@ -15,12 +15,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.training.socialnetwork.dto.request.comment.CommentCreateDto;
-import com.training.socialnetwork.dto.request.comment.CommentUpdateDto;
-import com.training.socialnetwork.dto.response.comment.CommentCreatedDto;
-import com.training.socialnetwork.dto.response.comment.CommentDetailDto;
-import com.training.socialnetwork.dto.response.comment.CommentUpdatedDto;
-import com.training.socialnetwork.dto.response.common.MessageDto;
+import com.training.socialnetwork.dto.request.comment.CommentCreateRequestDto;
+import com.training.socialnetwork.dto.request.comment.CommentUpdateRequestDto;
+import com.training.socialnetwork.dto.response.comment.CommentCreateResponseDto;
+import com.training.socialnetwork.dto.response.comment.CommentDetailResponseDto;
+import com.training.socialnetwork.dto.response.comment.CommentUpdateResponseDto;
+import com.training.socialnetwork.dto.response.common.MessageResponseDto;
 import com.training.socialnetwork.security.JwtUtils;
 import com.training.socialnetwork.service.ICommentService;
 import com.training.socialnetwork.util.constant.Constant;
@@ -39,18 +39,18 @@ public class CommentController {
 
 	@PostMapping(value = "/create")
 	public ResponseEntity<Object> createComment(HttpServletRequest request,
-			@RequestBody CommentCreateDto commentCreateDto) {
+			@RequestBody CommentCreateRequestDto commentCreateDto) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		try {
-			CommentCreatedDto result = commentService.createComment(userId, commentCreateDto);
+			CommentCreateResponseDto result = commentService.createComment(userId, commentCreateDto);
 			return new ResponseEntity<Object>(result, HttpStatus.CREATED);
 		} catch (CustomException e) {
-			MessageDto result = new MessageDto();
+			MessageResponseDto result = new MessageResponseDto();
 			result.setMessage(e.getMessage());
 			
 			return new ResponseEntity<Object>(result, e.getHttpStatus());
 		} catch (Exception e) {
-			MessageDto result = new MessageDto();
+			MessageResponseDto result = new MessageResponseDto();
 			result.setMessage(e.getMessage());
 			
 			return new ResponseEntity<Object>(result, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -59,19 +59,19 @@ public class CommentController {
 
 	@PutMapping(value = "/update/{commentId}")
 	public ResponseEntity<Object> updateComment(HttpServletRequest request,
-			@PathVariable(value = "commentId") int commentId, @RequestBody CommentUpdateDto commentUpdateDto) {
+			@PathVariable(value = "commentId") int commentId, @RequestBody CommentUpdateRequestDto commentUpdateDto) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		try {
-			CommentUpdatedDto result = commentService.updateComment(commentUpdateDto, commentId, userId);
+			CommentUpdateResponseDto result = commentService.updateComment(commentUpdateDto, commentId, userId);
 
 			return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (CustomException e) {
-			MessageDto result = new MessageDto();
+			MessageResponseDto result = new MessageResponseDto();
 			result.setMessage(e.getMessage());
 			
 			return new ResponseEntity<Object>(result, e.getHttpStatus());
 		} catch (Exception e) {
-			MessageDto result = new MessageDto();
+			MessageResponseDto result = new MessageResponseDto();
 			result.setMessage(e.getMessage());
 			
 			return new ResponseEntity<Object>(result, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -82,7 +82,7 @@ public class CommentController {
 	public ResponseEntity<Object> deleteComment(HttpServletRequest request,
 			@PathVariable(value = "commentId") int commentId) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
-		MessageDto result = new MessageDto();
+		MessageResponseDto result = new MessageResponseDto();
 		try {
 			commentService.deleteComment(commentId, userId);
 
@@ -103,16 +103,16 @@ public class CommentController {
 	@GetMapping(value = "/detail/{commentId}")
 	public ResponseEntity<Object> getCommentDetail(@PathVariable(value = "commentId") int commentId) {
 		try {
-			CommentDetailDto result = commentService.getCommentDetail(commentId);
+			CommentDetailResponseDto result = commentService.getCommentDetail(commentId);
 
 			return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (CustomException e) {
-			MessageDto result = new MessageDto();
+			MessageResponseDto result = new MessageResponseDto();
 			result.setMessage(e.getMessage());
 			
 			return new ResponseEntity<Object>(result, e.getHttpStatus());
 		} catch (Exception e) {
-			MessageDto result = new MessageDto();
+			MessageResponseDto result = new MessageResponseDto();
 			result.setMessage(e.getMessage());
 			
 			return new ResponseEntity<Object>(result, HttpStatus.INTERNAL_SERVER_ERROR);

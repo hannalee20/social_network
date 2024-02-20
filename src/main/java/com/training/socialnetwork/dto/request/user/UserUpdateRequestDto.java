@@ -1,37 +1,36 @@
-package com.training.socialnetwork.dto.response.user;
+package com.training.socialnetwork.dto.request.user;
 
-import java.time.LocalDate;
+import java.io.Serializable;
 
-public class UserDetailDto {
+import javax.validation.constraints.Pattern;
 
-	private int userId;
-	private String username;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.training.socialnetwork.util.constant.Constant;
+
+@JsonInclude(Include.NON_NULL)
+public class UserUpdateRequestDto implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Pattern(regexp = "^[a-zA-Z]{2,}(?: [a-zA-Z]+){0,2}$", message = Constant.INVALID_REAL_NAME)
 	private String realName;
-	private LocalDate birthDate;
+	
+	@Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = Constant.BIRTH_DATE_INVALID_MESSAGE)
+	private String birthDate;
+	
+	@Pattern(regexp = "^(Male|Female|male|female)$", message = Constant.GENDER_INVALID_MESSAGE)
 	private String gender;
+	
 	private String address;
-	private String email;
+	
 	private String university;
+	
 	private String job;
+	
 	private String status;
+	
 	private String about;
-	private String avatarUrl;
-
-	public int getUserId() {
-		return userId;
-	}
-
-	public void setUserId(int userId) {
-		this.userId = userId;
-	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
 
 	public String getRealName() {
 		return realName;
@@ -41,11 +40,11 @@ public class UserDetailDto {
 		this.realName = realName;
 	}
 
-	public LocalDate getBirthDate() {
+	public String getBirthDate() {
 		return birthDate;
 	}
 
-	public void setBirthDate(LocalDate birthDate) {
+	public void setBirthDate(String birthDate) {
 		this.birthDate = birthDate;
 	}
 
@@ -60,17 +59,8 @@ public class UserDetailDto {
 	public String getAddress() {
 		return address;
 	}
-
 	public void setAddress(String address) {
 		this.address = address;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
 	}
 
 	public String getUniversity() {
@@ -103,14 +93,6 @@ public class UserDetailDto {
 
 	public void setAbout(String about) {
 		this.about = about;
-	}
-
-	public String getAvatarUrl() {
-		return avatarUrl;
-	}
-
-	public void setAvatarUrl(String avatarUrl) {
-		this.avatarUrl = avatarUrl;
 	}
 
 }

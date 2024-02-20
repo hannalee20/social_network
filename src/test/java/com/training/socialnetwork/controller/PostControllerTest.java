@@ -31,10 +31,10 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.training.socialnetwork.dto.response.post.PostCreatedDto;
-import com.training.socialnetwork.dto.response.post.PostDetailDto;
-import com.training.socialnetwork.dto.response.post.PostListDto;
-import com.training.socialnetwork.dto.response.post.PostUpdatedDto;
+import com.training.socialnetwork.dto.response.post.PostCreateResponseDto;
+import com.training.socialnetwork.dto.response.post.PostDetailResponseDto;
+import com.training.socialnetwork.dto.response.post.PostListResponseDto;
+import com.training.socialnetwork.dto.response.post.PostUpdateResponseDto;
 import com.training.socialnetwork.security.JwtUtils;
 import com.training.socialnetwork.service.IPostService;
 
@@ -70,7 +70,7 @@ public class PostControllerTest {
 		photoUrlList.add(photo1.getOriginalFilename());
 		photoUrlList.add(photo2.getOriginalFilename());
 
-		PostCreatedDto postCreatedDto = new PostCreatedDto();
+		PostCreateResponseDto postCreatedDto = new PostCreateResponseDto();
 		postCreatedDto.setPostId(1);
 		postCreatedDto.setUserId(1);
 		postCreatedDto.setContent(content);
@@ -107,8 +107,8 @@ public class PostControllerTest {
 	
 	@Test
 	public void getTimelineSuccess() throws Exception {
-		List<PostListDto> postList = new ArrayList<>();
-		PostListDto postListDto = new PostListDto();
+		List<PostListResponseDto> postList = new ArrayList<>();
+		PostListResponseDto postListDto = new PostListResponseDto();
 		postListDto.setUserId(1);
 		postListDto.setPostId(1);
 		postListDto.setUsername("test");
@@ -116,7 +116,7 @@ public class PostControllerTest {
 		postListDto.setLikeCount(3);
 		postList.add(postListDto);
 		
-		Page<PostListDto> result = new PageImpl<PostListDto>(postList);
+		Page<PostListResponseDto> result = new PageImpl<PostListResponseDto>(postList);
 
 		when(postService.getTimeline(anyInt(), any())).thenReturn(result);
 
@@ -147,7 +147,7 @@ public class PostControllerTest {
     
 	@Test
 	public void getPostDetailSuccess() throws Exception {
-		PostDetailDto postDetailDto = new PostDetailDto();
+		PostDetailResponseDto postDetailDto = new PostDetailResponseDto();
 		postDetailDto.setPostId(1);
 		postDetailDto.setUserId(1);
 		postDetailDto.setUsername("test");
@@ -182,7 +182,7 @@ public class PostControllerTest {
 		MockMultipartFile photo2 = new MockMultipartFile("data2", "filename2.jpg", "multipart/form-data",
 				"some xml".getBytes());
 
-		PostUpdatedDto postUpdatedDto = new PostUpdatedDto();
+		PostUpdateResponseDto postUpdatedDto = new PostUpdateResponseDto();
 		postUpdatedDto.setPostId(1);
 		postUpdatedDto.setUserId(1);
 		postUpdatedDto.setUsername("test");

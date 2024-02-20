@@ -16,7 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.training.socialnetwork.dto.response.photo.PhotoUploadedDto;
+import com.training.socialnetwork.dto.response.photo.PhotoUploadResponseDto;
 import com.training.socialnetwork.entity.Photo;
 import com.training.socialnetwork.repository.PhotoRepository;
 import com.training.socialnetwork.service.IPhotoService;
@@ -38,7 +38,7 @@ public class PhotoService implements IPhotoService {
 	private Path foundFile;
 
 	@Override
-	public PhotoUploadedDto uploadPhoto(MultipartFile photo) throws IOException {
+	public PhotoUploadResponseDto uploadPhoto(MultipartFile photo) throws IOException {
 		if (!imageUtils.isValid(photo)) {
 			throw new CustomException(HttpStatus.BAD_REQUEST, "Invalid photo");
 		}
@@ -62,7 +62,7 @@ public class PhotoService implements IPhotoService {
 			os.write(photo.getBytes());
 		}
 
-		PhotoUploadedDto uploadedPhotoDto = new PhotoUploadedDto();
+		PhotoUploadResponseDto uploadedPhotoDto = new PhotoUploadResponseDto();
 		uploadedPhotoDto.setPhotoId(photoId);
 		
 		return uploadedPhotoDto;

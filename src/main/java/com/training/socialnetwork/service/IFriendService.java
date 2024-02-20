@@ -3,14 +3,14 @@ package com.training.socialnetwork.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.training.socialnetwork.dto.response.friend.FriendListDto;
-import com.training.socialnetwork.dto.response.friend.FriendRequestDto;
+import com.training.socialnetwork.dto.response.friend.FriendListResponseDto;
+import com.training.socialnetwork.dto.response.friend.FriendRequestListResponseDto;
 
 public interface IFriendService {
 
-	Page<FriendListDto> findAllFriendWithStatus(int userId, Pageable paging);
+	Page<FriendListResponseDto> findAllFriendWithStatus(int userId, Pageable paging);
 	
-	Page<FriendRequestDto> findAllAddFriendRequest(int userId, Pageable paging);
+	Page<FriendRequestListResponseDto> findAllAddFriendRequest(int userId, Pageable paging);
 	
 	boolean createFriendRequest(int sentUserId, int recievedUserId) throws Exception;
 	

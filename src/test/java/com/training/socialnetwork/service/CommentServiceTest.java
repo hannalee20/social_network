@@ -14,11 +14,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 
-import com.training.socialnetwork.dto.request.comment.CommentCreateDto;
-import com.training.socialnetwork.dto.request.comment.CommentUpdateDto;
-import com.training.socialnetwork.dto.response.comment.CommentCreatedDto;
-import com.training.socialnetwork.dto.response.comment.CommentDetailDto;
-import com.training.socialnetwork.dto.response.comment.CommentUpdatedDto;
+import com.training.socialnetwork.dto.request.comment.CommentCreateRequestDto;
+import com.training.socialnetwork.dto.request.comment.CommentUpdateRequestDto;
+import com.training.socialnetwork.dto.response.comment.CommentCreateResponseDto;
+import com.training.socialnetwork.dto.response.comment.CommentDetailResponseDto;
+import com.training.socialnetwork.dto.response.comment.CommentUpdateResponseDto;
 import com.training.socialnetwork.entity.Comment;
 import com.training.socialnetwork.entity.Post;
 import com.training.socialnetwork.entity.User;
@@ -64,7 +64,7 @@ public class CommentServiceTest {
 		post.setPostId(1);
 		post.setContent("content post");
 		
-		CommentCreateDto commentCreateDto = new CommentCreateDto();
+		CommentCreateRequestDto commentCreateDto = new CommentCreateRequestDto();
 		commentCreateDto.setPostId(1);
 		commentCreateDto.setContent("comment content");
 		
@@ -76,7 +76,7 @@ public class CommentServiceTest {
 		when(postRepository.findById(any())).thenReturn(Optional.of(post));
 		when(userRepository.findById(any())).thenReturn(Optional.of(user));
 		
-		CommentCreatedDto commentCreatedDto = new CommentCreatedDto();
+		CommentCreateResponseDto commentCreatedDto = new CommentCreateResponseDto();
 		
 		when(commentRepository.save(any())).thenReturn(comment);
 		when(modelMapper.map(any(), any())).thenReturn(commentCreatedDto);
@@ -87,7 +87,7 @@ public class CommentServiceTest {
 	@Test
 	public void createCommentFail() {
 		int userId = 1;
-		CommentCreateDto commentCreateDto = new CommentCreateDto();
+		CommentCreateRequestDto commentCreateDto = new CommentCreateRequestDto();
 		commentCreateDto.setPostId(1);
 		commentCreateDto.setContent("comment content");
 		
@@ -101,7 +101,7 @@ public class CommentServiceTest {
 		int commentId = 1;
 		int userId = 1;
 		String content = "content update";
-		CommentUpdateDto commentUpdateDto = new CommentUpdateDto();
+		CommentUpdateRequestDto commentUpdateDto = new CommentUpdateRequestDto();
 		commentUpdateDto.setContent(content);
 		
 		User user = new User();
@@ -119,7 +119,7 @@ public class CommentServiceTest {
 		comment.setUser(user);
 		comment.setContent("comment update content");
 		
-		CommentUpdatedDto commentUpdatedDto = new CommentUpdatedDto();
+		CommentUpdateResponseDto commentUpdatedDto = new CommentUpdateResponseDto();
 		
 		when(commentRepository.findById(any())).thenReturn(Optional.of(comment));
 		when(commentRepository.save(any())).thenReturn(comment);
@@ -133,7 +133,7 @@ public class CommentServiceTest {
 		int userId = 1;
 		int commentId = 2;
 		String content = "test";
-		CommentUpdateDto commentUpdateDto = new CommentUpdateDto();
+		CommentUpdateRequestDto commentUpdateDto = new CommentUpdateRequestDto();
 		commentUpdateDto.setContent(content);
 		
 		when(commentRepository.findById(anyInt())).thenReturn(Optional.empty());
@@ -146,7 +146,7 @@ public class CommentServiceTest {
 		int userId = 1;
 		int commentId = 2;
 		String content = "test";
-		CommentUpdateDto commentUpdateDto = new CommentUpdateDto();
+		CommentUpdateRequestDto commentUpdateDto = new CommentUpdateRequestDto();
 		commentUpdateDto.setContent(content);
 		
 		User user = new User();
@@ -224,7 +224,7 @@ public class CommentServiceTest {
 		comment.setCommentId(1);
 		comment.setContent("comment content");
 		
-		CommentDetailDto commentDetailDto = new CommentDetailDto();
+		CommentDetailResponseDto commentDetailDto = new CommentDetailResponseDto();
 		when(commentRepository.findById(any())).thenReturn(Optional.of(comment));
 		when(modelMapper.map(any(), any())).thenReturn(commentDetailDto);
 		

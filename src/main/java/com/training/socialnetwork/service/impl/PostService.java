@@ -15,13 +15,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import com.training.socialnetwork.dto.request.post.PostCreateDto;
-import com.training.socialnetwork.dto.request.post.PostUpdateDto;
-import com.training.socialnetwork.dto.response.comment.CommentDetailDto;
-import com.training.socialnetwork.dto.response.post.PostCreatedDto;
-import com.training.socialnetwork.dto.response.post.PostDetailDto;
-import com.training.socialnetwork.dto.response.post.PostListDto;
-import com.training.socialnetwork.dto.response.post.PostUpdatedDto;
+import com.training.socialnetwork.dto.request.post.PostCreateRequestDto;
+import com.training.socialnetwork.dto.request.post.PostUpdateRequestDto;
+import com.training.socialnetwork.dto.response.comment.CommentDetailResponseDto;
+import com.training.socialnetwork.dto.response.post.PostCreateResponseDto;
+import com.training.socialnetwork.dto.response.post.PostDetailResponseDto;
+import com.training.socialnetwork.dto.response.post.PostListResponseDto;
+import com.training.socialnetwork.dto.response.post.PostUpdateResponseDto;
 import com.training.socialnetwork.entity.Comment;
 import com.training.socialnetwork.entity.Like;
 import com.training.socialnetwork.entity.Photo;
@@ -55,7 +55,7 @@ public class PostService implements IPostService {
 	private ModelMapper modelMapper;
 
 	@Override
-	public PostCreatedDto createPost(int userId, PostCreateDto postCreateDto) throws Exception {
+	public PostCreateResponseDto createPost(int userId, PostCreateRequestDto postCreateDto) throws Exception {
 		User user = userRepository.findById(userId).orElse(null);
 
 		if (user == null) {
@@ -90,22 +90,22 @@ public class PostService implements IPostService {
 			}
 		}
 
-		PostCreatedDto postCreatedDto = modelMapper.map(post, PostCreatedDto.class);
+		PostCreateResponseDto postCreatedDto = modelMapper.map(post, PostCreateResponseDto.class);
 		postCreatedDto.setUsername(user.getUsername());
 		return postCreatedDto;
 	}
 
 	@Override
-	public Page<PostListDto> getTimeline(int userId, Pageable page) {
+	public Page<PostListResponseDto> getTimeline(int userId, Pageable page) {
 		List<Integer> friendUserIdList = friendRepository.findAllFriendUserId(userId);
 		friendUserIdList.add(userId);
 		Page<Post> postList = postRepository.findAllByUserId(friendUserIdList, page);
-		List<PostListDto> postListDtos = new ArrayList<>();
+		List<PostListResponseDto> postListDtos = new ArrayList<>();
 		for (Post post : postList) {
 			List<Photo> photoList = post.getPhotoList();
 			List<String> photoUrlList = new ArrayList<>();
 			photoList.stream().map(photo -> photoUrlList.add(photo.getName())).collect(Collectors.toList());
-			PostListDto postListDto = modelMapper.map(post, PostListDto.class);
+			PostListResponseDto postListDto = modelMapper.map(post, PostListResponseDto.class);
 			postListDto.setPhotoUrl(photoUrlList);
 			List<Like> likeList = new ArrayList<>();
 			for (Like like : post.getLikeList()) {
@@ -124,25 +124,25 @@ public class PostService implements IPostService {
 			postListDto.setUsername(post.getUser().getUsername());
 			postListDtos.add(postListDto);
 		}
-		Page<PostListDto> result = new PageImpl<PostListDto>(postListDtos);
+		Page<PostListResponseDto> result = new PageImpl<PostListResponseDto>(postListDtos);
 		
 		return result;
 	}
 
 	@Override
-	public PostDetailDto getPost(int postId) throws Exception {
+	public PostDetailResponseDto getPost(int postId) throws Exception {
 		Post post = postRepository.findById(postId).orElse(null);
 
 		if (post == null) {
 			throw new CustomException(HttpStatus.NOT_FOUND, "Post does not exist");
 		}
 
-		PostDetailDto postDetailDto = modelMapper.map(post, PostDetailDto.class);
+		PostDetailResponseDto postDetailDto = modelMapper.map(post, PostDetailResponseDto.class);
 		if (!post.getCommentList().isEmpty()) {
 			List<Comment> commentList = post.getCommentList();
-			List<CommentDetailDto> comDetailDtoList = new ArrayList<>();
+			List<CommentDetailResponseDto> comDetailDtoList = new ArrayList<>();
 			for (Comment comment : commentList) {
-				CommentDetailDto commentDetailDto = modelMapper.map(comment, CommentDetailDto.class);
+				CommentDetailResponseDto commentDetailDto = modelMapper.map(comment, CommentDetailResponseDto.class);
 				commentDetailDto.setUsername(comment.getUser().getUsername());
 				comDetailDtoList.add(commentDetailDto);
 			}
@@ -168,7 +168,7 @@ public class PostService implements IPostService {
 	}
 
 	@Override
-	public PostUpdatedDto updatePost(PostUpdateDto postUpdateDto, int postId, int userId) throws Exception {
+	public PostUpdateResponseDto updatePost(PostUpdateRequestDto postUpdateDto, int postId, int userId) throws Exception {
 		User user = userRepository.findById(userId).orElse(null);
 		Post postToUpdate = postRepository.findById(postId).orElse(null);
 
@@ -202,7 +202,7 @@ public class PostService implements IPostService {
 		postToUpdate.setUpdateDate(new Date());
 		postToUpdate = postRepository.save(postToUpdate);
 
-		PostUpdatedDto postUpdatedDto = modelMapper.map(postToUpdate, PostUpdatedDto.class);
+		PostUpdateResponseDto postUpdatedDto = modelMapper.map(postToUpdate, PostUpdateResponseDto.class);
 		for (Photo photo : postToUpdate.getPhotoList()) {
 			photoUrls.add(photo.getName());
 		}
