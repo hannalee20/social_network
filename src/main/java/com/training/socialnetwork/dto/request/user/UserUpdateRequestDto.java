@@ -8,29 +8,35 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.training.socialnetwork.util.constant.Constant;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 @JsonInclude(Include.NON_NULL)
 public class UserUpdateRequestDto implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	@Schema(example = "null")
 	@Pattern(regexp = "^[a-zA-Z]{2,}(?: [a-zA-Z]+){0,2}$", message = Constant.INVALID_REAL_NAME)
 	private String realName;
-	
+
+	@Schema(example = "null")
 	@Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = Constant.BIRTH_DATE_INVALID_MESSAGE)
 	private String birthDate;
-	
+
 	@Pattern(regexp = "^(Male|Female|male|female)$", message = Constant.GENDER_INVALID_MESSAGE)
 	private String gender;
-	
+
 	private String address;
-	
+
 	private String university;
-	
+
 	private String job;
-	
+
 	private String status;
-	
+
 	private String about;
+
+	private int avatar;
 
 	public String getRealName() {
 		return realName;
@@ -59,6 +65,7 @@ public class UserUpdateRequestDto implements Serializable {
 	public String getAddress() {
 		return address;
 	}
+
 	public void setAddress(String address) {
 		this.address = address;
 	}
@@ -93,6 +100,14 @@ public class UserUpdateRequestDto implements Serializable {
 
 	public void setAbout(String about) {
 		this.about = about;
+	}
+
+	public int getAvatar() {
+		return avatar;
+	}
+
+	public void setAvatar(int avatar) {
+		this.avatar = avatar;
 	}
 
 }

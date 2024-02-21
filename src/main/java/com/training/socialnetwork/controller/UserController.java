@@ -138,7 +138,7 @@ public class UserController {
 
 	@PatchMapping(value = "/update/{userId}")
 	public ResponseEntity<Object> updateUser(HttpServletRequest request, @PathVariable(value = "userId") int userId,
-			@RequestBody @Valid UserUpdateRequestDto userUpdateDto) {
+			@RequestBody(required = false) @Valid UserUpdateRequestDto userUpdateDto) {
 		int loggedInUserId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		try {
 			UserUpdateResponseDto result = userService.updateInfo(userUpdateDto, userId, loggedInUserId);
