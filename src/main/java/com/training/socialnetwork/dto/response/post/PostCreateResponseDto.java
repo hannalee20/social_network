@@ -8,7 +8,7 @@ public class PostCreateResponseDto {
 	private int userId;
 	private String username;
 	private String content;
-	private List<String> photoUrl;
+	private List<Integer> photoIdList;
 
 	public int getPostId() {
 		return postId;
@@ -42,12 +42,12 @@ public class PostCreateResponseDto {
 		this.content = content;
 	}
 
-	public List<String> getPhotoUrl() {
-		return photoUrl;
+	public List<Integer> getPhotoIdList() {
+		return photoIdList;
 	}
 
-	public void setPhotoUrl(List<String> photoUrl) {
-		this.photoUrl = photoUrl;
+	public void setPhotoIdList(List<Integer> photoIdList) {
+		this.photoIdList = photoIdList;
 	}
 
 }

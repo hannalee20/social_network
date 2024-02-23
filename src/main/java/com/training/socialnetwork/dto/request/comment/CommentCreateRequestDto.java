@@ -7,6 +7,8 @@ import javax.validation.constraints.Pattern;
 
 import com.training.socialnetwork.util.constant.Constant;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 public class CommentCreateRequestDto implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -15,6 +17,7 @@ public class CommentCreateRequestDto implements Serializable {
 	@Pattern(regexp = "^[0-9]*$", message = Constant.INVALID)
 	private int postId;
 
+	@Schema(type = "string", example = " ")
 	@NotBlank(message = Constant.INVALID)
 	private String content;
 

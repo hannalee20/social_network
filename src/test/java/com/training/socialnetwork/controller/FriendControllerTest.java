@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -30,7 +29,6 @@ import com.training.socialnetwork.dto.response.friend.FriendListResponseDto;
 import com.training.socialnetwork.dto.response.friend.FriendRequestListResponseDto;
 import com.training.socialnetwork.security.JwtUtils;
 import com.training.socialnetwork.service.IFriendService;
-import com.training.socialnetwork.util.constant.Constant;
 
 @WebMvcTest(FriendController.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -67,7 +65,7 @@ public class FriendControllerTest {
 		when(friendService.findAllFriendWithStatus(anyInt(), any())).thenReturn(page);
 
 		mockMvc.perform(get("/friend/all-friends").header("Authorization", "Bearer dummyToken"))
-				.andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1)));
+				.andExpect(status().isOk()).andExpect(jsonPath("$.friendList", hasSize(1)));
 	}
 	
 	@Test
@@ -86,7 +84,7 @@ public class FriendControllerTest {
 
 		mockMvc.perform(post("/friend/add-request").header("Authorization", "Bearer dummyToken")
 				.contentType(MediaType.APPLICATION_JSON).param("recievedUserId", Integer.toString(recievedUserId)))
-				.andExpect(status().isCreated()).andExpect(content().string(Constant.SEND_FRIEND_REQUEST_SUCCESSFULLY));
+				.andExpect(status().isCreated());
 	}
 
 	@Test
@@ -108,7 +106,7 @@ public class FriendControllerTest {
 
 		mockMvc.perform(post("/friend/accept-request").header("Authorization", "Bearer dummyToken")
 				.contentType(MediaType.APPLICATION_JSON).param("sentUserId", Integer.toString(sentUserId)))
-				.andExpect(status().isOk()).andExpect(content().string(Constant.ACCEPT_FRIEND_REQUEST_SUCCESSFULLY));
+				.andExpect(status().isOk());
 	}
 
 	@Test
@@ -130,7 +128,7 @@ public class FriendControllerTest {
 
 		mockMvc.perform(post("/friend/refuse-request").header("Authorization", "Bearer dummyToken")
 				.contentType(MediaType.APPLICATION_JSON).param("sentUserId", Integer.toString(sentUserId)))
-				.andExpect(status().isOk()).andExpect(content().string(Constant.REFUSE_FRIEND_REQUEST_SUCCESSFULLY));
+				.andExpect(status().isOk());
 	}
 	
 	@Test
@@ -152,7 +150,7 @@ public class FriendControllerTest {
 
 		mockMvc.perform(post("/friend/remove-friend").header("Authorization", "Bearer dummyToken")
 				.contentType(MediaType.APPLICATION_JSON).param("friendUserId", Integer.toString(friendUserId)))
-				.andExpect(status().isOk()).andExpect(content().string(Constant.REMOVE_FRIEND_SUCCESSFULLY));
+				.andExpect(status().isOk());
 	}
 
 	@Test
@@ -180,7 +178,7 @@ public class FriendControllerTest {
 		when(friendService.findAllAddFriendRequest(anyInt(), any())).thenReturn(friendRequestPage);
 
 		mockMvc.perform(get("/friend/all-friend-request").header("Authorization", "Bearer dummyToken"))
-				.andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1)));
+				.andExpect(status().isOk()).andExpect(jsonPath("$.friendList", hasSize(1)));
 	}
 	
 	@Test
@@ -206,7 +204,7 @@ public class FriendControllerTest {
 
 		mockMvc.perform(post("/friend/remove-friend-request").header("Authorization", "Bearer dummyToken")
 				.contentType(MediaType.APPLICATION_JSON).param("recievedUserId", Integer.toString(recievedUserId)))
-				.andExpect(status().isOk()).andExpect(content().string(Constant.REMOVE_FRIEND_REQUEST_SUCCESSFULLY));
+				.andExpect(status().isOk());
 	}
 	
 	@Test

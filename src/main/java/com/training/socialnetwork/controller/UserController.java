@@ -51,6 +51,7 @@ import com.training.socialnetwork.service.IUserService;
 import com.training.socialnetwork.util.constant.Constant;
 import com.training.socialnetwork.util.exception.CustomException;
 import com.training.socialnetwork.util.generator.ReportGenerator;
+import com.training.socialnetwork.util.mapper.ObjectMapperUtils;
 
 @RestController
 @RequestMapping(value = "/user")
@@ -67,6 +68,9 @@ public class UserController {
 
 	@Autowired
 	private OtpUtils otpUtils;
+	
+	@Autowired
+	private ObjectMapperUtils objectMapper;
 
 	@PostMapping(value = "/register")
 	public ResponseEntity<Object> registerUser(@RequestBody UserRegisterRequestDto userRegisterDto) {
@@ -141,7 +145,8 @@ public class UserController {
 			@RequestBody(required = false) @Valid UserUpdateRequestDto userUpdateDto) {
 		int loggedInUserId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		try {
-			UserUpdateResponseDto result = userService.updateInfo(userUpdateDto, userId, loggedInUserId);
+			UserUpdateRequestDto requestDto = (UserUpdateRequestDto) objectMapper.getDefaulter(userUpdateDto);
+			UserUpdateResponseDto result = userService.updateInfo(requestDto, userId, loggedInUserId);
 
 			return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (CustomException e) {
@@ -252,7 +257,7 @@ public class UserController {
 			reportGenerator.export(response);
 
 			result.setMessage(Constant.EXPORT_REPORT_SUCCESSFULLY);
-			return new ResponseEntity<>(result, HttpStatus.OK);
+			return ResponseEntity.ok(result);
 		} catch (CustomException e) {
 			result.setMessage(e.getMessage());
 

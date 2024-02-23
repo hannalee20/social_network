@@ -15,7 +15,7 @@ public class UserUpdateResponseDto {
 	private String job;
 	private String status;
 	private String about;
-	private String avatarUrl;
+	private Integer avatar;
 
 	public int getUserId() {
 		return userId;
@@ -105,12 +105,12 @@ public class UserUpdateResponseDto {
 		this.about = about;
 	}
 
-	public String getAvatarUrl() {
-		return avatarUrl;
+	public Integer getAvatar() {
+		return avatar;
 	}
 
-	public void setAvatarUrl(String avatarUrl) {
-		this.avatarUrl = avatarUrl;
+	public void setAvatar(Integer avatar) {
+		this.avatar = avatar;
 	}
 
 }

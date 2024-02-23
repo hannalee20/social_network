@@ -25,6 +25,7 @@ import com.training.socialnetwork.security.JwtUtils;
 import com.training.socialnetwork.service.ICommentService;
 import com.training.socialnetwork.util.constant.Constant;
 import com.training.socialnetwork.util.exception.CustomException;
+import com.training.socialnetwork.util.mapper.ObjectMapperUtils;
 
 @RestController
 @Validated
@@ -36,6 +37,9 @@ public class CommentController {
 
 	@Autowired
 	private JwtUtils jwtUtils;
+	
+	@Autowired
+	private ObjectMapperUtils objectMapper;
 
 	@PostMapping(value = "/create")
 	public ResponseEntity<Object> createComment(HttpServletRequest request,
@@ -62,7 +66,8 @@ public class CommentController {
 			@PathVariable(value = "commentId") int commentId, @RequestBody CommentUpdateRequestDto commentUpdateDto) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		try {
-			CommentUpdateResponseDto result = commentService.updateComment(commentUpdateDto, commentId, userId);
+			CommentUpdateRequestDto requestDto = (CommentUpdateRequestDto) objectMapper.getDefaulter(commentUpdateDto);
+			CommentUpdateResponseDto result = commentService.updateComment(requestDto, commentId, userId);
 
 			return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (CustomException e) {

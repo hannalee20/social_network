@@ -16,9 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -29,7 +27,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -39,7 +36,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.training.socialnetwork.dto.request.user.UserForgotPasswordRequestDto;
 import com.training.socialnetwork.dto.request.user.UserGetTokenRequestDto;
@@ -59,6 +55,7 @@ import com.training.socialnetwork.security.OtpUtils;
 import com.training.socialnetwork.service.impl.CustomUserDetailService;
 import com.training.socialnetwork.service.impl.UserService;
 import com.training.socialnetwork.util.constant.Constant;
+import com.training.socialnetwork.util.mapper.ObjectMapperUtils;
 import com.training.socialnetwork.utils.JSonHelper;
 
 @WebMvcTest(UserController.class)
@@ -88,6 +85,9 @@ public class UserControllerTest {
 	
 	@MockBean
 	private OtpUtils otpUtils;
+	
+	@MockBean
+	private ObjectMapperUtils objectMapper;
 
 	@MockBean
 	private UserService userService;
@@ -120,6 +120,8 @@ public class UserControllerTest {
 		userTokenDto.setPassword("123456");
 		userTokenDto.setOtp(123456);
 		
+		String request = JSonHelper.toJson(userTokenDto).orElse("");
+		
 		token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzA2MjU5NjgyLCJleHAiOjE3MDYzNDYwODF9.sVl5ksy4pXHHU9Bdx41AoDzAvs9gc5v3-NlAJG8p7DQ";
 		when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(new UsernamePasswordAuthenticationToken("test", "123456"));
 				
@@ -127,9 +129,7 @@ public class UserControllerTest {
 		when(jwtUtils.generateToken(any(Authentication.class))).thenReturn(token);
 		MvcResult tokenResult = mockMvc.perform(post("/user/token")
 				.contentType(MediaType.APPLICATION_JSON)
-				.param("username", "test")
-				.param("password", "123456")
-				.param("otp", Integer.toString(123456)))
+				.content(request))
 				.andExpect(status().isOk()).andReturn();
 		token = tokenResult.getResponse().getContentAsString().substring(8, 133);
 	}
@@ -174,12 +174,12 @@ public class UserControllerTest {
 		userLoginDto.setUsername("test");
 		userLoginDto.setPassword("123456");
 		
+		String request = JSonHelper.toJson(userLoginDto).orElse("");
 		when(userService.loginUser(userLoginDto.getUsername(), userLoginDto.getPassword())).thenReturn(true);
 		
 		mockMvc.perform(post("/user/login")
 				.contentType(MediaType.APPLICATION_JSON)
-				.param("username", "test")
-				.param("password", "123456"))
+				.content(request))
 				.andExpect(status().isOk());
 	}
 	
@@ -193,8 +193,7 @@ public class UserControllerTest {
 		mockMvc.perform(post("/user/login")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(request))
-				.andExpect(status().isBadRequest())
-				.andExpect(content().string(Constant.INVALID_USERNAME_OR_PASSWORD));
+				.andExpect(status().isBadRequest());
 	}
 	
 	@Test
@@ -274,8 +273,6 @@ public class UserControllerTest {
 		userUpdateDto.setStatus("test");
 		userUpdateDto.setAbout("");
 		
-		MultipartFile avatar = new MockMultipartFile("data2", "filename2.jpg", "multipart/form-data", "some xml".getBytes());
-		
 		UserUpdateResponseDto userUpdatedDto = new UserUpdateResponseDto();
 		userUpdatedDto.setUserId(1);
 		userUpdatedDto.setBirthDate(LocalDate.now());
@@ -285,22 +282,17 @@ public class UserControllerTest {
 		userUpdatedDto.setAddress("hanoi");
 		userUpdatedDto.setJob("developer");
 		userUpdatedDto.setUniversity("test");
-		userUpdatedDto.setAvatarUrl("test");
+		userUpdatedDto.setAvatar(1);
 		userUpdatedDto.setStatus("test");
 		userUpdatedDto.setAbout("");
 		
 		when(userService.updateInfo(any(), anyInt(), anyInt())).thenReturn(userUpdatedDto);
 		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
 		
-		Map<String, Object> requestBody = new HashMap<>();
-		requestBody.putIfAbsent("userUpdateDto", userUpdateDto);
-		requestBody.putIfAbsent("avatar", avatar);
-		requestBody.putIfAbsent("userId", userId);
-		
-		String request = JSonHelper.toJson(requestBody).orElse("");
+		String request = JSonHelper.toJson(userUpdateDto).orElse("");
 		mockMvc.perform(patch("/user/update/{userId}", userId)
 				.header("AUTHORIZATION", "Bearer " + token)
-				.contentType(MediaType.MULTIPART_FORM_DATA)
+				.contentType(MediaType.APPLICATION_JSON)
 				.content(request))
 				.andExpect(status().isOk())
 				.andDo(print())
@@ -316,20 +308,13 @@ public class UserControllerTest {
 		userUpdateDto.setBirthDate("2020-02-02");
 		userUpdateDto.setAddress("HCM");
 		
-		MultipartFile avatar = new MockMultipartFile("data2", "filename2.jpg", "multipart/form-data", "some xml".getBytes());
-		
 		when(userService.updateInfo(any(), anyInt(), anyInt())).thenThrow(new Exception());
 		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
 		
-		Map<String, Object> requestBody = new HashMap<>();
-		requestBody.putIfAbsent("userUpdateDto", userUpdateDto);
-		requestBody.putIfAbsent("avatar", avatar);
-		requestBody.putIfAbsent("userId", userId);
-		
-		String request = JSonHelper.toJson(requestBody).orElse("");
+		String request = JSonHelper.toJson(userUpdateDto).orElse("");
 		mockMvc.perform(patch("/user/update/{userId}", userId)
 				.header("AUTHORIZATION", "Bearer " + token)
-				.contentType(MediaType.MULTIPART_FORM_DATA)
+				.contentType(MediaType.APPLICATION_JSON)
 				.content(request))
 				.andExpect(status().isInternalServerError());
 	}
@@ -369,7 +354,7 @@ public class UserControllerTest {
 				.param("keyword", keyword))
 				.andExpect(status().isOk())
 				.andDo(print())
-				.andExpect(jsonPath("$", hasSize(3)));
+				.andExpect(jsonPath("$.userList", hasSize(3)));
 	}
 	
 	@Test
@@ -436,7 +421,7 @@ public class UserControllerTest {
 				.content(requestForgotPassword))
 				.andExpect(status().isOk()).andReturn();
 		
-		String tokenResetPassword = tokenResult.getResponse().getContentAsString().substring(48);
+		String tokenResetPassword = tokenResult.getResponse().getContentAsString().substring(10, 18);
 		UserResetPasswordRequestDto userResetPasswordDto = new UserResetPasswordRequestDto();
 		userResetPasswordDto.setToken(tokenResetPassword);
 		userResetPasswordDto.setNewPassword("newpassword");

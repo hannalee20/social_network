@@ -5,13 +5,13 @@ import org.springframework.beans.BeanUtils;
 
 import com.training.socialnetwork.dto.request.user.UserUpdateRequestDto;
 import com.training.socialnetwork.entity.User;
-import com.training.socialnetwork.util.mapper.ObjectMapper;
+import com.training.socialnetwork.util.mapper.ObjectMapperUtils;
 
 public class ObjectMapperTest {
 
 	@Test
     public void testCopyProperties() {
-		ObjectMapper objectMapper = new ObjectMapper();
+		ObjectMapperUtils objectMapper = new ObjectMapperUtils();
         UserUpdateRequestDto userUpdateDto = new UserUpdateRequestDto();
         User userToUpdate = new User();
         
@@ -22,7 +22,7 @@ public class ObjectMapperTest {
 
     @Test
     public void testGetNullPropertyNames() {
-    	ObjectMapper objectMapper = new ObjectMapper();
+    	ObjectMapperUtils objectMapper = new ObjectMapperUtils();
     	UserUpdateRequestDto userUpdateDto = new UserUpdateRequestDto();
         
         objectMapper.getNullPropertyNames(userUpdateDto);

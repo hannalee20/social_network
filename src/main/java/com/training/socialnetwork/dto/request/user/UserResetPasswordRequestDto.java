@@ -8,13 +8,17 @@ import javax.validation.constraints.Size;
 
 import com.training.socialnetwork.util.constant.Constant;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 public class UserResetPasswordRequestDto implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	@Schema(type = "string", example = " ")
 	@NotBlank
 	private String token;
 
+	@Schema(type = "string", example = " ")
 	@Pattern(regexp = "^([a-zA-Z0-9]+)$")
 	@Size(min = 6, max = 16, message = Constant.INVALID)
 	@NotBlank

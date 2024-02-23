@@ -15,28 +15,34 @@ public class UserUpdateRequestDto implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@Schema(example = "null")
-	@Pattern(regexp = "^[a-zA-Z]{2,}(?: [a-zA-Z]+){0,2}$", message = Constant.INVALID_REAL_NAME)
+	@Schema(type = "string", example = " ")
+	@Pattern(regexp = "^$|^[a-zA-Z]{2,}(?: [a-zA-Z]+){0,2}$", message = Constant.INVALID_REAL_NAME)
 	private String realName;
 
-	@Schema(example = "null")
-	@Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = Constant.BIRTH_DATE_INVALID_MESSAGE)
+	@Schema(type = "string", example = " ")
+	@Pattern(regexp = "^$|\\d{4}-\\d{2}-\\d{2}", message = Constant.BIRTH_DATE_INVALID_MESSAGE)
 	private String birthDate;
 
-	@Pattern(regexp = "^(Male|Female|male|female)$", message = Constant.GENDER_INVALID_MESSAGE)
+	@Schema(type = "string", example = " ")
+	@Pattern(regexp = "^$|^(Male|Female|male|female)$", message = Constant.GENDER_INVALID_MESSAGE)
 	private String gender;
 
+	@Schema(type = "string", example = " ")
 	private String address;
 
+	@Schema(type = "string", example = " ")
 	private String university;
 
+	@Schema(type = "string", example = " ")
 	private String job;
 
+	@Schema(type = "string", example = " ")
 	private String status;
 
+	@Schema(type = "string", example = " ")
 	private String about;
 
-	private int avatar;
+	private Integer avatar;
 
 	public String getRealName() {
 		return realName;
@@ -102,11 +108,11 @@ public class UserUpdateRequestDto implements Serializable {
 		this.about = about;
 	}
 
-	public int getAvatar() {
+	public Integer getAvatar() {
 		return avatar;
 	}
 
-	public void setAvatar(int avatar) {
+	public void setAvatar(Integer avatar) {
 		this.avatar = avatar;
 	}
 

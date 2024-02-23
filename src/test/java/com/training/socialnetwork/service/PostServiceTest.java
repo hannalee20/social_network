@@ -86,15 +86,22 @@ public class PostServiceTest {
 		post.setContent(content);
 		post.setCreateDate(new Date());
 		post.setUpdateDate(new Date());
-
+		
+		List<Post> postList = new ArrayList<>();
+		postList.add(post);
+		
 		when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
 		Photo photo = new Photo();
+		photo.setPhotoId(1);
+		photo.setUser(user);
+		photo.setPostList(postList);
 		photo.setName("data1");
 		photo.setCreateDate(new Date());
 
 		PostCreateResponseDto postCreatedDto = new PostCreateResponseDto();
 
+		when(photoRepository.findById(anyInt())).thenReturn(Optional.of(photo));
 		when(photoRepository.save(any())).thenReturn(photo);
 		when(postRepository.save(any())).thenReturn(post);
 		when(modelMapper.map(any(), any())).thenReturn(postCreatedDto);
@@ -285,6 +292,11 @@ public class PostServiceTest {
 		PostUpdateRequestDto postUpdateDto = new PostUpdateRequestDto();
 		postUpdateDto.setContent(content);
 
+		List<Integer> photoIdList = new ArrayList<>();
+		photoIdList.add(1);
+		
+		postUpdateDto.setPhotoIdList(photoIdList);
+		
 		int userId = 1;
 		int postId = 1;
 
@@ -302,13 +314,23 @@ public class PostServiceTest {
 		when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 		when(postRepository.findById(postId)).thenReturn(Optional.of(post1));
 
+		List<Post> postList = new ArrayList<>();
+		postList.add(post1);
+		
 		Photo photo = new Photo();
-//		photo.setPost(post1);
+		photo.setPostList(postList);
+		photo.setUser(user);
 		photo.setName("data1");
 		photo.setCreateDate(new Date());
+		
+		List<Photo> photoList = new ArrayList<>();
+		photoList.add(photo);
+		
+		post1.setPhotoList(photoList);
 
 		PostUpdateResponseDto postUpdatedDto = new PostUpdateResponseDto();
 
+		when(photoRepository.findById(anyInt())).thenReturn(Optional.of(photo));
 		when(photoRepository.save(any())).thenReturn(photo);
 		when(postRepository.save(any())).thenReturn(post1);
 		when(modelMapper.map(any(), any())).thenReturn(postUpdatedDto);

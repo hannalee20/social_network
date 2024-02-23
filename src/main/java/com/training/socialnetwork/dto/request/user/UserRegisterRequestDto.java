@@ -8,19 +8,24 @@ import javax.validation.constraints.Size;
 
 import com.training.socialnetwork.util.constant.Constant;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 public class UserRegisterRequestDto implements Serializable {
 	private static final long serialVersionUID = 1L;
 
+	@Schema(type = "string", example = " ")
 	@Pattern(regexp = "^([a-zA-Z0-9]+)$")
 	@Size(min = 4, max = 16, message = Constant.INVALID_USERNAME_OR_PASSWORD)
 	@NotBlank
 	private String username;
 
+	@Schema(type = "string", example = " ")
 	@Pattern(regexp = "^([a-zA-Z0-9]+)$")
 	@Size(min = 6, max = 16, message = Constant.INVALID)
 	@NotBlank
 	private String password;
 
+	@Schema(type = "string", example = " ")
 	@Pattern(regexp = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")
 	@NotBlank
 	private String email;

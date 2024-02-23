@@ -31,18 +31,20 @@ import com.training.socialnetwork.dto.response.user.UserReportResponseDto;
 import com.training.socialnetwork.dto.response.user.UserSearchResponseDto;
 import com.training.socialnetwork.dto.response.user.UserUpdateResponseDto;
 import com.training.socialnetwork.entity.Friend;
+import com.training.socialnetwork.entity.Photo;
 import com.training.socialnetwork.entity.Role;
 import com.training.socialnetwork.entity.User;
 import com.training.socialnetwork.repository.CommentRepository;
 import com.training.socialnetwork.repository.FriendRepository;
 import com.training.socialnetwork.repository.LikeRepository;
+import com.training.socialnetwork.repository.PhotoRepository;
 import com.training.socialnetwork.repository.PostRepository;
 import com.training.socialnetwork.repository.RoleRepository;
 import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.IUserService;
 import com.training.socialnetwork.util.constant.Constant;
 import com.training.socialnetwork.util.exception.CustomException;
-import com.training.socialnetwork.util.mapper.ObjectMapper;
+import com.training.socialnetwork.util.mapper.ObjectMapperUtils;
 
 @Service
 @Transactional
@@ -65,6 +67,9 @@ public class UserService implements IUserService {
 
 	@Autowired
 	private RoleRepository roleRepository;
+	
+	@Autowired
+	private PhotoRepository photoRepository;
 
 	@Autowired
 	private ModelMapper modelMapper;
@@ -73,7 +78,7 @@ public class UserService implements IUserService {
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 
 	@Autowired
-	private ObjectMapper objectMapper;
+	private ObjectMapperUtils objectMapper;
 
 	private static final long EXPIRE_TOKEN = 30;
 
@@ -119,7 +124,7 @@ public class UserService implements IUserService {
 	}
 
 	@Override
-	public UserUpdateResponseDto updateInfo(UserUpdateRequestDto userUpdateDto, int userId, int loggedInUserId)
+	public UserUpdateResponseDto updateInfo(UserUpdateRequestDto updateRequestDto, int userId, int loggedInUserId)
 			throws Exception {
 		User userToUpdate = userRepository.findById(userId).orElse(null);
 		User loggedInUser = userRepository.findById(loggedInUserId).orElse(null);
@@ -132,45 +137,60 @@ public class UserService implements IUserService {
 			throw new CustomException(HttpStatus.FORBIDDEN, "You do not have permission to update");
 		}
 
-		if (null != userUpdateDto.getGender()) {
-			if (userUpdateDto.getGender().toUpperCase().equals(Constant.MALE)) {
+		if (null != updateRequestDto.getGender()) {
+			if (updateRequestDto.getGender().toUpperCase().equals(Constant.MALE)) {
 				userToUpdate.setGender(Constant.NUMBER_0);
 			} else {
 				userToUpdate.setGender(Constant.NUMBER_1);
 			}
 		}
-		objectMapper.copyProperties(userUpdateDto, userToUpdate);
-		if (null != userUpdateDto.getBirthDate()) {
+
+		if (null != updateRequestDto.getAvatar()) {
+			Photo photo = photoRepository.findById(updateRequestDto.getAvatar()).orElse(null);
+
+			if (photo == null) {
+				throw new CustomException(HttpStatus.NOT_FOUND, "Photo does not exist");
+			}
+			if (photo.getUser().getUserId() != userId) {
+				throw new CustomException(HttpStatus.FORBIDDEN, "You do not have permission to use this photo");
+			}
+			
+			photo.setAvatar(updateRequestDto.getAvatar());
+			photoRepository.save(photo);
+		}
+		objectMapper.copyProperties(updateRequestDto, userToUpdate);
+		if (null != updateRequestDto.getBirthDate()) {
 			try {
 				SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 				formatter.setLenient(false);
-				userToUpdate.setBirthDate(formatter.parse(userUpdateDto.getBirthDate()));
+				userToUpdate.setBirthDate(formatter.parse(updateRequestDto.getBirthDate()));
 			} catch (Exception e) {
 				throw new CustomException(HttpStatus.BAD_REQUEST, "Invalid date");
 			}
 		}
 		userToUpdate.setUserId(userId);
-//		if (avatar != null) {
-//			String avatarUrl = imageUtils.saveImage(avatar);
-//			userToUpdate.setAvatarUrl(avatarUrl);
-//		}
 		userToUpdate.setUpdateDate(new Date());
 		userToUpdate = userRepository.save(userToUpdate);
 
-		UserUpdateResponseDto userUpdatedDto = modelMapper.map(userToUpdate, UserUpdateResponseDto.class);
+		UserUpdateResponseDto updateResponseDto = modelMapper.map(userToUpdate, UserUpdateResponseDto.class);
 		if (null != userToUpdate.getGender()) {
 			if (userToUpdate.getGender() == Constant.NUMBER_0) {
-				userUpdatedDto.setSex(Constant.MALE);
+				updateResponseDto.setSex(Constant.MALE);
 			} else {
-				userUpdatedDto.setSex(Constant.FEMALE);
+				updateResponseDto.setSex(Constant.FEMALE);
 			}
 		}
 		if (null != userToUpdate.getBirthDate()) {
-			userUpdatedDto
+			updateResponseDto
 					.setBirthDate(userToUpdate.getBirthDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
 		}
 
-		return userUpdatedDto;
+		if(null != updateRequestDto.getAvatar()) {
+			updateResponseDto.setAvatar(updateRequestDto.getAvatar());
+		} else {
+			updateResponseDto.setAvatar(null);
+		}
+		return updateResponseDto;
 	}
 
 	@Override
@@ -192,7 +212,7 @@ public class UserService implements IUserService {
 		if (null != user.getBirthDate()) {
 			userDetailDto.setBirthDate(user.getBirthDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
 		}
-		
+
 		return userDetailDto;
 	}
 

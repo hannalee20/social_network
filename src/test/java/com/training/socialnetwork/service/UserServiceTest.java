@@ -46,7 +46,7 @@ import com.training.socialnetwork.service.impl.UserService;
 import com.training.socialnetwork.util.constant.Constant;
 import com.training.socialnetwork.util.exception.CustomException;
 import com.training.socialnetwork.util.image.ImageUtils;
-import com.training.socialnetwork.util.mapper.ObjectMapper;
+import com.training.socialnetwork.util.mapper.ObjectMapperUtils;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -55,7 +55,7 @@ public class UserServiceTest {
 	private UserService userService;
 	
 	@Mock
-	private ObjectMapper objectMapper;
+	private ObjectMapperUtils objectMapper;
 	
 	@Mock
 	private ModelMapper modelMapper;
