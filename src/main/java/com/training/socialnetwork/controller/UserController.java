@@ -257,7 +257,7 @@ public class UserController {
 			reportGenerator.export(response);
 
 			result.setMessage(Constant.EXPORT_REPORT_SUCCESSFULLY);
-			return ResponseEntity.ok(result);
+			return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (CustomException e) {
 			result.setMessage(e.getMessage());
 
