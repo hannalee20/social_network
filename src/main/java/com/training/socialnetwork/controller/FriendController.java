@@ -70,9 +70,14 @@ public class FriendController {
 		int sentUserId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		MessageResponseDto result = new MessageResponseDto();
 		try {
-			friendService.createFriendRequest(sentUserId, recievedUserId);
+			int status = friendService.createFriendRequest(sentUserId, recievedUserId);
 
-			result.setMessage(Constant.SEND_FRIEND_REQUEST_SUCCESSFULLY);
+			if(status == Constant.NUMBER_0) {
+				result.setMessage(Constant.SEND_FRIEND_REQUEST_SUCCESSFULLY);
+			} else {
+				result.setMessage(Constant.ACCEPT_FRIEND_REQUEST_SUCCESSFULLY);
+			}
+			
 			return new ResponseEntity<Object>(result, HttpStatus.CREATED);
 		} catch (CustomException e) {
 			result.setMessage(e.getMessage());

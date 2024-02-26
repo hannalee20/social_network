@@ -72,7 +72,7 @@ public class CommentControllerTest {
 		commentCreatedDto.setUserId(1);
 		commentCreatedDto.setUsername("test");
 		commentCreatedDto.setContent("create content");
-		commentCreatedDto.setPhotoUrl("photo.png");
+		commentCreatedDto.setPhotoId(1);
 
 		when(jwtUtils.getUserIdFromJwt(anyString())).thenReturn(userId);
 		when(commentService.createComment(anyInt(), any())).thenReturn(commentCreatedDto);
@@ -85,7 +85,7 @@ public class CommentControllerTest {
 				.andExpect(jsonPath("$.commentId").value(commentCreatedDto.getCommentId()))
 				.andExpect(jsonPath("$.postId").value(commentCreatedDto.getPostId()))
 				.andExpect(jsonPath("$.content").value(commentCreatedDto.getContent()))
-				.andExpect(jsonPath("$.photoUrl").value(commentCreatedDto.getPhotoUrl()));
+				.andExpect(jsonPath("$.photoUrl").value(commentCreatedDto.getPhotoId()));
 	}
 
 	@Test

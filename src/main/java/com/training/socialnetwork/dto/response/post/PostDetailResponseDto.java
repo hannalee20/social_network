@@ -11,7 +11,7 @@ public class PostDetailResponseDto {
 	private int userId;
 	private String username;
 	private String content;
-	private List<String> photoUrl;
+	private List<Integer> photoIdList;
 	private Date createDate;
 	private int likeCount;
 	private List<CommentDetailResponseDto> commentList;
@@ -48,12 +48,12 @@ public class PostDetailResponseDto {
 		this.content = content;
 	}
 
-	public List<String> getPhotoUrl() {
-		return photoUrl;
+	public List<Integer> getPhotoIdList() {
+		return photoIdList;
 	}
 
-	public void setPhotoUrl(List<String> photoUrl) {
-		this.photoUrl = photoUrl;
+	public void setPhotoIdList(List<Integer> photoIdList) {
+		this.photoIdList = photoIdList;
 	}
 
 	public Date getCreateDate() {

@@ -79,8 +79,10 @@ public class FriendControllerTest {
 	@Test
 	public void createFriendRequestSuccess() throws Exception {
 		int recievedUserId = 2;
+		
+		int status = 1;
 
-		when(friendService.createFriendRequest(anyInt(), anyInt())).thenReturn(true);
+		when(friendService.createFriendRequest(anyInt(), anyInt())).thenReturn(status);
 
 		mockMvc.perform(post("/friend/add-request").header("Authorization", "Bearer dummyToken")
 				.contentType(MediaType.APPLICATION_JSON).param("recievedUserId", Integer.toString(recievedUserId)))

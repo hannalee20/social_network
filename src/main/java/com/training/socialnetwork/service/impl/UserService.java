@@ -67,7 +67,7 @@ public class UserService implements IUserService {
 
 	@Autowired
 	private RoleRepository roleRepository;
-	
+
 	@Autowired
 	private PhotoRepository photoRepository;
 
@@ -154,8 +154,13 @@ public class UserService implements IUserService {
 			if (photo.getUser().getUserId() != userId) {
 				throw new CustomException(HttpStatus.FORBIDDEN, "You do not have permission to use this photo");
 			}
-			
-			photo.setAvatar(updateRequestDto.getAvatar());
+			Photo avatar = photoRepository.findAvatarByUserId(loggedInUserId);
+			if (avatar != null) {
+				avatar.setAvatar(Constant.NUMBER_0);
+				photoRepository.save(avatar);
+			}
+
+			photo.setAvatar(Constant.NUMBER_1);
 			photoRepository.save(photo);
 		}
 		objectMapper.copyProperties(updateRequestDto, userToUpdate);
@@ -185,7 +190,7 @@ public class UserService implements IUserService {
 					.setBirthDate(userToUpdate.getBirthDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
 		}
 
-		if(null != updateRequestDto.getAvatar()) {
+		if (null != updateRequestDto.getAvatar()) {
 			updateResponseDto.setAvatar(updateRequestDto.getAvatar());
 		} else {
 			updateResponseDto.setAvatar(null);

@@ -18,4 +18,10 @@ public interface PhotoRepository extends JpaRepository<Photo, Integer>{
 			"and p.delete_flg = 0 ", nativeQuery = true)
 	List<Photo> findByPostId(@Param(value = "postId") int postId);
 	
+	@Query(value = "" + 
+			"select * from photos as p " +
+			"where p.user_id = :userId " +
+			"and p.avatar = 1 " + 
+			"and p.delete_flg = 0 ", nativeQuery = true)
+	Photo findAvatarByUserId(@Param(value = "userId") int userId);
 }

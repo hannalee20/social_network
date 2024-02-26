@@ -76,6 +76,9 @@ public class CommentService implements ICommentService {
 
 		CommentCreateResponseDto commentCreatedDto = modelMapper.map(comment, CommentCreateResponseDto.class);
 		commentCreatedDto.setUsername(comment.getUser().getUsername());
+		if(null != commentCreateDto.getPhotoId()) {
+			commentCreatedDto.setPhotoId(comment.getPhoto().getPhotoId());
+		}
 
 		return commentCreatedDto;
 	}
@@ -114,7 +117,10 @@ public class CommentService implements ICommentService {
 
 		CommentUpdateResponseDto commentUpdatedDto = modelMapper.map(commentToUpdate, CommentUpdateResponseDto.class);
 		commentUpdatedDto.setUsername(commentToUpdate.getUser().getUsername());
-
+		if (null != commentUpdateDto.getPhotoId()) {
+			commentUpdatedDto.setPhotoId(commentToUpdate.getPhoto().getPhotoId());
+		}
+		
 		return commentUpdatedDto;
 	}
 

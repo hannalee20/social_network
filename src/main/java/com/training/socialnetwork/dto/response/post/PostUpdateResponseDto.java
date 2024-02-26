@@ -9,7 +9,7 @@ public class PostUpdateResponseDto {
 	private int userId;
 	private String username;
 	private String content;
-	private List<String> photoUrls;
+	private List<Integer> photoIdList;
 	private Date updateDate;
 
 	public int getPostId() {
@@ -44,12 +44,12 @@ public class PostUpdateResponseDto {
 		this.content = content;
 	}
 
-	public List<String> getPhotoUrls() {
-		return photoUrls;
+	public List<Integer> getPhotoIdList() {
+		return photoIdList;
 	}
 
-	public void setPhotoUrls(List<String> photoUrls) {
-		this.photoUrls = photoUrls;
+	public void setPhotoIdList(List<Integer> photoIdList) {
+		this.photoIdList = photoIdList;
 	}
 
 	public Date getUpdateDate() {

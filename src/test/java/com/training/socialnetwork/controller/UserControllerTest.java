@@ -46,6 +46,7 @@ import com.training.socialnetwork.dto.request.user.UserUpdateRequestDto;
 import com.training.socialnetwork.dto.response.user.UserDetailResponseDto;
 import com.training.socialnetwork.dto.response.user.UserForgotPasswordResponseDto;
 import com.training.socialnetwork.dto.response.user.UserRegisterResponseDto;
+import com.training.socialnetwork.dto.response.user.UserReportResponseDto;
 import com.training.socialnetwork.dto.response.user.UserSearchResponseDto;
 import com.training.socialnetwork.dto.response.user.UserUpdateResponseDto;
 import com.training.socialnetwork.entity.User;
@@ -449,21 +450,21 @@ public class UserControllerTest {
 				.content(requestResetPassword))
 				.andExpect(status().isInternalServerError());
 	}
-//	
-//	@Test
-//	public void getReportUserSuccess() throws Exception {
-//		UserReportResponseDto userReportDto = new UserReportResponseDto();
-//		userReportDto.setCommentCount(1);
-//		userReportDto.setFriendCount(2);
-//		userReportDto.setLikeCount(3);
-//		userReportDto.setPostCount(4);
-//		
-//		
-//		when(userService.getReportUser(anyInt())).thenReturn(userReportDto);
-//		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
-//		
-//		mockMvc.perform(get("/user/export-report")
-//				.header("AUTHORIZATION", "Bearer " + token))
-//				.andExpect(status().isOk());
-//	}
+	
+	@Test
+	public void getReportUserSuccess() throws Exception {
+		UserReportResponseDto userReportDto = new UserReportResponseDto();
+		userReportDto.setCommentCount(1);
+		userReportDto.setFriendCount(2);
+		userReportDto.setLikeCount(3);
+		userReportDto.setPostCount(4);
+		
+		
+		when(userService.getReportUser(anyInt())).thenReturn(userReportDto);
+		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
+		
+		mockMvc.perform(get("/user/export-report")
+				.header("AUTHORIZATION", "Bearer " + token))
+				.andExpect(status().isOk());
+	}
 }

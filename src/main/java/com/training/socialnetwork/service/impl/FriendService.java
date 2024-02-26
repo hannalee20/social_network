@@ -60,7 +60,7 @@ public class FriendService implements IFriendService {
 	}
 
 	@Override
-	public boolean createFriendRequest(int sentUserId, int recievedUserId) throws Exception {
+	public int createFriendRequest(int sentUserId, int recievedUserId) throws Exception {
 		User sentUser = userRepository.findById(sentUserId).orElse(null);
 		User recievedUser = userRepository.findById(recievedUserId).orElse(null);
 
@@ -74,18 +74,23 @@ public class FriendService implements IFriendService {
 			friend = new Friend();
 			friend.setSentUser(sentUser);
 			friend.setReceivedUser(recievedUser);
+			friend.setStatus(Constant.FRIEND_REQUEST);
 		} else {
 			if (friend.getStatus() == Constant.NUMBER_0 && friend.getSentUser().getUserId() == sentUserId) {
 				throw new CustomException(HttpStatus.BAD_REQUEST, "You have already sent a friend request");
 			} else if (friend.getStatus() == Constant.NUMBER_1) {
 				throw new CustomException(HttpStatus.BAD_REQUEST, "You are already friends");
+			} else if (friend.getStatus() == Constant.NUMBER_0 && friend.getReceivedUser().getUserId() == sentUserId) {
+				friend.setStatus(Constant.FRIENDED_STATUS);
 			}
 		}
-		friend.setStatus(Constant.FRIEND_REQUEST);
+		
 		friend.setCreateDate(new Date());
 		friend.setUpdateDate(new Date());
 
-		return friendRepository.save(friend) != null;
+		friend = friendRepository.save(friend);
+		
+		return friend.getStatus();
 	}
 
 	@Override
@@ -160,7 +165,6 @@ public class FriendService implements IFriendService {
 			FriendRequestListResponseDto friendRequestDto = new FriendRequestListResponseDto();
 			friendRequestDto.setUserId(friendRequest.getSentUser().getUserId());
 			friendRequestDto.setUsername(friendRequest.getSentUser().getUsername());
-//			friendRequestDto.setAvatar(friendRequest.getSentUser().getAvatarUrl());
 			friendRequestDtos.add(friendRequestDto);
 		}
 		Page<FriendRequestListResponseDto> result = new PageImpl<FriendRequestListResponseDto>(friendRequestDtos);

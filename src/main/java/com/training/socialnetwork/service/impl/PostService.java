@@ -75,6 +75,7 @@ public class PostService implements IPostService {
 		List<Post> postList = new ArrayList<>();
 		postList.add(post);
 		
+		List<Integer> photoIdList = new ArrayList<>();
 		if(null != postCreateDto.getPhotoIdList()) {
 			for (int photoId : postCreateDto.getPhotoIdList()) {
 				Photo photo = photoRepository.findById(photoId).orElse(null);
@@ -90,9 +91,14 @@ public class PostService implements IPostService {
 			}
 		}
 
-		PostCreateResponseDto postCreatedDto = modelMapper.map(post, PostCreateResponseDto.class);
-		postCreatedDto.setUsername(user.getUsername());
-		return postCreatedDto;
+		PostCreateResponseDto postCreateResponseDto = modelMapper.map(post, PostCreateResponseDto.class);
+		postCreateResponseDto.setUsername(user.getUsername());
+		for (Photo photo : post.getPhotoList()) {
+			photoIdList.add(photo.getPhotoId());
+		}
+		postCreateResponseDto.setPhotoIdList(photoIdList);
+		
+		return postCreateResponseDto;
 	}
 
 	@Override
@@ -103,10 +109,10 @@ public class PostService implements IPostService {
 		List<PostListResponseDto> postListDtos = new ArrayList<>();
 		for (Post post : postList) {
 			List<Photo> photoList = post.getPhotoList();
-			List<String> photoUrlList = new ArrayList<>();
-			photoList.stream().map(photo -> photoUrlList.add(photo.getName())).collect(Collectors.toList());
+			List<Integer> photoIdList = new ArrayList<>();
+			photoList.stream().map(photo -> photoIdList.add(photo.getPhotoId())).collect(Collectors.toList());
 			PostListResponseDto postListDto = modelMapper.map(post, PostListResponseDto.class);
-			postListDto.setPhotoUrl(photoUrlList);
+			postListDto.setPhotoIdList(photoIdList);
 			List<Like> likeList = new ArrayList<>();
 			for (Like like : post.getLikeList()) {
 				if (like.getDeleteFlg() != Constant.DELETED_FlG) {
@@ -149,9 +155,9 @@ public class PostService implements IPostService {
 			postDetailDto.setCommentList(comDetailDtoList);
 		}
 		
-		List<String> photoUrls = new ArrayList<>();
+		List<Integer> photoIdList = new ArrayList<>();
 		for (Photo photo : post.getPhotoList()) {
-			photoUrls.add(photo.getName());
+			photoIdList.add(photo.getPhotoId());
 		}
 
 		List<Like> likeList = new ArrayList<>();
@@ -162,7 +168,7 @@ public class PostService implements IPostService {
 		}
 		postDetailDto.setUsername(post.getUser().getUsername());
 		postDetailDto.setLikeCount(likeList.size());
-		postDetailDto.setPhotoUrl(photoUrls);
+		postDetailDto.setPhotoIdList(photoIdList);
 
 		return postDetailDto;
 	}
@@ -184,7 +190,7 @@ public class PostService implements IPostService {
 			postToUpdate.setContent(postToUpdate.getContent());
 		}
 		
-		List<String> photoUrls = new ArrayList<>();
+		List<Integer> photoIdList = new ArrayList<>();
 		if(null != postUpdateDto.getPhotoIdList()) {
 			for (int photoId : postUpdateDto.getPhotoIdList()) {
 				Photo photo = photoRepository.findById(photoId).orElse(null);
@@ -204,9 +210,9 @@ public class PostService implements IPostService {
 
 		PostUpdateResponseDto postUpdatedDto = modelMapper.map(postToUpdate, PostUpdateResponseDto.class);
 		for (Photo photo : postToUpdate.getPhotoList()) {
-			photoUrls.add(photo.getName());
+			photoIdList.add(photo.getPhotoId());
 		}
-		postUpdatedDto.setPhotoUrls(photoUrls);
+		postUpdatedDto.setPhotoIdList(photoIdList);
 		postUpdatedDto.setUsername(postToUpdate.getUser().getUsername());
 
 		return postUpdatedDto;

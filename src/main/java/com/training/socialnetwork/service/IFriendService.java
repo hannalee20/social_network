@@ -12,7 +12,7 @@ public interface IFriendService {
 	
 	Page<FriendRequestListResponseDto> findAllAddFriendRequest(int userId, Pageable paging);
 	
-	boolean createFriendRequest(int sentUserId, int recievedUserId) throws Exception;
+	int createFriendRequest(int sentUserId, int recievedUserId) throws Exception;
 	
 	boolean acceptFriendRequest(int sentUserId, int recievedUserId) throws Exception;
 	

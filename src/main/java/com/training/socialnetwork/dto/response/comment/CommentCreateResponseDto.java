@@ -9,7 +9,7 @@ public class CommentCreateResponseDto {
 	private int userId;
 	private String username;
 	private String content;
-	private String photoUrl;
+	private int photoId;
 	private Date createDate;
 	private Date updateDate;
 
@@ -53,12 +53,12 @@ public class CommentCreateResponseDto {
 		this.content = content;
 	}
 
-	public String getPhotoUrl() {
-		return photoUrl;
+	public int getPhotoId() {
+		return photoId;
 	}
 
-	public void setPhotoUrl(String photoUrl) {
-		this.photoUrl = photoUrl;
+	public void setPhotoId(int photoId) {
+		this.photoId = photoId;
 	}
 
 	public Date getCreateDate() {
