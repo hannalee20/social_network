@@ -2,7 +2,9 @@ package com.training.socialnetwork.service.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
@@ -76,6 +78,7 @@ public class PostService implements IPostService {
 		postList.add(post);
 		
 		List<Integer> photoIdList = new ArrayList<>();
+		List<Photo> photoList = new ArrayList<>();
 		if(null != postCreateDto.getPhotoIdList()) {
 			for (int photoId : postCreateDto.getPhotoIdList()) {
 				Photo photo = photoRepository.findById(photoId).orElse(null);
@@ -88,21 +91,27 @@ public class PostService implements IPostService {
 				}
 				photo.getPostList().add(post);
 				photoRepository.save(photo);
+				photoList.add(photo);
 			}
+			post.setPhotoList(photoList);
+			postRepository.save(post);
 		}
 
 		PostCreateResponseDto postCreateResponseDto = modelMapper.map(post, PostCreateResponseDto.class);
 		postCreateResponseDto.setUsername(user.getUsername());
-		for (Photo photo : post.getPhotoList()) {
-			photoIdList.add(photo.getPhotoId());
+		if(null != post.getPhotoList()) {
+			for (Photo photo : post.getPhotoList()) {
+				photoIdList.add(photo.getPhotoId());
+			}
 		}
+		
 		postCreateResponseDto.setPhotoIdList(photoIdList);
 		
 		return postCreateResponseDto;
 	}
 
 	@Override
-	public Page<PostListResponseDto> getTimeline(int userId, Pageable page) {
+	public Map<String, Object> getTimeline(int userId, Pageable page) {
 		List<Integer> friendUserIdList = friendRepository.findAllFriendUserId(userId);
 		friendUserIdList.add(userId);
 		Page<Post> postList = postRepository.findAllByUserId(friendUserIdList, page);
@@ -130,7 +139,12 @@ public class PostService implements IPostService {
 			postListDto.setUsername(post.getUser().getUsername());
 			postListDtos.add(postListDto);
 		}
-		Page<PostListResponseDto> result = new PageImpl<PostListResponseDto>(postListDtos);
+		Page<PostListResponseDto> postListDtoPage = new PageImpl<PostListResponseDto>(postListDtos);
+		Map<String, Object> result = new HashMap<>();
+		result.put("postList", postListDtoPage.getContent());
+		result.put("currentPage", postList.getNumber());
+		result.put("totalItems", postList.getTotalElements());
+		result.put("totalPages", postList.getTotalPages());
 		
 		return result;
 	}

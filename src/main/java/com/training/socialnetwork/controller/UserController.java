@@ -136,7 +136,7 @@ public class UserController {
 			String jwt = jwtUtils.generateToken(authentication);
 			return ResponseEntity.ok(new UserGetTokenResponseDto(jwt));
 		} else {
-			return new ResponseEntity<Object>(Constant.INVALID, HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<Object>(Constant.INVALID_OTP, HttpStatus.BAD_REQUEST);
 		}
 	}
 

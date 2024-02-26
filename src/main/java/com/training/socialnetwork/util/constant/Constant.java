@@ -11,6 +11,8 @@ public class Constant {
 	public static final String SERVER_ERROR = "Server error";
 	
 	public static final String INVALID = "Invalid";
+	
+	public static final String INVALID_OTP = "Invalid otp";
 
 	public static final String INVALID_ID = "Invalid id";
 

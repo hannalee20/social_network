@@ -70,12 +70,12 @@ public class PostController {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		Pageable paging = PageRequest.of(page, pageSize);
 		try {
-			Page<PostListResponseDto> postList = postService.getTimeline(userId, paging);
-			Map<String, Object> result = new HashMap<>();
-			result.put("postList", postList.getContent());
-			result.put("currentPage", postList.getNumber());
-			result.put("totalItems", postList.getTotalElements());
-			result.put("totalPages", postList.getTotalPages());
+			Map<String, Object> result = postService.getTimeline(userId, paging);
+//			Map<String, Object> result = new HashMap<>();
+//			result.put("postList", postList.getContent());
+//			result.put("currentPage", postList.getNumber());
+//			result.put("totalItems", postList.getTotalElements());
+//			result.put("totalPages", postList.getTotalPages());
 
 			return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (CustomException e) {

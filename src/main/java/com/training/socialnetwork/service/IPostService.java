@@ -1,5 +1,7 @@
 package com.training.socialnetwork.service;
 
+import java.util.Map;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -14,7 +16,7 @@ public interface IPostService {
 	
 	PostCreateResponseDto createPost(int userId, PostCreateRequestDto postCreateDto) throws Exception;
 	
-	Page<PostListResponseDto> getTimeline(int userId, Pageable page);
+	Map<String, Object> getTimeline(int userId, Pageable page);
 	
 	PostDetailResponseDto getPost(int postId) throws Exception;
 	
