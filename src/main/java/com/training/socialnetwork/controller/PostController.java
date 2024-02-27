@@ -1,12 +1,10 @@
 package com.training.socialnetwork.controller;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -26,7 +24,6 @@ import com.training.socialnetwork.dto.request.post.PostUpdateRequestDto;
 import com.training.socialnetwork.dto.response.common.MessageResponseDto;
 import com.training.socialnetwork.dto.response.post.PostCreateResponseDto;
 import com.training.socialnetwork.dto.response.post.PostDetailResponseDto;
-import com.training.socialnetwork.dto.response.post.PostListResponseDto;
 import com.training.socialnetwork.dto.response.post.PostUpdateResponseDto;
 import com.training.socialnetwork.security.JwtUtils;
 import com.training.socialnetwork.service.IPostService;
@@ -71,11 +68,6 @@ public class PostController {
 		Pageable paging = PageRequest.of(page, pageSize);
 		try {
 			Map<String, Object> result = postService.getTimeline(userId, paging);
-//			Map<String, Object> result = new HashMap<>();
-//			result.put("postList", postList.getContent());
-//			result.put("currentPage", postList.getNumber());
-//			result.put("totalItems", postList.getTotalElements());
-//			result.put("totalPages", postList.getTotalPages());
 
 			return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (CustomException e) {
@@ -132,7 +124,7 @@ public class PostController {
 
 	}
 
-	@DeleteMapping(value = "/delete/{postId}")
+	@DeleteMapping(value = "/{postId}")
 	public ResponseEntity<Object> deletePost(HttpServletRequest request, @RequestParam(value = "postId") int postId) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		MessageResponseDto result = new MessageResponseDto();

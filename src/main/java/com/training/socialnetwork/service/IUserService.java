@@ -1,6 +1,7 @@
 package com.training.socialnetwork.service;
 
-import org.springframework.data.domain.Page;
+import java.util.Map;
+
 import org.springframework.data.domain.Pageable;
 
 import com.training.socialnetwork.dto.request.user.UserRegisterRequestDto;
@@ -9,7 +10,6 @@ import com.training.socialnetwork.dto.response.user.UserDetailResponseDto;
 import com.training.socialnetwork.dto.response.user.UserForgotPasswordResponseDto;
 import com.training.socialnetwork.dto.response.user.UserRegisterResponseDto;
 import com.training.socialnetwork.dto.response.user.UserReportResponseDto;
-import com.training.socialnetwork.dto.response.user.UserSearchResponseDto;
 import com.training.socialnetwork.dto.response.user.UserUpdateResponseDto;
 
 public interface IUserService {
@@ -22,7 +22,7 @@ public interface IUserService {
 	
 	UserDetailResponseDto getInfo(int userId) throws Exception;
 	
-	Page<UserSearchResponseDto> searchUser(int userId, String keyword, Pageable paging);
+	Map<String, Object> searchUser(int userId, String keyword, Pageable paging);
 	
 	UserReportResponseDto getReportUser(int userId);
 	

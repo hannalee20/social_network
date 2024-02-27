@@ -16,7 +16,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -228,7 +230,7 @@ public class UserControllerTest {
 		userDetailDto.setAddress("hanoi");
 		userDetailDto.setJob("developer");
 		userDetailDto.setUniversity("test");
-		userDetailDto.setAvatarUrl("test");
+		userDetailDto.setAvatar(1);
 		userDetailDto.setStatus("test");
 		userDetailDto.setAbout("");
 		
@@ -345,7 +347,10 @@ public class UserControllerTest {
 		
 		Page<UserSearchResponseDto> userPage = new PageImpl<UserSearchResponseDto>(userSearchList);
 		
-		when(userService.searchUser(anyInt(), any(), any())).thenReturn(userPage);
+		Map<String, Object> result = new HashMap<>();
+		result.put("userList", userPage.getContent());
+		
+		when(userService.searchUser(anyInt(), any(), any())).thenReturn(result);
 		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
 		
 		mockMvc.perform(get("/user/search")

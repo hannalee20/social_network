@@ -83,7 +83,7 @@ public class PostService implements IPostService {
 			for (int photoId : postCreateDto.getPhotoIdList()) {
 				Photo photo = photoRepository.findById(photoId).orElse(null);
 				
-				if(photo == null) {
+				if(photo == null || photo.getDeleteFlg() == Constant.DELETED_FlG) {
 					throw new CustomException(HttpStatus.NOT_FOUND, "Photo does not exist");
 				}
 				if(photo.getUser().getUserId() != userId) {
@@ -142,7 +142,7 @@ public class PostService implements IPostService {
 		Page<PostListResponseDto> postListDtoPage = new PageImpl<PostListResponseDto>(postListDtos);
 		Map<String, Object> result = new HashMap<>();
 		result.put("postList", postListDtoPage.getContent());
-		result.put("currentPage", postList.getNumber());
+		result.put("currentPage", postList.getNumber() + 1);
 		result.put("totalItems", postList.getTotalElements());
 		result.put("totalPages", postList.getTotalPages());
 		
@@ -153,7 +153,7 @@ public class PostService implements IPostService {
 	public PostDetailResponseDto getPost(int postId) throws Exception {
 		Post post = postRepository.findById(postId).orElse(null);
 
-		if (post == null) {
+		if (post == null || post.getDeleteFlg() == Constant.DELETED_FlG) {
 			throw new CustomException(HttpStatus.NOT_FOUND, "Post does not exist");
 		}
 
@@ -192,7 +192,7 @@ public class PostService implements IPostService {
 		User user = userRepository.findById(userId).orElse(null);
 		Post postToUpdate = postRepository.findById(postId).orElse(null);
 
-		if (postToUpdate == null) {
+		if (postToUpdate == null || postToUpdate.getDeleteFlg() == Constant.DELETED_FlG) {
 			throw new CustomException(HttpStatus.NOT_FOUND, "Post does not exist");
 		}
 
@@ -209,7 +209,7 @@ public class PostService implements IPostService {
 			for (int photoId : postUpdateDto.getPhotoIdList()) {
 				Photo photo = photoRepository.findById(photoId).orElse(null);
 				
-				if(photo == null) {
+				if(photo == null || photo.getDeleteFlg() == Constant.DELETED_FlG) {
 					throw new CustomException(HttpStatus.NOT_FOUND, "Photo does not exist");
 				}
 				if(photo.getUser().getUserId() != userId) {
@@ -236,7 +236,7 @@ public class PostService implements IPostService {
 	public boolean deletePost(int postId, int userId) throws Exception {
 		Post post = postRepository.findById(postId).orElse(null);
 
-		if (post == null) {
+		if (post == null || post.getDeleteFlg() == Constant.DELETED_FlG) {
 			throw new CustomException(HttpStatus.NOT_FOUND, "Post does not exist");
 		}
 

@@ -1,6 +1,7 @@
 package com.training.socialnetwork.dto.response.user;
 
 import java.time.LocalDate;
+import java.util.Date;
 
 public class UserUpdateResponseDto {
 
@@ -16,6 +17,7 @@ public class UserUpdateResponseDto {
 	private String status;
 	private String about;
 	private Integer avatar;
+	private Date updateDate;
 
 	public int getUserId() {
 		return userId;
@@ -111,6 +113,14 @@ public class UserUpdateResponseDto {
 
 	public void setAvatar(Integer avatar) {
 		this.avatar = avatar;
+	}
+
+	public Date getUpdateDate() {
+		return updateDate;
+	}
+
+	public void setUpdateDate(Date updateDate) {
+		this.updateDate = updateDate;
 	}
 
 }

@@ -1,12 +1,10 @@
 package com.training.socialnetwork.controller;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -18,8 +16,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.training.socialnetwork.dto.response.common.MessageResponseDto;
-import com.training.socialnetwork.dto.response.friend.FriendListResponseDto;
-import com.training.socialnetwork.dto.response.friend.FriendRequestListResponseDto;
 import com.training.socialnetwork.security.JwtUtils;
 import com.training.socialnetwork.service.IFriendService;
 import com.training.socialnetwork.util.constant.Constant;
@@ -42,12 +38,12 @@ public class FriendController {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		Pageable paging = PageRequest.of(page, pageSize);
 		try {
-			Page<FriendListResponseDto> friendList = friendService.findAllFriendWithStatus(userId, paging);
-			Map<String, Object> result = new HashMap<>();
-			result.put("friendList", friendList.getContent());
-			result.put("currentPage", friendList.getNumber());
-			result.put("totalItems", friendList.getTotalElements());
-			result.put("totalPages", friendList.getTotalPages());
+			Map<String, Object> result = friendService.findAllFriendWithStatus(userId, paging);
+//			Map<String, Object> result = new HashMap<>();
+//			result.put("friendList", friendList.getContent());
+//			result.put("currentPage", friendList.getNumber());
+//			result.put("totalItems", friendList.getTotalElements());
+//			result.put("totalPages", friendList.getTotalPages());
 
 			return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (CustomException e) {
@@ -165,13 +161,13 @@ public class FriendController {
 		Pageable paging = PageRequest.of(page, pageSize);
 
 		try {
-			Page<FriendRequestListResponseDto> friendRequestList = friendService.findAllAddFriendRequest(userId, paging);
+			Map<String, Object> result = friendService.findAllAddFriendRequest(userId, paging);
 			
-			Map<String, Object> result = new HashMap<>();
-			result.put("friendList", friendRequestList.getContent());
-			result.put("currentPage", friendRequestList.getNumber());
-			result.put("totalItems", friendRequestList.getTotalElements());
-			result.put("totalPages", friendRequestList.getTotalPages());
+//			Map<String, Object> result = new HashMap<>();
+//			result.put("friendList", friendRequestList.getContent());
+//			result.put("currentPage", friendRequestList.getNumber());
+//			result.put("totalItems", friendRequestList.getTotalElements());
+//			result.put("totalPages", friendRequestList.getTotalPages());
 
 			return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (CustomException e) {

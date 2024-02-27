@@ -1,16 +1,14 @@
 package com.training.socialnetwork.service;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import java.util.Map;
 
-import com.training.socialnetwork.dto.response.friend.FriendListResponseDto;
-import com.training.socialnetwork.dto.response.friend.FriendRequestListResponseDto;
+import org.springframework.data.domain.Pageable;
 
 public interface IFriendService {
 
-	Page<FriendListResponseDto> findAllFriendWithStatus(int userId, Pageable paging);
+	Map<String, Object> findAllFriendWithStatus(int userId, Pageable paging);
 	
-	Page<FriendRequestListResponseDto> findAllAddFriendRequest(int userId, Pageable paging);
+	Map<String, Object> findAllAddFriendRequest(int userId, Pageable paging);
 	
 	int createFriendRequest(int sentUserId, int recievedUserId) throws Exception;
 	

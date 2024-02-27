@@ -10,6 +10,7 @@ public class PostUpdateResponseDto {
 	private String username;
 	private String content;
 	private List<Integer> photoIdList;
+	private Date createDate;
 	private Date updateDate;
 
 	public int getPostId() {
@@ -50,6 +51,14 @@ public class PostUpdateResponseDto {
 
 	public void setPhotoIdList(List<Integer> photoIdList) {
 		this.photoIdList = photoIdList;
+	}
+
+	public Date getCreateDate() {
+		return createDate;
+	}
+
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
 	}
 
 	public Date getUpdateDate() {

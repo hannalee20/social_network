@@ -10,9 +10,10 @@ public class PostListResponseDto {
 	private String username;
 	private String content;
 	private List<Integer> photoIdList;
-	private Date createDate;
 	private int likeCount;
 	private int commentCount;
+	private Date createDate;
+	private Date updateDate;
 
 	public int getPostId() {
 		return postId;
@@ -76,6 +77,14 @@ public class PostListResponseDto {
 
 	public void setCommentCount(int commentCount) {
 		this.commentCount = commentCount;
+	}
+
+	public Date getUpdateDate() {
+		return updateDate;
+	}
+
+	public void setUpdateDate(Date updateDate) {
+		this.updateDate = updateDate;
 	}
 
 }

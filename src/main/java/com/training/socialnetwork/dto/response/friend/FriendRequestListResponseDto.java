@@ -1,10 +1,14 @@
 package com.training.socialnetwork.dto.response.friend;
 
+import java.util.Date;
+
 public class FriendRequestListResponseDto {
 
 	private int userId;
 	private String username;
-	private String avatar;
+	private Integer avatar;
+	private Date createDate;
+	private Date updateDate;
 
 	public int getUserId() {
 		return userId;
@@ -22,12 +26,28 @@ public class FriendRequestListResponseDto {
 		this.username = username;
 	}
 
-	public String getAvatar() {
+	public Integer getAvatar() {
 		return avatar;
 	}
 
-	public void setAvatar(String avatar) {
+	public void setAvatar(Integer avatar) {
 		this.avatar = avatar;
 	}
 
+	public Date getCreateDate() {
+		return createDate;
+	}
+
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
+	}
+
+	public Date getUpdateDate() {
+		return updateDate;
+	}
+
+	public void setUpdateDate(Date updateDate) {
+		this.updateDate = updateDate;
+	}
+	
 }

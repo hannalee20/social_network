@@ -175,7 +175,7 @@ public class CommentControllerTest {
 		commentDetailDto.setCommentId(1);
 		commentDetailDto.setUserId(1);
 		commentDetailDto.setPostId(1);
-		commentDetailDto.setPhotoUrl("test");
+		commentDetailDto.setPhotoId(1);
 
 		when(commentService.getCommentDetail(anyInt())).thenReturn(commentDetailDto);
 

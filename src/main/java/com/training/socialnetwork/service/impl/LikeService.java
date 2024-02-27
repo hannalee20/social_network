@@ -36,7 +36,7 @@ public class LikeService implements ILikeService {
 		Post post = postRepository.findById(postId).orElse(null);
 		User user = userRepository.findById(userId).orElse(null);
 
-		if (post == null) {
+		if (post == null || post.getDeleteFlg() == Constant.DELETED_FlG) {
 			throw new CustomException(HttpStatus.NOT_FOUND, "Post does not exist");
 		}
 		
@@ -61,7 +61,7 @@ public class LikeService implements ILikeService {
 		Post post = postRepository.findById(postId).orElse(null);
 		User user = userRepository.findById(userId).orElse(null);
 
-		if (post == null) {
+		if (post == null || post.getDeleteFlg() == Constant.DELETED_FlG) {
 			throw new CustomException(HttpStatus.NOT_FOUND, "Post does not exist");
 		}
 

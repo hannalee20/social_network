@@ -83,7 +83,7 @@ public class CommentController {
 		}
 	}
 
-	@DeleteMapping(value = "delete/{commentId}")
+	@DeleteMapping(value = "/{commentId}")
 	public ResponseEntity<Object> deleteComment(HttpServletRequest request,
 			@PathVariable(value = "commentId") int commentId) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));

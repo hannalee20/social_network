@@ -2,7 +2,7 @@ package com.training.socialnetwork.dto.response.photo;
 
 import java.util.Date;
 
-public class PhotoUploadResponseDto {
+public class PhotoListResponseDto {
 
 	private int photoId;
 	private Date createDate;

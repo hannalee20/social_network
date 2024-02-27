@@ -43,6 +43,7 @@ public class PhotoControllerTest {
 	
 	@Test
 	public void uploadPhotoSuccess() throws Exception {
+		int userId = 1;
 		MockMultipartFile photo = new MockMultipartFile("photo", "photo.jpg", "image/jpeg", "some data".getBytes());
 		
 		PhotoUploadResponseDto photoUploadResponseDto = new PhotoUploadResponseDto();
@@ -53,7 +54,7 @@ public class PhotoControllerTest {
 		
 		String request = JSonHelper.toJson(requestBody).orElse("");
 		
-		when(photoService.uploadPhoto(photo)).thenReturn(photoUploadResponseDto);
+		when(photoService.uploadPhoto(photo,userId)).thenReturn(photoUploadResponseDto);
 		
 		mockMvc.perform(post("/photo/upload").header("Authorization", "Bearer dummyToken")
 				.contentType(MediaType.MULTIPART_FORM_DATA)

@@ -12,9 +12,10 @@ public class PostDetailResponseDto {
 	private String username;
 	private String content;
 	private List<Integer> photoIdList;
-	private Date createDate;
 	private int likeCount;
 	private List<CommentDetailResponseDto> commentList;
+	private Date createDate;
+	private Date updateDate;
 
 	public int getPostId() {
 		return postId;
@@ -78,6 +79,14 @@ public class PostDetailResponseDto {
 
 	public void setCommentList(List<CommentDetailResponseDto> commentList) {
 		this.commentList = commentList;
+	}
+
+	public Date getUpdateDate() {
+		return updateDate;
+	}
+
+	public void setUpdateDate(Date updateDate) {
+		this.updateDate = updateDate;
 	}
 
 }

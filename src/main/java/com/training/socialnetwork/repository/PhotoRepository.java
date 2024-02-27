@@ -2,6 +2,8 @@ package com.training.socialnetwork.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -24,4 +26,10 @@ public interface PhotoRepository extends JpaRepository<Photo, Integer>{
 			"and p.avatar = 1 " + 
 			"and p.delete_flg = 0 ", nativeQuery = true)
 	Photo findAvatarByUserId(@Param(value = "userId") int userId);
+	
+	@Query(value = "" + 
+			"select * from photos as p " + 
+			"where p.user_id = :userId " + 
+			"and p.delete_flg = 0 ", nativeQuery = true)
+	Page<Photo> findAllPhotosByUserId(int userId, Pageable paging);
 }

@@ -4,7 +4,7 @@ public class UserSearchResponseDto {
 
 	private int userId;
 	private String username;
-	private String avatar;
+	private Integer avatar;
 	private String friendStatus;
 
 	public int getUserId() {
@@ -23,11 +23,11 @@ public class UserSearchResponseDto {
 		this.username = username;
 	}
 
-	public String getAvatar() {
+	public Integer getAvatar() {
 		return avatar;
 	}
 
-	public void setAvatar(String avatar) {
+	public void setAvatar(Integer avatar) {
 		this.avatar = avatar;
 	}
 

@@ -1,5 +1,6 @@
 package com.training.socialnetwork.dto.response.post;
 
+import java.util.Date;
 import java.util.List;
 
 public class PostCreateResponseDto {
@@ -9,6 +10,8 @@ public class PostCreateResponseDto {
 	private String username;
 	private String content;
 	private List<Integer> photoIdList;
+	private Date createDate;
+	private Date updateDate;	
 
 	public int getPostId() {
 		return postId;
@@ -48,6 +51,22 @@ public class PostCreateResponseDto {
 
 	public void setPhotoIdList(List<Integer> photoIdList) {
 		this.photoIdList = photoIdList;
+	}
+
+	public Date getCreateDate() {
+		return createDate;
+	}
+
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
+	}
+
+	public Date getUpdateDate() {
+		return updateDate;
+	}
+
+	public void setUpdateDate(Date updateDate) {
+		this.updateDate = updateDate;
 	}
 
 }

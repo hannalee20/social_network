@@ -3,7 +3,6 @@ package com.training.socialnetwork.controller;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,7 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -43,7 +41,6 @@ import com.training.socialnetwork.dto.response.user.UserGetTokenResponseDto;
 import com.training.socialnetwork.dto.response.user.UserLoginResponseDto;
 import com.training.socialnetwork.dto.response.user.UserRegisterResponseDto;
 import com.training.socialnetwork.dto.response.user.UserReportResponseDto;
-import com.training.socialnetwork.dto.response.user.UserSearchResponseDto;
 import com.training.socialnetwork.dto.response.user.UserUpdateResponseDto;
 import com.training.socialnetwork.security.JwtUtils;
 import com.training.socialnetwork.security.OtpUtils;
@@ -215,13 +212,7 @@ public class UserController {
 		Pageable paging = PageRequest.of(page, pageSize);
 
 		try {
-			Page<UserSearchResponseDto> userSearchList = userService.searchUser(userId, keyword, paging);
-
-			Map<String, Object> result = new HashMap<>();
-			result.put("userList", userSearchList.getContent());
-			result.put("currentPage", userSearchList.getNumber());
-			result.put("totalItems", userSearchList.getTotalElements());
-			result.put("totalPages", userSearchList.getTotalPages());
+			Map<String, Object> result = userService.searchUser(userId, keyword, paging);
 
 			return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (CustomException e) {

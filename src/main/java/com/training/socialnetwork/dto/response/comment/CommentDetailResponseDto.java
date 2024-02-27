@@ -7,7 +7,7 @@ public class CommentDetailResponseDto {
 	private int userId;
 	private String username;
 	private String content;
-	private String photoUrl;
+	private Integer photoId;
 
 	public int getCommentId() {
 		return commentId;
@@ -49,12 +49,12 @@ public class CommentDetailResponseDto {
 		this.content = content;
 	}
 
-	public String getPhotoUrl() {
-		return photoUrl;
+	public Integer getPhotoId() {
+		return photoId;
 	}
 
-	public void setPhotoUrl(String photoUrl) {
-		this.photoUrl = photoUrl;
+	public void setPhotoId(Integer photoId) {
+		this.photoId = photoId;
 	}
 
 }

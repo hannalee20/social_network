@@ -2,7 +2,9 @@ package com.training.socialnetwork.service.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.transaction.Transactional;
 
@@ -16,8 +18,10 @@ import org.springframework.stereotype.Service;
 import com.training.socialnetwork.dto.response.friend.FriendListResponseDto;
 import com.training.socialnetwork.dto.response.friend.FriendRequestListResponseDto;
 import com.training.socialnetwork.entity.Friend;
+import com.training.socialnetwork.entity.Photo;
 import com.training.socialnetwork.entity.User;
 import com.training.socialnetwork.repository.FriendRepository;
+import com.training.socialnetwork.repository.PhotoRepository;
 import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.IFriendService;
 import com.training.socialnetwork.util.constant.Constant;
@@ -33,8 +37,11 @@ public class FriendService implements IFriendService {
 	@Autowired
 	private UserRepository userRepository;
 
+	@Autowired
+	private PhotoRepository photoRepository;
+
 	@Override
-	public Page<FriendListResponseDto> findAllFriendWithStatus(int userId, Pageable paging) {
+	public Map<String, Object> findAllFriendWithStatus(int userId, Pageable paging) {
 		Page<Friend> friendList = friendRepository.findAllFriendByUserIdAndStatus(userId, Constant.FRIENDED_STATUS,
 				paging);
 
@@ -46,16 +53,32 @@ public class FriendService implements IFriendService {
 			if (friend.getSentUser().getUserId() == userId) {
 				friendListDto.setUserId(friend.getReceivedUser().getUserId());
 				friendListDto.setUsername(friend.getReceivedUser().getUsername());
-//				friendListDto.setAvatar(friend.getReceivedUser().getAvatarUrl());
+				Photo avatar = photoRepository.findAvatarByUserId(friend.getReceivedUser().getUserId());
+
+				if (avatar != null) {
+					friendListDto.setAvatar(avatar.getPhotoId());
+				}
+
 			} else {
 				friendListDto.setUserId(friend.getSentUser().getUserId());
 				friendListDto.setUsername(friend.getSentUser().getUsername());
-//				friendListDto.setAvatar(friend.getSentUser().getAvatarUrl());
+				Photo avatar = photoRepository.findAvatarByUserId(friend.getSentUser().getUserId());
+
+				if (avatar != null) {
+					friendListDto.setAvatar(avatar.getPhotoId());
+				}
 			}
 
 			friendListDtos.add(friendListDto);
 		}
-		Page<FriendListResponseDto> result = new PageImpl<FriendListResponseDto>(friendListDtos);
+		Page<FriendListResponseDto> friendListDtoPage = new PageImpl<FriendListResponseDto>(friendListDtos);
+
+		Map<String, Object> result = new HashMap<>();
+		result.put("friendList", friendListDtoPage.getContent());
+		result.put("currentPage", friendList.getNumber() + 1);
+		result.put("totalItems", friendList.getTotalElements());
+		result.put("totalPages", friendList.getTotalPages());
+
 		return result;
 	}
 
@@ -84,12 +107,12 @@ public class FriendService implements IFriendService {
 				friend.setStatus(Constant.FRIENDED_STATUS);
 			}
 		}
-		
+
 		friend.setCreateDate(new Date());
 		friend.setUpdateDate(new Date());
 
 		friend = friendRepository.save(friend);
-		
+
 		return friend.getStatus();
 	}
 
@@ -156,7 +179,7 @@ public class FriendService implements IFriendService {
 	}
 
 	@Override
-	public Page<FriendRequestListResponseDto> findAllAddFriendRequest(int userId, Pageable paging) {
+	public Map<String, Object> findAllAddFriendRequest(int userId, Pageable paging) {
 		Page<Friend> friendRequestList = friendRepository.findAllFriendRequest(userId, Constant.FRIEND_REQUEST, paging);
 
 		List<FriendRequestListResponseDto> friendRequestDtos = new ArrayList<>();
@@ -165,10 +188,21 @@ public class FriendService implements IFriendService {
 			FriendRequestListResponseDto friendRequestDto = new FriendRequestListResponseDto();
 			friendRequestDto.setUserId(friendRequest.getSentUser().getUserId());
 			friendRequestDto.setUsername(friendRequest.getSentUser().getUsername());
+			Photo avatar = photoRepository.findAvatarByUserId(friendRequest.getSentUser().getUserId());
+			if(avatar != null) {
+				friendRequestDto.setAvatar(avatar.getPhotoId());
+			}
 			friendRequestDtos.add(friendRequestDto);
 		}
-		Page<FriendRequestListResponseDto> result = new PageImpl<FriendRequestListResponseDto>(friendRequestDtos);
-		
+		Page<FriendRequestListResponseDto> friendRequestListDtoPage = new PageImpl<FriendRequestListResponseDto>(
+				friendRequestDtos);
+
+		Map<String, Object> result = new HashMap<>();
+		result.put("friendList", friendRequestListDtoPage.getContent());
+		result.put("currentPage", friendRequestList.getNumber() + 1);
+		result.put("totalItems", friendRequestList.getTotalElements());
+		result.put("totalPages", friendRequestList.getTotalPages());
+
 		return result;
 	}
 

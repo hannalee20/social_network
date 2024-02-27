@@ -50,7 +50,7 @@ public class CommentService implements ICommentService {
 		Post post = postRepository.findById(commentCreateDto.getPostId()).orElse(null);
 		User user = userRepository.findById(userId).orElse(null);
 
-		if (post == null) {
+		if (post == null || post.getDeleteFlg() == Constant.DELETED_FlG) {
 			throw new CustomException(HttpStatus.NOT_FOUND, "Post does not exist");
 		}
 
@@ -58,7 +58,7 @@ public class CommentService implements ICommentService {
 		if(null != commentCreateDto.getPhotoId()) {
 			photo = photoRepository.findById(commentCreateDto.getPhotoId()).orElse(null);
 			
-			if(photo == null) {
+			if(photo == null || photo.getDeleteFlg() == Constant.DELETED_FlG) {
 				throw new CustomException(HttpStatus.NOT_FOUND, "Photo does not exist");
 			}
 			if(photo.getUser().getUserId() != userId) {
@@ -88,7 +88,7 @@ public class CommentService implements ICommentService {
 			throws Exception {
 		Comment commentToUpdate = commentRepository.findById(commentId).orElse(null);
 
-		if (commentToUpdate == null) {
+		if (commentToUpdate == null || commentToUpdate.getDeleteFlg() == Constant.DELETED_FlG) {
 			throw new CustomException(HttpStatus.NOT_FOUND, "Comment does not exist");
 		}
 
@@ -103,7 +103,7 @@ public class CommentService implements ICommentService {
 		if (null != commentUpdateDto.getPhotoId()) {
 			Photo photo = photoRepository.findById(commentUpdateDto.getPhotoId()).orElse(null);
 			
-			if(photo == null) {
+			if(photo == null || photo.getDeleteFlg() == Constant.DELETED_FlG) {
 				throw new CustomException(HttpStatus.NOT_FOUND, "Photo does not exist");
 			}
 			if(photo.getUser().getUserId() != userId) {
@@ -128,7 +128,7 @@ public class CommentService implements ICommentService {
 	public boolean deleteComment(int commentId, int userId) throws Exception {
 		Comment comment = commentRepository.findById(commentId).orElse(null);
 
-		if (comment == null) {
+		if (comment == null || comment.getDeleteFlg() == Constant.DELETED_FlG) {
 			throw new CustomException(HttpStatus.NOT_FOUND, "Comment does not exist");
 		}
 
@@ -146,13 +146,15 @@ public class CommentService implements ICommentService {
 	public CommentDetailResponseDto getCommentDetail(int commentId) throws Exception {
 		Comment comment = commentRepository.findById(commentId).orElse(null);
 
-		if (comment == null) {
+		if (comment == null || comment.getDeleteFlg() == Constant.DELETED_FlG) {
 			throw new CustomException(HttpStatus.NOT_FOUND, "Comment does not exist");
 		}
 
 		CommentDetailResponseDto commentDetailDto = modelMapper.map(comment, CommentDetailResponseDto.class);
 		commentDetailDto.setUsername(comment.getUser().getUsername());
-
+		if (null != comment.getPhoto()) {
+			commentDetailDto.setPhotoId(comment.getPhoto().getPhotoId());
+		}
 		return commentDetailDto;
 	}
 

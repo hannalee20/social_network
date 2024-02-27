@@ -7,8 +7,10 @@ import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.transaction.Transactional;
@@ -145,23 +147,24 @@ public class UserService implements IUserService {
 			}
 		}
 
+		Photo avatar = photoRepository.findAvatarByUserId(loggedInUserId);
+		
 		if (null != updateRequestDto.getAvatar()) {
 			Photo photo = photoRepository.findById(updateRequestDto.getAvatar()).orElse(null);
 
-			if (photo == null) {
+			if (photo == null || photo.getDeleteFlg() == Constant.DELETED_FlG) {
 				throw new CustomException(HttpStatus.NOT_FOUND, "Photo does not exist");
 			}
 			if (photo.getUser().getUserId() != userId) {
 				throw new CustomException(HttpStatus.FORBIDDEN, "You do not have permission to use this photo");
 			}
-			Photo avatar = photoRepository.findAvatarByUserId(loggedInUserId);
 			if (avatar != null) {
 				avatar.setAvatar(Constant.NUMBER_0);
 				photoRepository.save(avatar);
 			}
 
 			photo.setAvatar(Constant.NUMBER_1);
-			photoRepository.save(photo);
+			avatar = photoRepository.save(photo);
 		}
 		objectMapper.copyProperties(updateRequestDto, userToUpdate);
 		if (null != updateRequestDto.getBirthDate()) {
@@ -190,11 +193,10 @@ public class UserService implements IUserService {
 					.setBirthDate(userToUpdate.getBirthDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
 		}
 
-		if (null != updateRequestDto.getAvatar()) {
-			updateResponseDto.setAvatar(updateRequestDto.getAvatar());
-		} else {
-			updateResponseDto.setAvatar(null);
+		if (avatar != null) {
+			updateResponseDto.setAvatar(avatar.getPhotoId());
 		}
+		
 		return updateResponseDto;
 	}
 
@@ -205,8 +207,14 @@ public class UserService implements IUserService {
 		if (user == null) {
 			throw new CustomException(HttpStatus.NOT_FOUND, "User does not exist");
 		}
-
+		
 		UserDetailResponseDto userDetailDto = modelMapper.map(user, UserDetailResponseDto.class);
+
+		Photo avatar = photoRepository.findAvatarByUserId(userId);
+		if (avatar != null) {
+			userDetailDto.setAvatar(avatar.getPhotoId());
+		}
+		
 		if (null != user.getGender()) {
 			if (user.getGender() == Constant.NUMBER_0) {
 				userDetailDto.setGender(Constant.MALE);
@@ -222,7 +230,7 @@ public class UserService implements IUserService {
 	}
 
 	@Override
-	public Page<UserSearchResponseDto> searchUser(int userId, String keyword, Pageable paging) {
+	public Map<String, Object> searchUser(int userId, String keyword, Pageable paging) {
 		Page<User> userList = userRepository.findAllUserByKeyword(userId, keyword, paging);
 
 		List<Friend> friendList = friendRepository.findAllByUserId(userId);
@@ -233,6 +241,10 @@ public class UserService implements IUserService {
 			userSearchList.add(userSearchDto);
 		}
 		for (UserSearchResponseDto user : userSearchList) {
+			Photo avatar = photoRepository.findAvatarByUserId(user.getUserId());
+			if (avatar != null) {
+				user.setAvatar(avatar.getPhotoId());
+			}
 			user.setFriendStatus(Constant.SEND_REQUEST);
 			for (Friend friend : friendList) {
 				if (friend.getSentUser().getUserId() == user.getUserId()
@@ -249,8 +261,14 @@ public class UserService implements IUserService {
 			}
 		}
 
-		Page<UserSearchResponseDto> result = new PageImpl<UserSearchResponseDto>(userSearchList);
+		Page<UserSearchResponseDto> userSearchListDtoPage = new PageImpl<UserSearchResponseDto>(userSearchList);
 
+		Map<String, Object> result = new HashMap<>();
+		result.put("userList", userSearchListDtoPage.getContent());
+		result.put("currentPage", userList.getNumber() + 1);
+		result.put("totalItems", userList.getTotalElements());
+		result.put("totalPages", userList.getTotalPages());
+		
 		return result;
 	}
 
