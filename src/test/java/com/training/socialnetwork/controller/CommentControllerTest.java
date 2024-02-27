@@ -84,8 +84,7 @@ public class CommentControllerTest {
 				.andExpect(jsonPath("$.username").value(commentCreatedDto.getUsername()))
 				.andExpect(jsonPath("$.commentId").value(commentCreatedDto.getCommentId()))
 				.andExpect(jsonPath("$.postId").value(commentCreatedDto.getPostId()))
-				.andExpect(jsonPath("$.content").value(commentCreatedDto.getContent()))
-				.andExpect(jsonPath("$.photoUrl").value(commentCreatedDto.getPhotoId()));
+				.andExpect(jsonPath("$.content").value(commentCreatedDto.getContent()));
 	}
 
 	@Test
@@ -110,7 +109,7 @@ public class CommentControllerTest {
 
 		when(commentService.deleteComment(anyInt(), anyInt())).thenReturn(true);
 
-		mockMvc.perform(delete("/comment/delete/{commentId}", commentId).header("Authorization", "Bearer dummyToken")
+		mockMvc.perform(delete("/comment/{commentId}", commentId).header("Authorization", "Bearer dummyToken")
 				.contentType(MediaType.APPLICATION_JSON).param("commentId", Integer.toString(commentId)))
 				.andExpect(status().isOk());
 	}
@@ -121,7 +120,7 @@ public class CommentControllerTest {
 
 		when(commentService.deleteComment(anyInt(), anyInt())).thenThrow(new Exception());
 
-		mockMvc.perform(delete("/comment/delete/{commentId}", commentId).header("Authorization", "Bearer dummyToken")
+		mockMvc.perform(delete("/comment/{commentId}", commentId).header("Authorization", "Bearer dummyToken")
 				.contentType(MediaType.APPLICATION_JSON).param("commentId", Integer.toString(commentId)))
 				.andExpect(status().isInternalServerError());
 	}

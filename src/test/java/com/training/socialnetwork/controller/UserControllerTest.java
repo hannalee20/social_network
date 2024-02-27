@@ -214,7 +214,7 @@ public class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(request))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string(Constant.INVALID));
+                .andExpect(content().string(Constant.INVALID_OTP));
     }
 	
 	@Test

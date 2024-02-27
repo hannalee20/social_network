@@ -34,11 +34,13 @@ import com.training.socialnetwork.dto.response.user.UserReportResponseDto;
 import com.training.socialnetwork.dto.response.user.UserSearchResponseDto;
 import com.training.socialnetwork.dto.response.user.UserUpdateResponseDto;
 import com.training.socialnetwork.entity.Friend;
+import com.training.socialnetwork.entity.Photo;
 import com.training.socialnetwork.entity.Role;
 import com.training.socialnetwork.entity.User;
 import com.training.socialnetwork.repository.CommentRepository;
 import com.training.socialnetwork.repository.FriendRepository;
 import com.training.socialnetwork.repository.LikeRepository;
+import com.training.socialnetwork.repository.PhotoRepository;
 import com.training.socialnetwork.repository.PostRepository;
 import com.training.socialnetwork.repository.RoleRepository;
 import com.training.socialnetwork.repository.UserRepository;
@@ -83,6 +85,9 @@ public class UserServiceTest {
 	
 	@Mock
 	private CommentRepository commentRepository;
+	
+	@Mock
+	private PhotoRepository photoRepository;
 	
 	@Test
 	public void createUserSuccess() throws Exception {
@@ -217,8 +222,13 @@ public class UserServiceTest {
 		userUpdatedDto.setUsername("test");
 		userUpdatedDto.setEmail("test@gmail.com");
 		
+		Photo avatar = new Photo();
+		avatar.setPhotoId(1);
+		avatar.setUser(userToUpdate);
+		
 		when(userRepository.findById(1)).thenReturn(Optional.of(userToUpdate));
 		objectMapper.copyProperties(userUpdateDto, userToUpdate);
+		when(photoRepository.findAvatarByUserId(anyInt())).thenReturn(avatar);
 		when(userRepository.save(any())).thenReturn(userToUpdate);
 		when(modelMapper.map(any(), any())).thenReturn(userUpdatedDto);
 		
@@ -267,9 +277,14 @@ public class UserServiceTest {
 		user.setBirthDate(new Date());
 		user.setAddress("Hanoi");
 		
+		Photo avatar = new Photo();
+		avatar.setPhotoId(1);
+		avatar.setUser(user);
+		
 		UserDetailResponseDto userDetailDto = new UserDetailResponseDto();
 		
 		when(userRepository.findById(1)).thenReturn(Optional.of(user));
+		when(photoRepository.findAvatarByUserId(anyInt())).thenReturn(avatar);
 		when(modelMapper.map(any(), any())).thenReturn(userDetailDto);
 		
 		userService.getInfo(1);
@@ -286,9 +301,14 @@ public class UserServiceTest {
 		user.setBirthDate(new Date());
 		user.setAddress("Hanoi");
 		
+		Photo avatar = new Photo();
+		avatar.setPhotoId(1);
+		avatar.setUser(user);
+		
 		UserDetailResponseDto userDetailDto = new UserDetailResponseDto();
 		
 		when(userRepository.findById(1)).thenReturn(Optional.of(user));
+		when(photoRepository.findAvatarByUserId(anyInt())).thenReturn(avatar);
 		when(modelMapper.map(any(), any())).thenReturn(userDetailDto);
 		
 		userService.getInfo(1);
@@ -343,6 +363,10 @@ public class UserServiceTest {
 		userList.add(user1);
 		userList.add(user2);
 		
+		Photo avatar = new Photo();
+		avatar.setPhotoId(1);
+		avatar.setUser(user2);
+		
 		Page<User> userPage = new PageImpl<User>(userList);
 		
 		Friend friend = new Friend();
@@ -358,6 +382,7 @@ public class UserServiceTest {
 		UserSearchResponseDto userSearchDto = new UserSearchResponseDto();
 		when(userRepository.findAllUserByKeyword(anyInt(), any(), any())).thenReturn(userPage);
 		when(friendRepository.findAllByUserId(anyInt())).thenReturn(friendList);
+		when(photoRepository.findAvatarByUserId(anyInt())).thenReturn(avatar);
 		when(modelMapper.map(any(), any())).thenReturn(userSearchDto);
 		
 		userService.searchUser(3, keyword, null);

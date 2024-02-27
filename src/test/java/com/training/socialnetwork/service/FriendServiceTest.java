@@ -19,8 +19,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 
 import com.training.socialnetwork.entity.Friend;
+import com.training.socialnetwork.entity.Photo;
 import com.training.socialnetwork.entity.User;
 import com.training.socialnetwork.repository.FriendRepository;
+import com.training.socialnetwork.repository.PhotoRepository;
 import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.impl.FriendService;
 import com.training.socialnetwork.util.constant.Constant;
@@ -38,6 +40,9 @@ public class FriendServiceTest {
 	@Mock
 	private UserRepository userRepository;
 
+	@Mock
+	private PhotoRepository photoRepository;
+	
 	@Test
 	public void findAllFriendWithStatusSuccess() {
 		int userId = 1;
@@ -84,8 +89,14 @@ public class FriendServiceTest {
 		friendList.add(friend1);
 		friendList.add(friend2);
 
-		Page<Friend> page = new PageImpl<Friend>(friendList);
-		when(friendRepository.findAllFriendByUserIdAndStatus(1, 1, null)).thenReturn(page);
+		Photo avatar = new Photo();
+		avatar.setPhotoId(1);
+		avatar.setUser(user2);
+		
+		Page<Friend> friendPage = new PageImpl<Friend>(friendList);
+
+		when(photoRepository.findAvatarByUserId(anyInt())).thenReturn(avatar);
+		when(friendRepository.findAllFriendByUserIdAndStatus(1, 1, null)).thenReturn(friendPage);
 
 		friendService.findAllFriendWithStatus(userId, null);
 	}
@@ -490,8 +501,13 @@ public class FriendServiceTest {
 		List<Friend> friendList = new ArrayList<Friend>();
 		friendList.add(friend1);
 		
+		Photo avatar = new Photo();
+		avatar.setPhotoId(1);
+		avatar.setUser(user2);
+		
 		Page<Friend> friendPage = new PageImpl<Friend>(friendList);
 
+		when(photoRepository.findAvatarByUserId(anyInt())).thenReturn(avatar);
 		when(friendRepository.findAllFriendRequest(anyInt(), anyInt(), any())).thenReturn(friendPage);
 
 		friendService.findAllAddFriendRequest(userId, null);

@@ -175,7 +175,7 @@ public class CommentServiceTest {
 		comment.setCommentId(1);
 		comment.setUser(user);
 		comment.setContent("comment content");
-		comment.setDeleteFlg(Constant.DELETED_FlG);
+		comment.setDeleteFlg(Constant.UNDELETED_FLG);
 		
 		when(commentRepository.findById(any())).thenReturn(Optional.of(comment));
 		when(commentRepository.save(any())).thenReturn(comment);
