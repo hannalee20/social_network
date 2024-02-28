@@ -58,25 +58,25 @@ public class PhotoController {
 		Resource resource = null;
 		try {
 			resource = photoService.downloadPhoto(photoId);
+			
+			if (resource == null) {
+				MessageResponseDto result = new MessageResponseDto();
+				result.setMessage(Constant.FILE_NOT_FOUND);
+
+				return new ResponseEntity<Object>(result, HttpStatus.NOT_FOUND);
+			}
+			String contentType = "application/octet-stream";
+			String headerValue = "attachment; filename=\"" + resource.getFilename() + "\"";
+			response.setHeader(HttpHeaders.CONTENT_DISPOSITION, headerValue);
+
+			return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+					.header(HttpHeaders.CONTENT_DISPOSITION, headerValue).body(resource);
 		} catch (Exception e) {
 			MessageResponseDto result = new MessageResponseDto();
 			result.setMessage(e.getMessage());
 
 			return new ResponseEntity<Object>(result, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-
-		if (resource == null) {
-			MessageResponseDto result = new MessageResponseDto();
-			result.setMessage(Constant.FILE_NOT_FOUND);
-
-			return new ResponseEntity<Object>(result, HttpStatus.NOT_FOUND);
-		}
-		String contentType = "application/octet-stream";
-		String headerValue = "attachment; filename=\"" + resource.getFilename() + "\"";
-		response.setHeader(HttpHeaders.CONTENT_DISPOSITION, headerValue);
-
-		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
-				.header(HttpHeaders.CONTENT_DISPOSITION, headerValue).body(resource);
 	}
 
 	@DeleteMapping(value = "/{photoId}")

@@ -1,5 +1,6 @@
 package com.training.socialnetwork.controller;
 
+import java.io.ByteArrayOutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -12,7 +13,9 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -230,30 +233,22 @@ public class UserController {
 
 	@GetMapping(value = "/export-report")
 	public ResponseEntity<Object> getReportUser(HttpServletRequest request, HttpServletResponse response) {
-		response.setContentType("application/octet-stream");
 		DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
 		String currentDate = dateFormatter.format(new Date());
 
-		String headerKey = "Content-Disposition";
 		String headerValue = "attachment; filename=report_" + currentDate + ".xlsx";
-		response.setHeader(headerKey, headerValue);
-
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
-		MessageResponseDto result = new MessageResponseDto();
 
 		try {
 			UserReportResponseDto user = userService.getReportUser(userId);
 
 			ReportGenerator reportGenerator = new ReportGenerator(user);
-			reportGenerator.export(response);
-
-			result.setMessage(Constant.EXPORT_REPORT_SUCCESSFULLY);
-			return new ResponseEntity<Object>(result, HttpStatus.OK);
-		} catch (CustomException e) {
-			result.setMessage(e.getMessage());
-
-			return new ResponseEntity<Object>(result, e.getHttpStatus());
+			ByteArrayOutputStream outputStream = reportGenerator.export();
+			
+			return ResponseEntity.ok().contentType(MediaType.APPLICATION_OCTET_STREAM)
+					.header(HttpHeaders.CONTENT_DISPOSITION, headerValue).body(outputStream.toByteArray());
 		} catch (Exception e) {
+			MessageResponseDto result = new MessageResponseDto();
 			result.setMessage(e.getMessage());
 
 			return new ResponseEntity<Object>(result, HttpStatus.INTERNAL_SERVER_ERROR);

@@ -28,6 +28,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -57,6 +58,7 @@ import com.training.socialnetwork.security.OtpUtils;
 import com.training.socialnetwork.service.impl.CustomUserDetailService;
 import com.training.socialnetwork.service.impl.UserService;
 import com.training.socialnetwork.util.constant.Constant;
+import com.training.socialnetwork.util.exception.CustomException;
 import com.training.socialnetwork.util.mapper.ObjectMapperUtils;
 import com.training.socialnetwork.utils.JSonHelper;
 
@@ -137,7 +139,7 @@ public class UserControllerTest {
 	}
 
 	@Test
-	public void createValidUser() throws Exception {
+	public void createUserSuccess() throws Exception {
 		UserRegisterRequestDto userRegisterDto = new UserRegisterRequestDto();
 
 		userRegisterDto.setUsername("test");
@@ -170,7 +172,37 @@ public class UserControllerTest {
 		}
 
 	@Test
-	public void loginSuccess() throws Exception {
+	public void createUserFail() throws Exception {
+		UserRegisterRequestDto userRegisterDto = new UserRegisterRequestDto();
+
+		userRegisterDto.setUsername("test");
+		userRegisterDto.setPassword("123456");
+		userRegisterDto.setEmail("test@gmail.com");
+
+		when(userService.createUser(any())).thenThrow(new CustomException(HttpStatus.BAD_REQUEST, ""));
+		String request = JSonHelper.toJson(userRegisterDto).orElse("");
+		
+		mockMvc.perform(post("/user/register").contentType(MediaType.APPLICATION_JSON).content(request))
+				.andExpect(status().isBadRequest());
+		}
+	
+	@Test
+	public void createUserFail2() throws Exception {
+		UserRegisterRequestDto userRegisterDto = new UserRegisterRequestDto();
+
+		userRegisterDto.setUsername("test");
+		userRegisterDto.setPassword("123456");
+		userRegisterDto.setEmail("test@gmail.com");
+
+		when(userService.createUser(any())).thenThrow(new Exception());
+		String request = JSonHelper.toJson(userRegisterDto).orElse("");
+		
+		mockMvc.perform(post("/user/register").contentType(MediaType.APPLICATION_JSON).content(request))
+				.andExpect(status().isInternalServerError());
+		}
+	
+	@Test
+	public void loginUserSuccess() throws Exception {
 
 		UserLoginRequestDto userLoginDto = new UserLoginRequestDto();
 		userLoginDto.setUsername("test");
@@ -186,7 +218,7 @@ public class UserControllerTest {
 	}
 	
 	@Test
-	public void loginFail() throws Exception {
+	public void loginUserFail() throws Exception {
 		UserLoginRequestDto userLoginDto = new UserLoginRequestDto();
 		
 		when(userService.loginUser(userLoginDto.getUsername(), userLoginDto.getPassword())).thenReturn(false);
@@ -199,7 +231,39 @@ public class UserControllerTest {
 	}
 	
 	@Test
-    public void testGetToken_Failure() throws Exception {
+	public void loginUserFail2() throws Exception {
+
+		UserLoginRequestDto userLoginDto = new UserLoginRequestDto();
+		userLoginDto.setUsername("test");
+		userLoginDto.setPassword("123456");
+		
+		String request = JSonHelper.toJson(userLoginDto).orElse("");
+		when(userService.loginUser(userLoginDto.getUsername(), userLoginDto.getPassword())).thenThrow(new CustomException(HttpStatus.NOT_FOUND, ""));
+		
+		mockMvc.perform(post("/user/login")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(request))
+				.andExpect(status().isNotFound());
+	}
+	
+	@Test
+	public void loginUserFail3() throws Exception {
+
+		UserLoginRequestDto userLoginDto = new UserLoginRequestDto();
+		userLoginDto.setUsername("test");
+		userLoginDto.setPassword("123456");
+		
+		String request = JSonHelper.toJson(userLoginDto).orElse("");
+		when(userService.loginUser(userLoginDto.getUsername(), userLoginDto.getPassword())).thenThrow(new Exception());
+		
+		mockMvc.perform(post("/user/login")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(request))
+				.andExpect(status().isInternalServerError());
+	}
+	
+	@Test
+    public void getTokenFail() throws Exception {
 		UserGetTokenRequestDto userTokenDto = new UserGetTokenRequestDto();
 		userTokenDto.setUsername("test");
 		userTokenDto.setPassword("123456");
@@ -218,7 +282,7 @@ public class UserControllerTest {
     }
 	
 	@Test
-	public void getUserInfoSuccess() throws Exception {
+	public void getOtherUserInfoSuccess() throws Exception {
 		int userId = 1;
 		UserDetailResponseDto userDetailDto = new UserDetailResponseDto();
 		userDetailDto.setUserId(1);
@@ -250,7 +314,7 @@ public class UserControllerTest {
 	}
 	
 	@Test
-	public void getUserInfoFail() throws Exception {
+	public void getOtherUserInfoFail() throws Exception {
 		int userId = 1;
 		
 		when(userService.getInfo(anyInt())).thenThrow(new Exception());
@@ -262,6 +326,83 @@ public class UserControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(request))
 				.andExpect(status().isInternalServerError());
+	}
+	
+	@Test
+	public void getOtherUserInfoFail2() throws Exception {
+		int userId = 1;
+		
+		when(userService.getInfo(anyInt())).thenThrow(new CustomException(HttpStatus.NOT_FOUND, ""));
+		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
+		
+		String request = JSonHelper.toJson(userId).orElse("");
+		mockMvc.perform(get("/user/detail/{userId}", userId)
+				.header("AUTHORIZATION", "Bearer " + token)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(request))
+				.andExpect(status().isNotFound());
+	}
+	
+	@Test
+	public void getUserInfoSuccess() throws Exception {
+		int userId = 1;
+		UserDetailResponseDto userDetailDto = new UserDetailResponseDto();
+		userDetailDto.setUserId(1);
+		userDetailDto.setUsername("test");
+		userDetailDto.setRealName("Test");
+		userDetailDto.setGender("female");
+		userDetailDto.setBirthDate(LocalDate.now());
+		userDetailDto.setEmail("test");
+		userDetailDto.setAddress("hanoi");
+		userDetailDto.setJob("developer");
+		userDetailDto.setUniversity("test");
+		userDetailDto.setAvatar(1);
+		userDetailDto.setStatus("test");
+		userDetailDto.setAbout("");
+		
+		when(userService.getInfo(anyInt())).thenReturn(userDetailDto);
+		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
+		
+		String request = JSonHelper.toJson(userId).orElse("");
+		mockMvc.perform(get("/user/detail", userId)
+				.header("AUTHORIZATION", "Bearer " + token)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(request))
+				.andExpect(status().isOk())
+				.andDo(print())
+				.andExpect(jsonPath("$.userId").value(1))
+				.andExpect(jsonPath("$.realName").value("Test"))
+				.andExpect(jsonPath("$.gender").value("female"));
+	}
+	
+	@Test
+	public void getUserInfoFail() throws Exception {
+		int userId = 1;
+		
+		when(userService.getInfo(anyInt())).thenThrow(new Exception());
+		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
+		
+		String request = JSonHelper.toJson(userId).orElse("");
+		mockMvc.perform(get("/user/detail", userId)
+				.header("AUTHORIZATION", "Bearer " + token)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(request))
+				.andExpect(status().isInternalServerError());
+	}
+	
+	@Test
+	public void getUserInfoFail2() throws Exception {
+		int userId = 1;
+		
+		when(userService.getInfo(anyInt())).thenThrow(new CustomException(HttpStatus.NOT_FOUND, ""));
+		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
+		
+		String request = JSonHelper.toJson(userId).orElse("");
+		mockMvc.perform(get("/user/detail", userId)
+				.header("AUTHORIZATION", "Bearer " + token)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(request))
+				.andExpect(status().isNotFound());
 	}
 	
 	@Test
@@ -322,6 +463,25 @@ public class UserControllerTest {
 	}
 	
 	@Test
+	public void updateUserFail2() throws Exception {
+		int userId = 1;
+		
+		UserUpdateRequestDto userUpdateDto = new UserUpdateRequestDto();
+		userUpdateDto.setBirthDate("2020-02-02");
+		userUpdateDto.setAddress("HCM");
+		
+		when(userService.updateInfo(any(), anyInt(), anyInt())).thenThrow(new CustomException(HttpStatus.FORBIDDEN, ""));
+		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
+		
+		String request = JSonHelper.toJson(userUpdateDto).orElse("");
+		mockMvc.perform(patch("/user/update/{userId}", userId)
+				.header("AUTHORIZATION", "Bearer " + token)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(request))
+				.andExpect(status().isForbidden());
+	}
+	
+	@Test
 	public void searchUserSuccess() throws Exception {
 		String keyword = "test";
 		
@@ -377,6 +537,20 @@ public class UserControllerTest {
 	}
 	
 	@Test
+	public void searchUserFail2() throws Exception {
+		String keyword = "test";
+		
+		when(userService.searchUser(anyInt(), any(), any())).thenThrow(new CustomException(HttpStatus.NO_CONTENT, ""));
+		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
+		
+		mockMvc.perform(get("/user/search")
+				.header("AUTHORIZATION", "Bearer " + token)
+				.contentType(MediaType.APPLICATION_JSON)
+				.param("keyword", keyword))
+				.andExpect(status().isNoContent());
+	}
+	
+	@Test
 	public void forgotPasswordSuccess() throws Exception {
 		UserForgotPasswordRequestDto userForgotPasswordDto = new UserForgotPasswordRequestDto();
 		userForgotPasswordDto.setEmail("test@gmail.com");
@@ -407,6 +581,21 @@ public class UserControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(request))
 				.andExpect(status().isInternalServerError());
+	}
+	
+	@Test
+	public void forgotPasswordFail2() throws Exception {
+		UserForgotPasswordRequestDto userForgotPasswordDto = new UserForgotPasswordRequestDto();
+		userForgotPasswordDto.setEmail("test@gmail.com");
+		
+		when(userService.forgotPassword(any())).thenThrow(new CustomException(HttpStatus.NOT_FOUND, ""));
+		
+		String request = JSonHelper.toJson(userForgotPasswordDto).orElse("");
+		
+		mockMvc.perform(post("/user/forgot-password")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(request))
+				.andExpect(status().isNotFound());
 	}
 	
 	@Test
@@ -457,6 +646,21 @@ public class UserControllerTest {
 	}
 	
 	@Test
+	public void resetPasswordFail2() throws Exception {
+		UserResetPasswordRequestDto userResetPasswordDto = new UserResetPasswordRequestDto();
+		userResetPasswordDto.setToken("wrong token");
+		userResetPasswordDto.setNewPassword("newpassword");
+		
+		when(userService.resetPassword(any(), any())).thenThrow(new CustomException(HttpStatus.BAD_REQUEST, ""));
+		String requestResetPassword = JSonHelper.toJson(userResetPasswordDto).orElse("");
+		
+		mockMvc.perform(put("/user/reset-password")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(requestResetPassword))
+				.andExpect(status().isBadRequest());
+	}
+	
+	@Test
 	public void getReportUserSuccess() throws Exception {
 		UserReportResponseDto userReportDto = new UserReportResponseDto();
 		userReportDto.setCommentCount(1);
@@ -471,5 +675,21 @@ public class UserControllerTest {
 		mockMvc.perform(get("/user/export-report")
 				.header("AUTHORIZATION", "Bearer " + token))
 				.andExpect(status().isOk());
+	}
+	
+	@Test
+	public void getReportUserFail() throws Exception {
+		UserReportResponseDto userReportDto = new UserReportResponseDto();
+		userReportDto.setCommentCount(1);
+		userReportDto.setFriendCount(2);
+		userReportDto.setLikeCount(3);
+		userReportDto.setPostCount(4);
+		
+		
+		when(userService.getReportUser(anyInt())).thenThrow(new RuntimeException());
+		
+		mockMvc.perform(get("/user/export-report")
+				.header("AUTHORIZATION", "Bearer " + token))
+				.andExpect(status().isInternalServerError());
 	}
 }

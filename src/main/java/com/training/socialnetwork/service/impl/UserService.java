@@ -233,6 +233,9 @@ public class UserService implements IUserService {
 	public Map<String, Object> searchUser(int userId, String keyword, Pageable paging) {
 		Page<User> userList = userRepository.findAllUserByKeyword(userId, keyword, paging);
 
+		if (userList == null) {
+			throw new CustomException(HttpStatus.NO_CONTENT, "No matching users were found");
+		}
 		List<Friend> friendList = friendRepository.findAllByUserId(userId);
 
 		List<UserSearchResponseDto> userSearchList = new ArrayList<>();

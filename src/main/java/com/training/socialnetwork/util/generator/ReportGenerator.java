@@ -1,9 +1,7 @@
 package com.training.socialnetwork.util.generator;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -70,14 +68,13 @@ public class ReportGenerator {
 		createCell(row, columnCount++, user.getLikeCount(), style);
 	}
 	
-	public void export(HttpServletResponse response) throws IOException {
+	public ByteArrayOutputStream export() throws IOException {
 		writeHeaderLine();
 		writeDataLines();
 		
-		ServletOutputStream outputStream = response.getOutputStream();
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		workbook.write(outputStream);
-		workbook.close();
 		
-		outputStream.close();
+		return outputStream;
 	}
 }

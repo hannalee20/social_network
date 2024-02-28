@@ -23,6 +23,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -36,6 +37,7 @@ import com.training.socialnetwork.dto.response.post.PostListResponseDto;
 import com.training.socialnetwork.dto.response.post.PostUpdateResponseDto;
 import com.training.socialnetwork.security.JwtUtils;
 import com.training.socialnetwork.service.IPostService;
+import com.training.socialnetwork.util.exception.CustomException;
 import com.training.socialnetwork.utils.JSonHelper;
 
 @WebMvcTest(PostController.class)
@@ -111,6 +113,28 @@ public class PostControllerTest {
 	}
 
 	@Test
+	public void createPostFail2() throws Exception {
+		int userId = 1;
+		String content = "Test post content";
+		List<Integer> photoIdList = new ArrayList<>();
+		photoIdList.add(1);
+		photoIdList.add(2);
+		
+		PostCreateRequestDto postCreateDto = new PostCreateRequestDto();
+		postCreateDto.setContent(content);
+		postCreateDto.setPhotoIdList(photoIdList);
+		
+		String request = JSonHelper.toJson(postCreateDto).orElse("");
+		
+		when(jwtUtils.getUserIdFromJwt(anyString())).thenReturn(userId);
+		when(postService.createPost(anyInt(), any())).thenThrow(new CustomException(HttpStatus.NOT_FOUND, ""));
+
+		mockMvc.perform(post("/post/create").header("Authorization", "Bearer dummyToken")
+				.contentType(MediaType.APPLICATION_JSON).content(request))
+				.andExpect(status().isNotFound());
+	}
+	
+	@Test
 	public void getTimelineSuccess() throws Exception {
 		List<PostListResponseDto> postList = new ArrayList<>();
 		PostListResponseDto postListDto = new PostListResponseDto();
@@ -164,6 +188,16 @@ public class PostControllerTest {
 		mockMvc.perform(get("/post/detail/{postId}", postId).header("Authorization", "Bearer dummyToken")
 				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isInternalServerError());
 	}
+	
+	@Test
+	public void getPostDetailFail2() throws Exception {
+		int postId = 1;
+
+		when(postService.getPost(anyInt())).thenThrow(new CustomException(HttpStatus.NOT_FOUND, ""));
+
+		mockMvc.perform(get("/post/detail/{postId}", postId).header("Authorization", "Bearer dummyToken")
+				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNotFound());
+	}
 
 	@Test
 	public void updatePostSuccess() throws Exception {
@@ -202,6 +236,21 @@ public class PostControllerTest {
 		mockMvc.perform(put("/post/update/{postId}", postId).header("Authorization", "Bearer dummyToken").contentType(MediaType.APPLICATION_JSON).content(request))
 				.andExpect(status().isInternalServerError());
 	}
+	
+	@Test
+	public void updatePostFail2() throws Exception {
+		int userId = 1;
+		int postId = 1;
+
+		PostUpdateRequestDto postUpdateDto = new PostUpdateRequestDto();
+		String request = JSonHelper.toJson(postUpdateDto).orElse("");
+		
+		when(jwtUtils.getUserIdFromJwt(anyString())).thenReturn(userId);
+		when(postService.updatePost(any(), anyInt(), anyInt())).thenThrow(new CustomException(HttpStatus.FORBIDDEN, ""));
+
+		mockMvc.perform(put("/post/update/{postId}", postId).header("Authorization", "Bearer dummyToken").contentType(MediaType.APPLICATION_JSON).content(request))
+				.andExpect(status().isForbidden());
+	}
 
 	@Test
 	public void deletePostSuccess() throws Exception {
@@ -225,5 +274,18 @@ public class PostControllerTest {
 		mockMvc.perform(delete("/post/{postId}", postId).header("Authorization", "Bearer dummyToken")
 				.contentType(MediaType.APPLICATION_JSON).param("postId", Integer.toString(postId)))
 				.andExpect(status().isInternalServerError());
+	}
+	
+	@Test
+	public void deletePostFail2() throws Exception {
+		int userId = 1;
+		int postId = 1;
+
+		when(jwtUtils.getUserIdFromJwt(anyString())).thenReturn(userId);
+		when(postService.deletePost(anyInt(), anyInt())).thenThrow(new CustomException(HttpStatus.NOT_FOUND, ""));
+
+		mockMvc.perform(delete("/post/{postId}", postId).header("Authorization", "Bearer dummyToken")
+				.contentType(MediaType.APPLICATION_JSON).param("postId", Integer.toString(postId)))
+				.andExpect(status().isNotFound());
 	}
 }

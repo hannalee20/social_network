@@ -7,10 +7,10 @@ import com.training.socialnetwork.dto.request.user.UserUpdateRequestDto;
 import com.training.socialnetwork.entity.User;
 import com.training.socialnetwork.util.mapper.ObjectMapperUtils;
 
-public class ObjectMapperTest {
+public class ObjectMapperutilsTest {
 
 	@Test
-    public void testCopyProperties() {
+    public void copyPropertiesTest() {
 		ObjectMapperUtils objectMapper = new ObjectMapperUtils();
         UserUpdateRequestDto userUpdateDto = new UserUpdateRequestDto();
         User userToUpdate = new User();
@@ -21,7 +21,7 @@ public class ObjectMapperTest {
     }
 
     @Test
-    public void testGetNullPropertyNames() {
+    public void getNullPropertyNamesTest() {
     	ObjectMapperUtils objectMapper = new ObjectMapperUtils();
     	UserUpdateRequestDto userUpdateDto = new UserUpdateRequestDto();
         
