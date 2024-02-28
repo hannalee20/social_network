@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,6 +70,8 @@ public class PhotoControllerTest {
 
 		PhotoUploadResponseDto photoUploadResponseDto = new PhotoUploadResponseDto();
 		photoUploadResponseDto.setPhotoId(1);
+		photoUploadResponseDto.setCreateDate(new Date());
+		photoUploadResponseDto.setUpdateDate(new Date());
 
 		when(photoService.uploadPhoto(photo1, userId)).thenReturn(photoUploadResponseDto);
 
@@ -161,9 +164,11 @@ public class PhotoControllerTest {
 	public void getPhotoListSuccess() throws Exception {
 		PhotoListResponseDto photo = new PhotoListResponseDto();
 		photo.setPhotoId(1);
+		photo.setCreateDate(new Date());
+		photo.setUpdateDate(new Date());
 		
 		PhotoListResponseDto photo2 = new PhotoListResponseDto();
-		photo.setPhotoId(2);
+		photo2.setPhotoId(2);
 		
 		List<PhotoListResponseDto> photoList = new ArrayList<>();
 		photoList.add(photo);

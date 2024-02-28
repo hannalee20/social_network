@@ -138,11 +138,14 @@ public class PostControllerTest {
 	public void getTimelineSuccess() throws Exception {
 		List<PostListResponseDto> postList = new ArrayList<>();
 		PostListResponseDto postListDto = new PostListResponseDto();
+		postListDto.setContent("content");
 		postListDto.setUserId(1);
 		postListDto.setPostId(1);
 		postListDto.setUsername("test");
 		postListDto.setCommentCount(2);
 		postListDto.setLikeCount(3);
+		postListDto.setCreateDate(new Date());
+		postListDto.setUpdateDate(new Date());
 		postList.add(postListDto);
 
 		Map<String, Object> result = new HashMap<>();
@@ -214,6 +217,7 @@ public class PostControllerTest {
 		postUpdatedDto.setUserId(1);
 		postUpdatedDto.setUsername("test");
 		postUpdatedDto.setContent(content);
+		postUpdatedDto.setCreateDate(new Date());
 		postUpdatedDto.setUpdateDate(new Date());
 
 		when(postService.updatePost(any(), anyInt(), anyInt())).thenReturn(postUpdatedDto);

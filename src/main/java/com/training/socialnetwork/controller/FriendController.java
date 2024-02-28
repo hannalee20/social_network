@@ -39,18 +39,8 @@ public class FriendController {
 		Pageable paging = PageRequest.of(page, pageSize);
 		try {
 			Map<String, Object> result = friendService.findAllFriendWithStatus(userId, paging);
-//			Map<String, Object> result = new HashMap<>();
-//			result.put("friendList", friendList.getContent());
-//			result.put("currentPage", friendList.getNumber());
-//			result.put("totalItems", friendList.getTotalElements());
-//			result.put("totalPages", friendList.getTotalPages());
 
 			return new ResponseEntity<Object>(result, HttpStatus.OK);
-		} catch (CustomException e) {
-			MessageResponseDto result = new MessageResponseDto();
-			result.setMessage(e.getMessage());
-			
-			return new ResponseEntity<Object>(result, e.getHttpStatus());
 		} catch (Exception e) {
 			MessageResponseDto result = new MessageResponseDto();
 			result.setMessage(e.getMessage());
@@ -163,18 +153,7 @@ public class FriendController {
 		try {
 			Map<String, Object> result = friendService.findAllAddFriendRequest(userId, paging);
 			
-//			Map<String, Object> result = new HashMap<>();
-//			result.put("friendList", friendRequestList.getContent());
-//			result.put("currentPage", friendRequestList.getNumber());
-//			result.put("totalItems", friendRequestList.getTotalElements());
-//			result.put("totalPages", friendRequestList.getTotalPages());
-
 			return new ResponseEntity<Object>(result, HttpStatus.OK);
-		} catch (CustomException e) {
-			MessageResponseDto result = new MessageResponseDto();
-			result.setMessage(e.getMessage());
-			
-			return new ResponseEntity<Object>(result, e.getHttpStatus());
 		} catch (Exception e) {
 			MessageResponseDto result = new MessageResponseDto();
 			result.setMessage(e.getMessage());

@@ -70,11 +70,6 @@ public class PostController {
 			Map<String, Object> result = postService.getTimeline(userId, paging);
 
 			return new ResponseEntity<Object>(result, HttpStatus.OK);
-		} catch (CustomException e) {
-			MessageResponseDto result = new MessageResponseDto();
-			result.setMessage(e.getMessage());
-			
-			return new ResponseEntity<Object>(result, e.getHttpStatus());
 		} catch (Exception e) {
 			MessageResponseDto result = new MessageResponseDto();
 			result.setMessage(e.getMessage());

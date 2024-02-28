@@ -22,6 +22,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -31,6 +32,7 @@ import com.training.socialnetwork.dto.response.friend.FriendListResponseDto;
 import com.training.socialnetwork.dto.response.friend.FriendRequestListResponseDto;
 import com.training.socialnetwork.security.JwtUtils;
 import com.training.socialnetwork.service.IFriendService;
+import com.training.socialnetwork.util.exception.CustomException;
 
 @WebMvcTest(FriendController.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -94,6 +96,19 @@ public class FriendControllerTest {
 				.contentType(MediaType.APPLICATION_JSON).param("recievedUserId", Integer.toString(recievedUserId)))
 				.andExpect(status().isCreated());
 	}
+	
+	@Test
+	public void createFriendRequestSuccess2() throws Exception {
+		int recievedUserId = 2;
+
+		int status = 0;
+
+		when(friendService.createFriendRequest(anyInt(), anyInt())).thenReturn(status);
+
+		mockMvc.perform(post("/friend/add-request").header("Authorization", "Bearer dummyToken")
+				.contentType(MediaType.APPLICATION_JSON).param("recievedUserId", Integer.toString(recievedUserId)))
+				.andExpect(status().isCreated());
+	}
 
 	@Test
 	public void createFriendRequestFail() throws Exception {
@@ -106,6 +121,17 @@ public class FriendControllerTest {
 				.andExpect(status().isInternalServerError());
 	}
 
+	@Test
+	public void createFriendRequestFail2() throws Exception {
+		int recievedUserId = 2;
+
+		when(friendService.createFriendRequest(anyInt(), anyInt())).thenThrow(new CustomException(HttpStatus.NOT_FOUND, ""));
+
+		mockMvc.perform(post("/friend/add-request").header("Authorization", "Bearer dummyToken")
+				.contentType(MediaType.APPLICATION_JSON).param("recievedUserId", Integer.toString(recievedUserId)))
+				.andExpect(status().isNotFound());
+	}
+	
 	@Test
 	public void acceptFriendSuccess() throws Exception {
 		int sentUserId = 2;
@@ -126,6 +152,17 @@ public class FriendControllerTest {
 		mockMvc.perform(post("/friend/accept-request").header("Authorization", "Bearer dummyToken")
 				.contentType(MediaType.APPLICATION_JSON).param("sentUserId", Integer.toString(sentUserId)))
 				.andExpect(status().isInternalServerError());
+	}
+	
+	@Test
+	public void acceptFriendFail2() throws Exception {
+		int sentUserId = 2;
+
+		when(friendService.acceptFriendRequest(anyInt(), anyInt())).thenThrow(new CustomException(HttpStatus.NOT_FOUND, ""));
+
+		mockMvc.perform(post("/friend/accept-request").header("Authorization", "Bearer dummyToken")
+				.contentType(MediaType.APPLICATION_JSON).param("sentUserId", Integer.toString(sentUserId)))
+				.andExpect(status().isNotFound());
 	}
 
 	@Test
@@ -149,6 +186,17 @@ public class FriendControllerTest {
 				.contentType(MediaType.APPLICATION_JSON).param("sentUserId", Integer.toString(sentUserId)))
 				.andExpect(status().isInternalServerError());
 	}
+	
+	@Test
+	public void refuseFriendRequestFail2() throws Exception {
+		int sentUserId = 2;
+
+		when(friendService.refuseFriendRequest(anyInt(), anyInt())).thenThrow(new CustomException(HttpStatus.NOT_FOUND, ""));
+
+		mockMvc.perform(post("/friend/refuse-request").header("Authorization", "Bearer dummyToken")
+				.contentType(MediaType.APPLICATION_JSON).param("sentUserId", Integer.toString(sentUserId)))
+				.andExpect(status().isNotFound());
+	}
 
 	@Test
 	public void removeFriendSuccess() throws Exception {
@@ -170,6 +218,17 @@ public class FriendControllerTest {
 		mockMvc.perform(post("/friend/remove-friend").header("Authorization", "Bearer dummyToken")
 				.contentType(MediaType.APPLICATION_JSON).param("friendUserId", Integer.toString(friendUserId)))
 				.andExpect(status().isInternalServerError());
+	}
+	
+	@Test
+	public void removeFriendFail2() throws Exception {
+		int friendUserId = 2;
+
+		when(friendService.unfriend(anyInt(), anyInt())).thenThrow(new CustomException(HttpStatus.NOT_FOUND, ""));
+
+		mockMvc.perform(post("/friend/remove-friend").header("Authorization", "Bearer dummyToken")
+				.contentType(MediaType.APPLICATION_JSON).param("friendUserId", Integer.toString(friendUserId)))
+				.andExpect(status().isNotFound());
 	}
 
 	@Test
@@ -228,5 +287,16 @@ public class FriendControllerTest {
 		mockMvc.perform(post("/friend/remove-friend-request").header("Authorization", "Bearer dummyToken")
 				.contentType(MediaType.APPLICATION_JSON).param("recievedUserId", Integer.toString(recievedUserId)))
 				.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	public void removeFriendRequestFail2() throws Exception {
+		int recievedUserId = 2;
+
+		when(friendService.removeFriendRequest(anyInt(), anyInt())).thenThrow(new CustomException(HttpStatus.NOT_FOUND, ""));
+
+		mockMvc.perform(post("/friend/remove-friend-request").header("Authorization", "Bearer dummyToken")
+				.contentType(MediaType.APPLICATION_JSON).param("recievedUserId", Integer.toString(recievedUserId)))
+				.andExpect(status().isNotFound());
 	}
 }

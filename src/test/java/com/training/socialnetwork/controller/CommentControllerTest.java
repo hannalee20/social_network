@@ -19,6 +19,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -31,6 +32,7 @@ import com.training.socialnetwork.dto.response.comment.CommentDetailResponseDto;
 import com.training.socialnetwork.dto.response.comment.CommentUpdateResponseDto;
 import com.training.socialnetwork.security.JwtUtils;
 import com.training.socialnetwork.service.ICommentService;
+import com.training.socialnetwork.util.exception.CustomException;
 import com.training.socialnetwork.util.mapper.ObjectMapperUtils;
 import com.training.socialnetwork.utils.JSonHelper;
 
@@ -102,6 +104,22 @@ public class CommentControllerTest {
 				.contentType(MediaType.APPLICATION_JSON).content(request))
 				.andExpect(status().isInternalServerError());
 	}
+	
+	@Test
+	public void createCommentFail2() throws Exception {
+		CommentCreateRequestDto commentCreateDto = new CommentCreateRequestDto();
+		commentCreateDto.setPostId(1);
+		commentCreateDto.setContent("create content");
+		commentCreateDto.setPhotoId(1);
+
+		when(commentService.createComment(anyInt(), any())).thenThrow(new CustomException(HttpStatus.NOT_FOUND, ""));
+
+		String request = JSonHelper.toJson(commentCreateDto).orElse("");
+
+		mockMvc.perform(post("/comment/create").header("Authorization", "Bearer dummyToken")
+				.contentType(MediaType.APPLICATION_JSON).content(request))
+				.andExpect(status().isNotFound());
+	}
 
 	@Test
 	public void deleteCommentSuccess() throws Exception {
@@ -123,6 +141,17 @@ public class CommentControllerTest {
 		mockMvc.perform(delete("/comment/{commentId}", commentId).header("Authorization", "Bearer dummyToken")
 				.contentType(MediaType.APPLICATION_JSON).param("commentId", Integer.toString(commentId)))
 				.andExpect(status().isInternalServerError());
+	}
+	
+	@Test
+	public void deleteCommentFail2() throws Exception {
+		int commentId = 1;
+
+		when(commentService.deleteComment(anyInt(), anyInt())).thenThrow(new CustomException(HttpStatus.NOT_FOUND, ""));
+
+		mockMvc.perform(delete("/comment/{commentId}", commentId).header("Authorization", "Bearer dummyToken")
+				.contentType(MediaType.APPLICATION_JSON).param("commentId", Integer.toString(commentId)))
+				.andExpect(status().isNotFound());
 	}
 
 	@Test
@@ -166,6 +195,23 @@ public class CommentControllerTest {
 				.header("Authorization", "Bearer dummyToken").contentType(MediaType.APPLICATION_JSON)
 				.content(request)).andExpect(status().isInternalServerError());
 	}
+	
+	@Test
+	public void updateCommentFail2() throws Exception {
+		String content = "update content";
+
+		CommentUpdateRequestDto commentUpdateDto = new CommentUpdateRequestDto();
+		commentUpdateDto.setContent(content);
+		commentUpdateDto.setPhotoId(1);
+		
+		String request = JSonHelper.toJson(commentUpdateDto).orElse("");
+		
+		when(commentService.updateComment(any(), anyInt(), anyInt())).thenThrow(new CustomException(HttpStatus.NOT_FOUND, ""));
+
+		mockMvc.perform(put("/comment/update/{commentId}", 1)
+				.header("Authorization", "Bearer dummyToken").contentType(MediaType.APPLICATION_JSON)
+				.content(request)).andExpect(status().isNotFound());
+	}
 
 	@Test
 	public void getCommentDetailSuccess() throws Exception {
@@ -195,5 +241,19 @@ public class CommentControllerTest {
 
 		mockMvc.perform(get("/comment/detail/{commentId}", 1).header("Authorization", "Bearer dummyToken")
 				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isInternalServerError());
+	}
+	
+	@Test
+	public void getCommentDetailFail2() throws Exception {
+		CommentDetailResponseDto commentDetailDto = new CommentDetailResponseDto();
+		commentDetailDto.setContent("comment content");
+		commentDetailDto.setCommentId(1);
+		commentDetailDto.setUserId(1);
+		commentDetailDto.setPostId(1);
+
+		when(commentService.getCommentDetail(anyInt())).thenThrow(new CustomException(HttpStatus.NOT_FOUND, ""));
+
+		mockMvc.perform(get("/comment/detail/{commentId}", 1).header("Authorization", "Bearer dummyToken")
+				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNotFound());
 	}
 }

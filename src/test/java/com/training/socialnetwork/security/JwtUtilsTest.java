@@ -34,4 +34,5 @@ public class JwtUtilsTest {
         assertNotNull(jwt);
         assertEquals("your_jwt_token_string", jwt);
     }
+    
 }
