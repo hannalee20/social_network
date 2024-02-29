@@ -14,13 +14,13 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
 	@Query(value = "" + 
 			"select * from users as u " + 
-			"where username = :username " + 
+			"where lower(username) = lower(:username) " + 
 			"or email = :email", nativeQuery = true)
 	User findByUsernameOrEmail(String username, String email);
 	
 	@Query(value = "" + 
 			"select * from users as u " + 
-			"where username = :username ", nativeQuery = true)
+			"where lower(username) = lower(:username) ", nativeQuery = true)
 	User findByUsername(String username);
 	
 	User findByEmail(String email);

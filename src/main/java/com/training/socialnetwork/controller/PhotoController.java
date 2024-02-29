@@ -101,10 +101,10 @@ public class PhotoController {
 
 	@GetMapping(value = "/all-photos")
 	public ResponseEntity<Object> getPhotoList(HttpServletRequest request,
-			@RequestParam(defaultValue = Constant.STRING_0, required = false) int page,
+			@RequestParam(defaultValue = Constant.STRING_1, required = false) int page,
 			@RequestParam(defaultValue = Constant.STRING_5, required = false) int pageSize) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
-		Pageable paging = PageRequest.of(page, pageSize);
+		Pageable paging = PageRequest.of(page - 1, pageSize);
 
 		try {
 			Map<String, Object> result = photoService.getPhotoList(userId, paging);

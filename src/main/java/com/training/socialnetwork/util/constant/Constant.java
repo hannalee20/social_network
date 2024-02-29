@@ -34,6 +34,8 @@ public class Constant {
 	
 	public static final String STRING_0 = "0";
 	
+	public static final String STRING_1 = "1";
+	
 	public static final String STRING_5 = "5";
 	
 	public static final int NUMBER_0 = 0;

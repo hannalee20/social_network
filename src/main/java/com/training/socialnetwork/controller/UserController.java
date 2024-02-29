@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -68,7 +69,7 @@ public class UserController {
 
 	@Autowired
 	private OtpUtils otpUtils;
-	
+
 	@Autowired
 	private ObjectMapperUtils objectMapper;
 
@@ -98,7 +99,7 @@ public class UserController {
 			boolean checkLogin = userService.loginUser(userLoginDto.getUsername(), userLoginDto.getPassword());
 
 			if (checkLogin) {
-				int otp = otpUtils.generateOtp(userLoginDto.getUsername());
+				int otp = otpUtils.generateOtp(userLoginDto.getUsername().toLowerCase());
 				return ResponseEntity.ok(new UserLoginResponseDto(String.valueOf(otp)));
 			} else {
 				MessageResponseDto result = new MessageResponseDto();
@@ -121,22 +122,33 @@ public class UserController {
 
 	@PostMapping(value = "/token")
 	public ResponseEntity<Object> getToken(@RequestBody UserGetTokenRequestDto userTokenDto) {
-		Authentication authentication = authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(userTokenDto.getUsername(), userTokenDto.getPassword()));
-		SecurityContextHolder.getContext().setAuthentication(authentication);
+		Authentication authentication;
+		try {
+			authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+					userTokenDto.getUsername().toLowerCase(), userTokenDto.getPassword()));
+		} catch (BadCredentialsException e) {
+			MessageResponseDto result = new MessageResponseDto();
+			result.setMessage(Constant.INVALID_USERNAME_OR_PASSWORD);
 
+			return new ResponseEntity<Object>(result, HttpStatus.BAD_REQUEST);
+		}
+
+		SecurityContextHolder.getContext().setAuthentication(authentication);
 		int otpFromCache = 0;
 
 		if (userTokenDto.getOtp() >= 0) {
-			otpFromCache = otpUtils.getOtp(userTokenDto.getUsername());
+			otpFromCache = otpUtils.getOtp(userTokenDto.getUsername().toLowerCase());
 		}
 
-		if (otpFromCache > 0 && otpFromCache == userTokenDto.getOtp() && authentication != null) {
+		if (otpFromCache > 0 && otpFromCache == userTokenDto.getOtp()) {
 			otpUtils.clearOtp(userTokenDto.getUsername());
 			String jwt = jwtUtils.generateToken(authentication);
 			return ResponseEntity.ok(new UserGetTokenResponseDto(jwt));
 		} else {
-			return new ResponseEntity<Object>(Constant.INVALID_OTP, HttpStatus.BAD_REQUEST);
+			MessageResponseDto result = new MessageResponseDto();
+			result.setMessage(Constant.INVALID_OTP);
+
+			return new ResponseEntity<Object>(result, HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -209,10 +221,10 @@ public class UserController {
 	@GetMapping(value = "/search")
 	public ResponseEntity<Object> searchUser(HttpServletRequest request,
 			@RequestParam(value = "keyword") String keyword,
-			@RequestParam(defaultValue = Constant.STRING_0, required = false) int page,
+			@RequestParam(defaultValue = Constant.STRING_1, required = false) int page,
 			@RequestParam(defaultValue = Constant.STRING_5, required = false) int pageSize) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
-		Pageable paging = PageRequest.of(page, pageSize);
+		Pageable paging = PageRequest.of(page - 1, pageSize);
 
 		try {
 			Map<String, Object> result = userService.searchUser(userId, keyword, paging);
@@ -244,7 +256,7 @@ public class UserController {
 
 			ReportGenerator reportGenerator = new ReportGenerator(user);
 			ByteArrayOutputStream outputStream = reportGenerator.export();
-			
+
 			return ResponseEntity.ok().contentType(MediaType.APPLICATION_OCTET_STREAM)
 					.header(HttpHeaders.CONTENT_DISPOSITION, headerValue).body(outputStream.toByteArray());
 		} catch (Exception e) {

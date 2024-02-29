@@ -2,14 +2,12 @@ package com.training.socialnetwork.service;
 
 import java.util.Map;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.training.socialnetwork.dto.request.post.PostCreateRequestDto;
 import com.training.socialnetwork.dto.request.post.PostUpdateRequestDto;
 import com.training.socialnetwork.dto.response.post.PostCreateResponseDto;
 import com.training.socialnetwork.dto.response.post.PostDetailResponseDto;
-import com.training.socialnetwork.dto.response.post.PostListResponseDto;
 import com.training.socialnetwork.dto.response.post.PostUpdateResponseDto;
 
 public interface IPostService {

@@ -121,7 +121,7 @@ public class UserControllerTest {
 		
 		UserGetTokenRequestDto userTokenDto = new UserGetTokenRequestDto();
 		userTokenDto.setUsername("test");
-		userTokenDto.setPassword("123456");
+//		userTokenDto.setPassword("123456");
 		userTokenDto.setOtp(123456);
 		
 		String request = JSonHelper.toJson(userTokenDto).orElse("");
@@ -130,7 +130,7 @@ public class UserControllerTest {
 		when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(new UsernamePasswordAuthenticationToken("test", "123456"));
 				
 		when(otpUtils.getOtp("test")).thenReturn(123456);
-		when(jwtUtils.generateToken(any(Authentication.class))).thenReturn(token);
+//		when(jwtUtils.generateToken(any(Authentication.class))).thenReturn(token);
 		MvcResult tokenResult = mockMvc.perform(post("/user/token")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(request))
@@ -266,7 +266,7 @@ public class UserControllerTest {
     public void getTokenFail() throws Exception {
 		UserGetTokenRequestDto userTokenDto = new UserGetTokenRequestDto();
 		userTokenDto.setUsername("test");
-		userTokenDto.setPassword("123456");
+//		userTokenDto.setPassword("123456");
 		userTokenDto.setOtp(123456);
 		
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(null);

@@ -94,7 +94,7 @@ public class UserService implements IUserService {
 			throw new CustomException(HttpStatus.BAD_REQUEST, "Username already exists");
 		}
 		User user = new User();
-		user.setUsername(userRegisterDto.getUsername());
+		user.setUsername(userRegisterDto.getUsername().toLowerCase());
 		user.setPassword(bCryptPasswordEncoder.encode(userRegisterDto.getPassword()));
 		user.setEmail(userRegisterDto.getEmail());
 		Role role = roleRepository.findByName(Constant.ROLE_USER);

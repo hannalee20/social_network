@@ -33,10 +33,10 @@ public class FriendController {
 
 	@GetMapping(value = "/all-friends")
 	public ResponseEntity<Object> getFriendList(HttpServletRequest request,
-			@RequestParam(defaultValue = Constant.STRING_0, required = false) int page,
+			@RequestParam(defaultValue = Constant.STRING_1, required = false) int page,
 			@RequestParam(defaultValue = Constant.STRING_5, required = false) int pageSize) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
-		Pageable paging = PageRequest.of(page, pageSize);
+		Pageable paging = PageRequest.of(page - 1, pageSize);
 		try {
 			Map<String, Object> result = friendService.findAllFriendWithStatus(userId, paging);
 
@@ -145,10 +145,10 @@ public class FriendController {
 
 	@GetMapping(value = "all-friend-request")
 	public ResponseEntity<Object> getFriendRequestList(HttpServletRequest request,
-			@RequestParam(defaultValue = Constant.STRING_0, required = false) int page,
+			@RequestParam(defaultValue = Constant.STRING_1, required = false) int page,
 			@RequestParam(defaultValue = Constant.STRING_5, required = false) int pageSize) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
-		Pageable paging = PageRequest.of(page, pageSize);
+		Pageable paging = PageRequest.of(page - 1, pageSize);
 
 		try {
 			Map<String, Object> result = friendService.findAllAddFriendRequest(userId, paging);
