@@ -18,7 +18,6 @@ public class CommentCreateRequestDto implements Serializable {
 	private int postId;
 
 	@Schema(type = "string", example = " ")
-	@NotBlank(message = Constant.INVALID)
 	private String content;
 
 	private Integer photoId;

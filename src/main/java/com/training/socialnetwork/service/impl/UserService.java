@@ -46,7 +46,7 @@ import com.training.socialnetwork.repository.UserRepository;
 import com.training.socialnetwork.service.IUserService;
 import com.training.socialnetwork.util.constant.Constant;
 import com.training.socialnetwork.util.exception.CustomException;
-import com.training.socialnetwork.util.mapper.ObjectMapperUtils;
+import com.training.socialnetwork.util.mapper.ObjectUtils;
 
 @Service
 @Transactional
@@ -80,7 +80,7 @@ public class UserService implements IUserService {
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 
 	@Autowired
-	private ObjectMapperUtils objectMapper;
+	private ObjectUtils objectUtils;
 
 	private static final long EXPIRE_TOKEN = 30;
 
@@ -166,7 +166,7 @@ public class UserService implements IUserService {
 			photo.setAvatar(Constant.NUMBER_1);
 			avatar = photoRepository.save(photo);
 		}
-		objectMapper.copyProperties(updateRequestDto, userToUpdate);
+		objectUtils.copyProperties(updateRequestDto, userToUpdate);
 		if (null != updateRequestDto.getBirthDate()) {
 			try {
 				SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");

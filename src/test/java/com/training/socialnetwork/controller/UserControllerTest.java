@@ -59,7 +59,7 @@ import com.training.socialnetwork.service.impl.CustomUserDetailService;
 import com.training.socialnetwork.service.impl.UserService;
 import com.training.socialnetwork.util.constant.Constant;
 import com.training.socialnetwork.util.exception.CustomException;
-import com.training.socialnetwork.util.mapper.ObjectMapperUtils;
+import com.training.socialnetwork.util.mapper.ObjectUtils;
 import com.training.socialnetwork.utils.JSonHelper;
 
 @WebMvcTest(UserController.class)
@@ -91,7 +91,7 @@ public class UserControllerTest {
 	private OtpUtils otpUtils;
 	
 	@MockBean
-	private ObjectMapperUtils objectMapper;
+	private ObjectUtils objectUtils;
 
 	@MockBean
 	private UserService userService;

@@ -1,5 +1,6 @@
 package com.training.socialnetwork.util.mapper;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
@@ -12,7 +13,7 @@ import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ObjectMapperUtils {
+public class ObjectUtils {
 
 	public void copyProperties(Object source, Object destination) {
 		BeanUtils.copyProperties(source, destination, getNullPropertyNames(source));
@@ -35,16 +36,24 @@ public class ObjectMapperUtils {
 	    Arrays.stream(obj.getClass().getDeclaredFields()).map(f -> {
 	        f.setAccessible(true);
 	        try {
-	            if (Objects.equals(f.get(obj), "")) {
-	                f.set(obj, null);
-	            }else if(Objects.equals(f.get(obj), 0)) {
+	            if (Objects.equals(f.get(obj), "") || Objects.equals(f.get(obj), 0) || Objects.equals(f.get(obj), Arrays.asList(0))) {
 	                f.set(obj, null);
 	            }
 	        } catch (IllegalArgumentException | IllegalAccessException e) {
-	            
+	            return null;
 	        }
 	        return f;
 	    }).collect(Collectors.toList());
 	    return obj;
+	}
+	
+	public boolean checkNull(Object obj) throws IllegalAccessException {
+		for (Field f : obj.getClass().getDeclaredFields()) {
+			f.setAccessible(true);
+	        if (f.get(obj) != null) {
+	        	return false;
+	        }
+		}
+	    return true; 
 	}
 }

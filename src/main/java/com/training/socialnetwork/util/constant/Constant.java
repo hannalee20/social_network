@@ -83,4 +83,6 @@ public class Constant {
 	public static final String UNLIKED = "Unliked";
 	
 	public static final String FILE_NOT_FOUND = "File not found";
+	
+	public static final String ENTER_AT_LEAST_ONE_FIELD = "Enter at least one field";
 }

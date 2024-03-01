@@ -29,6 +29,7 @@ import com.training.socialnetwork.security.JwtUtils;
 import com.training.socialnetwork.service.IPostService;
 import com.training.socialnetwork.util.constant.Constant;
 import com.training.socialnetwork.util.exception.CustomException;
+import com.training.socialnetwork.util.mapper.ObjectUtils;
 
 @RestController
 @RequestMapping(value = "/post")
@@ -36,6 +37,9 @@ public class PostController {
 
 	@Autowired
 	private IPostService postService;
+	
+	@Autowired
+	private ObjectUtils objectUtils;
 
 	@Autowired
 	private JwtUtils jwtUtils;
@@ -43,20 +47,24 @@ public class PostController {
 	@PostMapping(value = "/create")
 	public ResponseEntity<Object> createPost(HttpServletRequest request, @RequestBody PostCreateRequestDto postCreateDto) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
+		MessageResponseDto errorResult = new MessageResponseDto();
 		try {
-			PostCreateResponseDto result = postService.createPost(userId, postCreateDto);
+			PostCreateRequestDto requestDto = (PostCreateRequestDto) objectUtils.getDefaulter(postCreateDto);
+			if (objectUtils.checkNull(requestDto)) {
+				errorResult.setMessage(Constant.ENTER_AT_LEAST_ONE_FIELD);
+				return new ResponseEntity<Object>(errorResult, HttpStatus.BAD_REQUEST);
+			}
+			PostCreateResponseDto result = postService.createPost(userId, requestDto);
 
 			return new ResponseEntity<Object>(result, HttpStatus.CREATED);
 		} catch (CustomException e) {
-			MessageResponseDto result = new MessageResponseDto();
-			result.setMessage(e.getMessage());
+			errorResult.setMessage(e.getMessage());
 			
-			return new ResponseEntity<Object>(result, e.getHttpStatus());
+			return new ResponseEntity<Object>(errorResult, e.getHttpStatus());
 		} catch (Exception e) {
-			MessageResponseDto result = new MessageResponseDto();
-			result.setMessage(e.getMessage());
+			errorResult.setMessage(e.getMessage());
 			
-			return new ResponseEntity<Object>(result, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<Object>(errorResult, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -95,28 +103,30 @@ public class PostController {
 			
 			return new ResponseEntity<Object>(result, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-
 	}
 
 	@PutMapping(value = "/update/{postId}")
 	public ResponseEntity<Object> updatePost(HttpServletRequest request, @PathVariable(value = "postId") int postId, @RequestBody PostUpdateRequestDto postUpdateDto) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
+		MessageResponseDto errorResult = new MessageResponseDto();
 		try {
+			PostUpdateRequestDto requestDto = (PostUpdateRequestDto) objectUtils.getDefaulter(postUpdateDto);
+			if (objectUtils.checkNull(requestDto)) {
+				errorResult.setMessage(Constant.ENTER_AT_LEAST_ONE_FIELD);
+				return new ResponseEntity<Object>(errorResult, HttpStatus.BAD_REQUEST);
+			}
 			PostUpdateResponseDto result = postService.updatePost(postUpdateDto, postId, userId);
 
 			return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (CustomException e) {
-			MessageResponseDto result = new MessageResponseDto();
-			result.setMessage(e.getMessage());
+			errorResult.setMessage(e.getMessage());
 			
-			return new ResponseEntity<Object>(result, e.getHttpStatus());
+			return new ResponseEntity<Object>(errorResult, e.getHttpStatus());
 		} catch (Exception e) {
-			MessageResponseDto result = new MessageResponseDto();
-			result.setMessage(e.getMessage());
+			errorResult.setMessage(e.getMessage());
 			
-			return new ResponseEntity<Object>(result, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<Object>(errorResult, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-
 	}
 
 	@DeleteMapping(value = "/{postId}")

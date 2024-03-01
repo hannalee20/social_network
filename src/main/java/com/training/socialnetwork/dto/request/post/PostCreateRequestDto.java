@@ -1,13 +1,10 @@
 package com.training.socialnetwork.dto.request.post;
 
-import java.io.Serializable;
 import java.util.List;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-public class PostCreateRequestDto implements Serializable{
-
-	private static final long serialVersionUID = 1L;
+public class PostCreateRequestDto {
 	
 	@Schema(type = "string", example = " ")
 	private String content;

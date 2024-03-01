@@ -48,7 +48,7 @@ import com.training.socialnetwork.service.impl.UserService;
 import com.training.socialnetwork.util.constant.Constant;
 import com.training.socialnetwork.util.exception.CustomException;
 import com.training.socialnetwork.util.image.ImageUtils;
-import com.training.socialnetwork.util.mapper.ObjectMapperUtils;
+import com.training.socialnetwork.util.mapper.ObjectUtils;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -57,7 +57,7 @@ public class UserServiceTest {
 	private UserService userService;
 	
 	@Mock
-	private ObjectMapperUtils objectMapper;
+	private ObjectUtils objectUtils;
 	
 	@Mock
 	private ModelMapper modelMapper;
@@ -227,7 +227,7 @@ public class UserServiceTest {
 		avatar.setUser(userToUpdate);
 		
 		when(userRepository.findById(1)).thenReturn(Optional.of(userToUpdate));
-		objectMapper.copyProperties(userUpdateDto, userToUpdate);
+		objectUtils.copyProperties(userUpdateDto, userToUpdate);
 		when(photoRepository.findAvatarByUserId(anyInt())).thenReturn(avatar);
 		when(userRepository.save(any())).thenReturn(userToUpdate);
 		when(modelMapper.map(any(), any())).thenReturn(userUpdatedDto);

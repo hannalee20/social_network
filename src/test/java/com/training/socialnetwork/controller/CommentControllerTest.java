@@ -33,7 +33,7 @@ import com.training.socialnetwork.dto.response.comment.CommentUpdateResponseDto;
 import com.training.socialnetwork.security.JwtUtils;
 import com.training.socialnetwork.service.ICommentService;
 import com.training.socialnetwork.util.exception.CustomException;
-import com.training.socialnetwork.util.mapper.ObjectMapperUtils;
+import com.training.socialnetwork.util.mapper.ObjectUtils;
 import com.training.socialnetwork.utils.JSonHelper;
 
 @WebMvcTest(CommentController.class)
@@ -53,7 +53,7 @@ public class CommentControllerTest {
     private JwtUtils jwtUtils;
 	
 	@MockBean
-	private ObjectMapperUtils objectMapper;
+	private ObjectUtils objectUtils;
 
     @BeforeAll
 	void setUp() throws Exception {

@@ -6,16 +6,16 @@ import org.springframework.beans.BeanUtils;
 
 import com.training.socialnetwork.dto.request.user.UserUpdateRequestDto;
 import com.training.socialnetwork.entity.User;
-import com.training.socialnetwork.util.mapper.ObjectMapperUtils;
+import com.training.socialnetwork.util.mapper.ObjectUtils;
 
-public class ObjectMapperUtilsTest {
+public class ObjectUtilsTest {
 
 	@InjectMocks
-    private ObjectMapperUtils objectMapperUtils;
+    private ObjectUtils objectUtils;
 	
 	@Test
     public void copyPropertiesTest() {
-		ObjectMapperUtils objectMapper = new ObjectMapperUtils();
+		ObjectUtils objectMapper = new ObjectUtils();
         UserUpdateRequestDto userUpdateDto = new UserUpdateRequestDto();
         User userToUpdate = new User();
         
@@ -26,7 +26,7 @@ public class ObjectMapperUtilsTest {
 
     @Test
     public void getNullPropertyNamesTest() {
-    	ObjectMapperUtils objectMapper = new ObjectMapperUtils();
+    	ObjectUtils objectMapper = new ObjectUtils();
     	UserUpdateRequestDto userUpdateDto = new UserUpdateRequestDto();
         
         objectMapper.getNullPropertyNames(userUpdateDto);
@@ -34,11 +34,11 @@ public class ObjectMapperUtilsTest {
     
     @Test
     public void testGetDefaulterWithEmptyString() {
-        objectMapperUtils = new ObjectMapperUtils();
+    	objectUtils = new ObjectUtils();
         User user = new User();
         user.setUsername("");
         user.setUserId(0);
         
-        objectMapperUtils.getDefaulter(user);
+        objectUtils.getDefaulter(user);
     }
 }

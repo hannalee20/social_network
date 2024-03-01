@@ -52,7 +52,7 @@ import com.training.socialnetwork.service.IUserService;
 import com.training.socialnetwork.util.constant.Constant;
 import com.training.socialnetwork.util.exception.CustomException;
 import com.training.socialnetwork.util.generator.ReportGenerator;
-import com.training.socialnetwork.util.mapper.ObjectMapperUtils;
+import com.training.socialnetwork.util.mapper.ObjectUtils;
 
 @RestController
 @RequestMapping(value = "/user")
@@ -71,7 +71,7 @@ public class UserController {
 	private OtpUtils otpUtils;
 
 	@Autowired
-	private ObjectMapperUtils objectMapper;
+	private ObjectUtils objectUtils;
 
 	@PostMapping(value = "/register")
 	public ResponseEntity<Object> registerUser(@RequestBody UserRegisterRequestDto userRegisterDto) {
@@ -156,23 +156,25 @@ public class UserController {
 	public ResponseEntity<Object> updateUser(HttpServletRequest request, @PathVariable(value = "userId") int userId,
 			@RequestBody(required = false) @Valid UserUpdateRequestDto userUpdateDto) {
 		int loggedInUserId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
+		MessageResponseDto errorResult = new MessageResponseDto();
 		try {
-			UserUpdateRequestDto requestDto = (UserUpdateRequestDto) objectMapper.getDefaulter(userUpdateDto);
+			UserUpdateRequestDto requestDto = (UserUpdateRequestDto) objectUtils.getDefaulter(userUpdateDto);
+			if (objectUtils.checkNull(requestDto)) {
+				errorResult.setMessage(Constant.ENTER_AT_LEAST_ONE_FIELD);
+				return new ResponseEntity<Object>(errorResult, HttpStatus.BAD_REQUEST);
+			}
 			UserUpdateResponseDto result = userService.updateInfo(requestDto, userId, loggedInUserId);
 
 			return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (CustomException e) {
-			MessageResponseDto result = new MessageResponseDto();
-			result.setMessage(e.getMessage());
-
-			return new ResponseEntity<Object>(result, e.getHttpStatus());
+			errorResult.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(errorResult, e.getHttpStatus());
 		} catch (Exception e) {
-			MessageResponseDto result = new MessageResponseDto();
-			result.setMessage(e.getMessage());
-
-			return new ResponseEntity<Object>(result, HttpStatus.INTERNAL_SERVER_ERROR);
+			errorResult.setMessage(e.getMessage());
+			
+			return new ResponseEntity<Object>(errorResult, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-
 	}
 
 	@GetMapping(value = "/detail/{userId}")
@@ -193,7 +195,6 @@ public class UserController {
 
 			return new ResponseEntity<Object>(result, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-
 	}
 
 	@GetMapping(value = "/detail")
@@ -215,7 +216,6 @@ public class UserController {
 
 			return new ResponseEntity<Object>(result, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-
 	}
 
 	@GetMapping(value = "/search")
@@ -284,7 +284,6 @@ public class UserController {
 
 			return new ResponseEntity<Object>(result, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-
 	}
 
 	@PutMapping(value = "/reset-password")
@@ -305,7 +304,6 @@ public class UserController {
 
 			return new ResponseEntity<Object>(result, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-
 	}
 
 }
