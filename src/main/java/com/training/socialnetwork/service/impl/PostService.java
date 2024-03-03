@@ -205,6 +205,7 @@ public class PostService implements IPostService {
 		}
 		
 		List<Integer> photoIdList = new ArrayList<>();
+		List<Photo> photoList = new ArrayList<>();
 		if(null != postUpdateDto.getPhotoIdList()) {
 			for (int photoId : postUpdateDto.getPhotoIdList()) {
 				Photo photo = photoRepository.findById(photoId).orElse(null);
@@ -217,7 +218,9 @@ public class PostService implements IPostService {
 				}
 				photo.getPostList().add(postToUpdate);
 				photoRepository.save(photo);
+				photoList.add(photo);
 			}
+			postToUpdate.setPhotoList(photoList);
 		}
 		postToUpdate.setUpdateDate(new Date());
 		postToUpdate = postRepository.save(postToUpdate);

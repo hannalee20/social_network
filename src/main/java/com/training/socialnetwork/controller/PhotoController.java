@@ -40,7 +40,7 @@ public class PhotoController {
 	private IPhotoService photoService;
 
 	@PostMapping(value = "/upload", consumes = { "multipart/form-data" })
-	public ResponseEntity<Object> uploadPhoto(HttpServletRequest request, @RequestParam(value = "image", required = false) MultipartFile photo) {
+	public ResponseEntity<Object> uploadPhoto(HttpServletRequest request, @RequestParam(value = "photo") MultipartFile photo) {
 		int userId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
 		try {
 			PhotoUploadResponseDto result = photoService.uploadPhoto(photo, userId);

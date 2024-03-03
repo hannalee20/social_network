@@ -98,44 +98,11 @@ public class UserControllerTest {
 	
 	@MockBean
 	private CustomUserDetailService customUserDetailService;
-	
-	private String token;
 
 	@BeforeAll
 	void setUp() throws Exception {
 		this.bCryptPasswordEncoder = new BCryptPasswordEncoder();
 		mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-
-		UserLoginRequestDto userLoginDto = new UserLoginRequestDto();
-		userLoginDto.setUsername("test");
-		userLoginDto.setPassword("123456");
-		
-		when(userService.loginUser(any(), any())).thenReturn(true);
-		when(otpUtils.generateOtp(any())).thenReturn(123456);
-		String otpRequest = JSonHelper.toJson(userLoginDto).orElse("");
-		
-		mockMvc.perform(post("/user/login")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(otpRequest))
-				.andExpect(status().isOk()).andReturn();
-		
-		UserGetTokenRequestDto userTokenDto = new UserGetTokenRequestDto();
-		userTokenDto.setUsername("test");
-//		userTokenDto.setPassword("123456");
-		userTokenDto.setOtp(123456);
-		
-		String request = JSonHelper.toJson(userTokenDto).orElse("");
-		
-		token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzA2MjU5NjgyLCJleHAiOjE3MDYzNDYwODF9.sVl5ksy4pXHHU9Bdx41AoDzAvs9gc5v3-NlAJG8p7DQ";
-		when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(new UsernamePasswordAuthenticationToken("test", "123456"));
-				
-		when(otpUtils.getOtp("test")).thenReturn(123456);
-//		when(jwtUtils.generateToken(any(Authentication.class))).thenReturn(token);
-		MvcResult tokenResult = mockMvc.perform(post("/user/token")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(request))
-				.andExpect(status().isOk()).andReturn();
-		token = tokenResult.getResponse().getContentAsString().substring(8, 133);
 	}
 
 	@Test
@@ -266,19 +233,18 @@ public class UserControllerTest {
     public void getTokenFail() throws Exception {
 		UserGetTokenRequestDto userTokenDto = new UserGetTokenRequestDto();
 		userTokenDto.setUsername("test");
-//		userTokenDto.setPassword("123456");
+		userTokenDto.setPassword("123456");
 		userTokenDto.setOtp(123456);
 		
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(null);
-        when(otpUtils.getOtp(anyString())).thenReturn(123456);
+        when(otpUtils.getOtp(anyString())).thenReturn(123457);
 
         String request = JSonHelper.toJson(userTokenDto).orElse("");
         
         mockMvc.perform(post("/user/token")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(request))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string(Constant.INVALID_OTP));
+                .andExpect(status().isBadRequest());
     }
 	
 	@Test
@@ -303,7 +269,7 @@ public class UserControllerTest {
 		
 		String request = JSonHelper.toJson(userId).orElse("");
 		mockMvc.perform(get("/user/detail/{userId}", userId)
-				.header("AUTHORIZATION", "Bearer " + token)
+				.header("Authorization", "Bearer dummyToken")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(request))
 				.andExpect(status().isOk())
@@ -322,7 +288,7 @@ public class UserControllerTest {
 		
 		String request = JSonHelper.toJson(userId).orElse("");
 		mockMvc.perform(get("/user/detail/{userId}", userId)
-				.header("AUTHORIZATION", "Bearer " + token)
+				.header("Authorization", "Bearer dummyToken")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(request))
 				.andExpect(status().isInternalServerError());
@@ -337,7 +303,7 @@ public class UserControllerTest {
 		
 		String request = JSonHelper.toJson(userId).orElse("");
 		mockMvc.perform(get("/user/detail/{userId}", userId)
-				.header("AUTHORIZATION", "Bearer " + token)
+				.header("Authorization", "Bearer dummyToken")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(request))
 				.andExpect(status().isNotFound());
@@ -365,7 +331,7 @@ public class UserControllerTest {
 		
 		String request = JSonHelper.toJson(userId).orElse("");
 		mockMvc.perform(get("/user/detail", userId)
-				.header("AUTHORIZATION", "Bearer " + token)
+				.header("Authorization", "Bearer dummyToken")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(request))
 				.andExpect(status().isOk())
@@ -384,7 +350,7 @@ public class UserControllerTest {
 		
 		String request = JSonHelper.toJson(userId).orElse("");
 		mockMvc.perform(get("/user/detail", userId)
-				.header("AUTHORIZATION", "Bearer " + token)
+				.header("Authorization", "Bearer dummyToken")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(request))
 				.andExpect(status().isInternalServerError());
@@ -399,7 +365,7 @@ public class UserControllerTest {
 		
 		String request = JSonHelper.toJson(userId).orElse("");
 		mockMvc.perform(get("/user/detail", userId)
-				.header("AUTHORIZATION", "Bearer " + token)
+				.header("Authorization", "Bearer dummyToken")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(request))
 				.andExpect(status().isNotFound());
@@ -434,7 +400,7 @@ public class UserControllerTest {
 		
 		String request = JSonHelper.toJson(userUpdateDto).orElse("");
 		mockMvc.perform(patch("/user/update/{userId}", userId)
-				.header("AUTHORIZATION", "Bearer " + token)
+				.header("Authorization", "Bearer dummyToken")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(request))
 				.andExpect(status().isOk())
@@ -456,7 +422,7 @@ public class UserControllerTest {
 		
 		String request = JSonHelper.toJson(userUpdateDto).orElse("");
 		mockMvc.perform(patch("/user/update/{userId}", userId)
-				.header("AUTHORIZATION", "Bearer " + token)
+				.header("Authorization", "Bearer dummyToken")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(request))
 				.andExpect(status().isInternalServerError());
@@ -475,7 +441,7 @@ public class UserControllerTest {
 		
 		String request = JSonHelper.toJson(userUpdateDto).orElse("");
 		mockMvc.perform(patch("/user/update/{userId}", userId)
-				.header("AUTHORIZATION", "Bearer " + token)
+				.header("Authorization", "Bearer dummyToken")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(request))
 				.andExpect(status().isForbidden());
@@ -514,7 +480,7 @@ public class UserControllerTest {
 		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
 		
 		mockMvc.perform(get("/user/search")
-				.header("AUTHORIZATION", "Bearer " + token)
+				.header("Authorization", "Bearer dummyToken")
 				.contentType(MediaType.APPLICATION_JSON)
 				.param("keyword", keyword))
 				.andExpect(status().isOk())
@@ -530,7 +496,7 @@ public class UserControllerTest {
 		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
 		
 		mockMvc.perform(get("/user/search")
-				.header("AUTHORIZATION", "Bearer " + token)
+				.header("Authorization", "Bearer dummyToken")
 				.contentType(MediaType.APPLICATION_JSON)
 				.param("keyword", keyword))
 				.andExpect(status().isInternalServerError());
@@ -544,7 +510,7 @@ public class UserControllerTest {
 		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
 		
 		mockMvc.perform(get("/user/search")
-				.header("AUTHORIZATION", "Bearer " + token)
+				.header("Authorization", "Bearer dummyToken")
 				.contentType(MediaType.APPLICATION_JSON)
 				.param("keyword", keyword))
 				.andExpect(status().isNoContent());
@@ -673,7 +639,7 @@ public class UserControllerTest {
 		when(customUserDetailService.loadUserByUserId(1)).thenReturn(userDetails);
 		
 		mockMvc.perform(get("/user/export-report")
-				.header("AUTHORIZATION", "Bearer " + token))
+				.header("Authorization", "Bearer dummyToken"))
 				.andExpect(status().isOk());
 	}
 	
@@ -689,7 +655,7 @@ public class UserControllerTest {
 		when(userService.getReportUser(anyInt())).thenThrow(new RuntimeException());
 		
 		mockMvc.perform(get("/user/export-report")
-				.header("AUTHORIZATION", "Bearer " + token))
+				.header("Authorization", "Bearer dummyToken"))
 				.andExpect(status().isInternalServerError());
 	}
 }

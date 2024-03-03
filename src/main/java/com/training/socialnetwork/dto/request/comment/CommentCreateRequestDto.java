@@ -1,7 +1,5 @@
 package com.training.socialnetwork.dto.request.comment;
 
-import java.io.Serializable;
-
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
@@ -9,9 +7,7 @@ import com.training.socialnetwork.util.constant.Constant;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-public class CommentCreateRequestDto implements Serializable {
-
-	private static final long serialVersionUID = 1L;
+public class CommentCreateRequestDto {
 
 	@NotBlank
 	@Pattern(regexp = "^[0-9]*$", message = Constant.INVALID)

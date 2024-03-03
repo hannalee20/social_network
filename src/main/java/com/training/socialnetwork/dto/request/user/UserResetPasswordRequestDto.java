@@ -1,7 +1,5 @@
 package com.training.socialnetwork.dto.request.user;
 
-import java.io.Serializable;
-
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -10,9 +8,7 @@ import com.training.socialnetwork.util.constant.Constant;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-public class UserResetPasswordRequestDto implements Serializable {
-
-	private static final long serialVersionUID = 1L;
+public class UserResetPasswordRequestDto {
 
 	@Schema(type = "string", example = " ")
 	@NotBlank

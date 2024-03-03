@@ -38,6 +38,7 @@ import com.training.socialnetwork.dto.response.post.PostUpdateResponseDto;
 import com.training.socialnetwork.security.JwtUtils;
 import com.training.socialnetwork.service.IPostService;
 import com.training.socialnetwork.util.exception.CustomException;
+import com.training.socialnetwork.util.mapper.ObjectUtils;
 import com.training.socialnetwork.utils.JSonHelper;
 
 @WebMvcTest(PostController.class)
@@ -53,6 +54,9 @@ public class PostControllerTest {
 	@MockBean
 	private IPostService postService;
 
+	@MockBean
+	private ObjectUtils objectUtils;
+	
 	@MockBean
 	private JwtUtils jwtUtils;
 

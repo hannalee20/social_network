@@ -65,7 +65,7 @@ public class PhotoControllerTest {
 	@Test
 	public void uploadPhotoSuccess() throws Exception {
 		int userId = 1;
-		MockMultipartFile photo1 = new MockMultipartFile("data1", "filename1.jpg", "multipart/form-data",
+		MockMultipartFile photo1 = new MockMultipartFile("photo", "filename1.jpg", "multipart/form-data",
 				"some xml".getBytes());
 
 		PhotoUploadResponseDto photoUploadResponseDto = new PhotoUploadResponseDto();
@@ -82,7 +82,7 @@ public class PhotoControllerTest {
 
 	@Test
 	public void uploadPhotoFail() throws Exception {
-		MockMultipartFile photo1 = new MockMultipartFile("data1", "filename1.jpg", "multipart/form-data",
+		MockMultipartFile photo1 = new MockMultipartFile("photo", "filename1.jpg", "multipart/form-data",
 				"some xml".getBytes());
 
 		PhotoUploadResponseDto photoUploadResponseDto = new PhotoUploadResponseDto();

@@ -1,19 +1,12 @@
 package com.training.socialnetwork.dto.request.user;
 
-import java.io.Serializable;
-
 import javax.validation.constraints.Pattern;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.training.socialnetwork.util.constant.Constant;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@JsonInclude(Include.NON_NULL)
-public class UserUpdateRequestDto implements Serializable {
-
-	private static final long serialVersionUID = 1L;
+public class UserUpdateRequestDto {
 
 	@Schema(type = "string", example = " ")
 	@Pattern(regexp = "^$|^[a-zA-Z]{2,}(?: [a-zA-Z]+){0,2}$", message = Constant.INVALID_REAL_NAME)
