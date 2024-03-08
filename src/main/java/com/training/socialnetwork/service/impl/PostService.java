@@ -200,8 +200,8 @@ public class PostService implements IPostService {
 			throw new CustomException(HttpStatus.FORBIDDEN, "You do not have permission to update");
 		}
 		
-		if(null != postToUpdate.getContent()) {
-			postToUpdate.setContent(postToUpdate.getContent());
+		if(null != postUpdateDto.getContent()) {
+			postToUpdate.setContent(postUpdateDto.getContent());
 		}
 		
 		List<Integer> photoIdList = new ArrayList<>();
