@@ -83,20 +83,20 @@ public class FriendService implements IFriendService {
 	}
 
 	@Override
-	public int createFriendRequest(int sentUserId, int recievedUserId) throws Exception {
+	public int createFriendRequest(int sentUserId, int receivedUserId) throws Exception {
 		User sentUser = userRepository.findById(sentUserId).orElse(null);
-		User recievedUser = userRepository.findById(recievedUserId).orElse(null);
+		User receivedUser = userRepository.findById(receivedUserId).orElse(null);
 
-		if (recievedUser == null) {
+		if (receivedUser == null) {
 			throw new CustomException(HttpStatus.NOT_FOUND, "User does not exist");
 		}
 
-		Friend friend = friendRepository.findFriendBySentUserAndReceivedUser(sentUserId, recievedUserId);
+		Friend friend = friendRepository.findFriendBySentUserAndReceivedUser(sentUserId, receivedUserId);
 
 		if (friend == null) {
 			friend = new Friend();
 			friend.setSentUser(sentUser);
-			friend.setReceivedUser(recievedUser);
+			friend.setReceivedUser(receivedUser);
 			friend.setStatus(Constant.FRIEND_REQUEST);
 		} else {
 			if (friend.getStatus() == Constant.NUMBER_0 && friend.getSentUser().getUserId() == sentUserId) {
@@ -117,14 +117,14 @@ public class FriendService implements IFriendService {
 	}
 
 	@Override
-	public boolean acceptFriendRequest(int sentUserId, int recievedUserId) throws Exception {
+	public boolean acceptFriendRequest(int sentUserId, int receivedUserId) throws Exception {
 		User sentUser = userRepository.findById(sentUserId).orElse(null);
 
 		if (sentUser == null) {
 			throw new CustomException(HttpStatus.NOT_FOUND, "User does not exist");
 		}
 
-		Friend friend = friendRepository.findFriendRequestByUserId(sentUserId, recievedUserId);
+		Friend friend = friendRepository.findFriendRequestByUserId(sentUserId, receivedUserId);
 
 		if (friend == null) {
 			throw new CustomException(HttpStatus.NOT_FOUND, "Friend request does not exist");
@@ -137,14 +137,14 @@ public class FriendService implements IFriendService {
 	}
 
 	@Override
-	public boolean refuseFriendRequest(int sentUserId, int recievedUserId) {
+	public boolean refuseFriendRequest(int sentUserId, int receivedUserId) {
 		User sentUser = userRepository.findById(sentUserId).orElse(null);
 
 		if (sentUser == null) {
 			throw new CustomException(HttpStatus.NOT_FOUND, "User does not exist");
 		}
 
-		Friend friend = friendRepository.findFriendRequestByUserId(sentUserId, recievedUserId);
+		Friend friend = friendRepository.findFriendRequestByUserId(sentUserId, receivedUserId);
 
 		if (friend == null) {
 			throw new CustomException(HttpStatus.NOT_FOUND, "Friend request does not exist");
@@ -207,14 +207,14 @@ public class FriendService implements IFriendService {
 	}
 
 	@Override
-	public boolean removeFriendRequest(int sentUserId, int recievedUserId) throws Exception {
+	public boolean removeFriendRequest(int sentUserId, int receivedUserId) throws Exception {
 		User sentUser = userRepository.findById(sentUserId).orElse(null);
 
 		if (sentUser == null) {
 			throw new CustomException(HttpStatus.NOT_FOUND, "User does not exist");
 		}
 
-		Friend friend = friendRepository.findFriendRequestByUserId(sentUserId, recievedUserId);
+		Friend friend = friendRepository.findFriendRequestByUserId(sentUserId, receivedUserId);
 
 		if (friend == null) {
 			throw new CustomException(HttpStatus.NOT_FOUND, "Friend request does not exist");

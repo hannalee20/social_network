@@ -10,7 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -50,7 +49,7 @@ public class FriendController {
 
 	}
 
-	@PostMapping(value = "/add-request")
+	@GetMapping(value = "/add-request")
 	public ResponseEntity<Object> createFriendRequest(HttpServletRequest request,
 			@RequestParam(value = "recievedUserId") int recievedUserId) throws Exception {
 		int sentUserId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
@@ -77,7 +76,7 @@ public class FriendController {
 
 	}
 
-	@PostMapping(value = "/accept-request")
+	@GetMapping(value = "/accept-request")
 	public ResponseEntity<Object> acceptFriendRequest(HttpServletRequest request,
 			@RequestParam(value = "sentUserId") int sentUserId) throws Exception {
 		int recievedUserId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
@@ -99,7 +98,7 @@ public class FriendController {
 
 	}
 
-	@PostMapping(value = "/refuse-request")
+	@GetMapping(value = "/refuse-request")
 	public ResponseEntity<Object> refuseFriendRequest(HttpServletRequest request,
 			@RequestParam(value = "sentUserId") int sentUserId) throws Exception {
 		int recievedUserId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
@@ -121,7 +120,7 @@ public class FriendController {
 
 	}
 
-	@PostMapping(value = "remove-friend")
+	@GetMapping(value = "remove-friend")
 	public ResponseEntity<Object> removeFriend(HttpServletRequest request,
 			@RequestParam(value = "friendUserId") int friendUserId) throws Exception {
 		int loggedInUserId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));
@@ -162,7 +161,7 @@ public class FriendController {
 		}
 	}
 
-	@PostMapping(value = "remove-friend-request")
+	@GetMapping(value = "remove-friend-request")
 	public ResponseEntity<Object> removeFriendRequest(HttpServletRequest request,
 			@RequestParam(value = "recievedUserId") int recievedUserId) throws Exception {
 		int sentUserId = jwtUtils.getUserIdFromJwt(jwtUtils.getJwt(request));

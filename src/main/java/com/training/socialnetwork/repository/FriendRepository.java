@@ -34,23 +34,23 @@ public interface FriendRepository extends JpaRepository<Friend, Integer> {
 			Pageable paging);
 
 	@Query(value = "" + "select * from friends as f "
-			+ "where (f.sent_user_id = :sentUserId and f.received_user_id = :recievedUserId) "
-			+ "or (f.sent_user_id = :recievedUserId and f.received_user_id = :sentUserId) ", nativeQuery = true)
+			+ "where (f.sent_user_id = :sentUserId and f.received_user_id = :receivedUserId) "
+			+ "or (f.sent_user_id = :receivedUserId and f.received_user_id = :sentUserId) ", nativeQuery = true)
 	Friend findFriendBySentUserAndReceivedUser(@Param(value = "sentUserId") int sentUserId,
-			@Param(value = "recievedUserId") int recievedUserId);
+			@Param(value = "receivedUserId") int receivedUserId);
 
 	@Query(value = "" + "select * from friends as f "
-			+ "where ((f.sent_user_id = :sentUserId and f.received_user_id = :recievedUserId) "
-			+ "or (f.sent_user_id = :recievedUserId and f.received_user_id = :sentUserId)) "
+			+ "where ((f.sent_user_id = :sentUserId and f.received_user_id = :receivedUserId) "
+			+ "or (f.sent_user_id = :receivedUserId and f.received_user_id = :sentUserId)) "
 			+ "and f.status = :status ", nativeQuery = true)
 	Friend findFriendByUserIdAndStatus(@Param(value = "sentUserId") int sentUserId,
-			@Param(value = "recievedUserId") int recievedUserId, @Param(value = "status") int status);
+			@Param(value = "receivedUserId") int receivedUserId, @Param(value = "status") int status);
 
 	@Query(value = "" + "select * from friends as f "
-			+ "where f.sent_user_id = :sentUserId and f.received_user_id = :recievedUserId "
+			+ "where f.sent_user_id = :sentUserId and f.received_user_id = :receivedUserId "
 			+ "and f.status = 0 ", nativeQuery = true)
 	Friend findFriendRequestByUserId(@Param(value = "sentUserId") int sentUserId,
-			@Param(value = "recievedUserId") int recievedUserId);
+			@Param(value = "receivedUserId") int receivedUserId);
 
 	@Query(value = "" + "select * from friends as f " + "where f.sent_user_id = :userId "
 			+ "or f.received_user_id = :userId ", nativeQuery = true)
